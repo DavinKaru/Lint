@@ -19,9 +19,15 @@ There are no accounts, no settings screens, and no network calls, everything hap
 and nothing about the link or your activity ever leaves the phone.
 
 ## Status
-Android prototype in progress. iOS, Windows, and macOS support are planned but not yet started.
+Android prototype in progress. iOS support is planned but not yet started.
 
-## Contributin
+## Repo layout
+The project is organized to support multiple platforms from the start — see `ARCHITECTURE.md`
+for the full explanation. In short: each platform lives in its own self-contained directory
+under `/platforms`, and anything genuinely shared across platforms (like the tracking-parameter
+rule catalog) lives under `/shared`.
+
+## Contributing
 Contribution guidelines will go here once the project is far enough along to support outside
 contributions. In the meantime, feel free to open an issue with ideas or bug reports.
 

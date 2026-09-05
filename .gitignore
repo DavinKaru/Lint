@@ -33,14 +33,6 @@ out/
 # VS Code
 .vscode/
 
-# macOS
-.DS_Store
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
 # Misc
 *.bak
 *.tmp
