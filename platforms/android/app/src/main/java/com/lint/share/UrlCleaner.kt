@@ -11,16 +11,40 @@ object UrlCleaner {
     private val URL_REGEX = Regex("""https?://[^\s]+""")
 
     private val EXACT_TRACKING_PARAMS = setOf(
+        // Original set
         "fbclid", "gclid", "gclsrc", "dclid", "gbraid", "wbraid", "msclkid",
         "igshid", "igsh", "twclid", "ttclid", "yclid",
         "vero_id", "vero_conv",
         "mc_cid", "mc_eid",
         "mkt_tok", "_hsenc", "_hsmi",
         "ref", "ref_src", "si", "cid", "epik",
+        // Google (Ads/Analytics/Shopping)
+        "aqs", "cd", "ei", "iflsig", "pcampaignid", "rlz", "srsltid", "sxsrf", "uact", "ved",
+        "_ga", "_gl",
+        // Meta/Facebook
+        "comment_tracking", "eav", "eid", "mibextid", "__tn__",
+        // Snapchat
+        "ScCid",
+        // Reddit
+        "correlation_id", "rdt", "ref_campaign", "ref_source", "share_id",
+        // LinkedIn
+        "refId", "trackingId", "trk",
+        // Amazon
+        "ascsubtag", "camp", "creative", "dchild", "qid", "refRID", "smid", "spIA", "srs",
+        // HubSpot / marketing
+        "__hsfp", "__hssc", "__hstc",
+        // Twitter/X
+        "__twitter_impression",
+        // Matomo/Piwik legacy exact params (not a blanket "pk_*"/"piwik_*" prefix — those are too
+        // generic and collide with ordinary app query params like "?pk_id=42")
+        "pk_campaign", "pk_kwd", "pk_keyword", "pk_medium", "pk_source", "pk_content", "pk_cid",
+        "piwik_campaign", "piwik_kwd",
     )
 
+    private val TRACKING_PREFIXES = listOf("utm_", "mtm_")
+
     private fun isTrackingParam(name: String): Boolean {
-        return name.startsWith("utm_") || name in EXACT_TRACKING_PARAMS
+        return TRACKING_PREFIXES.any { name.startsWith(it) } || name in EXACT_TRACKING_PARAMS
     }
 
     /**

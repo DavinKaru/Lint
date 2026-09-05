@@ -41,4 +41,16 @@ class UrlCleanerTest {
         val expected = "Check this out: https://example.com/page?keep=1 thanks!"
         assertEquals(expected, UrlCleaner.cleanFirstUrl(input))
     }
+
+    @Test
+    fun `strips google shopping srsltid param`() {
+        val input = "https://global.gullylabs.com/?srsltid=AfmBOorKICbL9x5psNN1MHBeoHeSkEY2KBQTU71NgfpNuIpFXeSN8lQW"
+        assertEquals("https://global.gullylabs.com/", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `strips matomo mtm prefixed params`() {
+        val input = "https://example.com/article?mtm_campaign=launch&mtm_source=newsletter&keep=1"
+        assertEquals("https://example.com/article?keep=1", UrlCleaner.cleanUrl(input))
+    }
 }
