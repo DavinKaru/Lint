@@ -1,0 +1,46 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+!gradle-wrapper.properties
+
+# Android
+*.apk
+*.aar
+*.ap_
+*.aab
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+*.keystore
+*.jks
+
+# Kotlin / Java
+*.class
+*.log
+hs_err_pid*
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.navigation/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Misc
+*.bak
+*.tmp
