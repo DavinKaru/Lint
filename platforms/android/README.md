@@ -10,6 +10,8 @@ The current prototype is a share-sheet-only app with no UI and no launcher icon 
 
 For known short links (`amzn.to`/`amzn.asia`/`a.co`, `youtu.be`, `t.co`) specifically, `ShortLinkResolver` first follows the redirect (a direct, headers-only, on-device request to that provider — see [`/PRIVACY.md`](../../PRIVACY.md)) to find the full destination URL, since some tracking params only appear after that redirect. This resolve step runs on a background thread with a ~3s total budget; any failure or timeout falls back to the original short link unchanged. Every other link skips this entirely and stays fully synchronous/offline, exactly as before.
 
+Since that resolve step involves a short network wait, `ShareActivity` shows a small loading view (`res/layout/activity_resolving.xml`, a spinner and text) only for that path, so the user isn't left wondering if anything's happening. The instant offline path shows nothing at all, same as before.
+
 **Known limitation — Amazon:** as of this writing, Amazon's servers block this resolution request
 outright (a `404` with an empty body, confirmed on `amzn.asia` and `a.co` from real devices,
 likely TLS/protocol-level bot detection rather than anything about the request's headers/content).

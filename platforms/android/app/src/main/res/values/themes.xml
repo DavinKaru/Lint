@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        ShareActivity needs a Material3 theme (LoadingIndicator checks for one internally
+        and throws otherwise), but must stay invisible when no content view is set, since the
+        offline path never calls setContentView, so the window must show nothing.
+    -->
+    <style name="Theme.Lint.Trampoline" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>
