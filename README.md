@@ -11,10 +11,10 @@ Lint has no visible UI beyond the OS share sheet:
 3. Lint strips known tracking parameters from the URL.
 4. The OS share sheet reopens with the cleaned link, ready to send wherever you originally intended.
 
-There are no accounts, no settings screens, and no network calls, everything happens on-device, and nothing about the link or your activity ever leaves the phone.
+There are no accounts and no settings screens. Almost everything happens fully offline, and on-device. The one exception is short links (currently only supporting three explicit Amazon links: `amzn.to`/`amzn.asia`/`a.co`), which need a direct, on-device, headers-only request to Amazon to find the destination URL before it can be cleaned. See [`PRIVACY.md`](PRIVACY.md) for exactly what that involves and why it's safe.
 
 ## Status
-Android has a working prototype, released as v0.1.0 (see [`platforms/android/README.md`](platforms/android/README.md)) for details on how it works, building, and installing.
+Android has a working prototype, released as v0.1.0 (see [`platforms/android/README.md`](platforms/android/README.md) for details on how it works, building, and installing).
 
 iOS support is planned but not yet started.
 

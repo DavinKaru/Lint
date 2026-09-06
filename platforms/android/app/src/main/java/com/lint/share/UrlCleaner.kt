@@ -47,13 +47,22 @@ object UrlCleaner {
         return TRACKING_PREFIXES.any { name.startsWith(it) } || name in EXACT_TRACKING_PARAMS
     }
 
+    /** The first http(s) URL found in some text, and where it sits within that text. */
+    data class UrlMatch(val range: IntRange, val url: String)
+
+    /** Returns the first http(s) URL found in [text] along with its range, or null if none is present. */
+    fun findFirstUrl(text: String): UrlMatch? {
+        val match = URL_REGEX.find(text) ?: return null
+        return UrlMatch(match.range, match.value)
+    }
+
     /**
      * Finds the first http(s) URL in [text] and returns [text] with that URL's tracking
      * query parameters removed. If no URL is found, returns [text] unchanged.
      */
     fun cleanFirstUrl(text: String): String {
-        val match = URL_REGEX.find(text) ?: return text
-        val cleaned = cleanUrl(match.value) ?: return text
+        val match = findFirstUrl(text) ?: return text
+        val cleaned = cleanUrl(match.url) ?: return text
         return text.replaceRange(match.range, cleaned)
     }
 
