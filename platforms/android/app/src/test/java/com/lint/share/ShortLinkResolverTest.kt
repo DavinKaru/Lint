@@ -13,6 +13,8 @@ class ShortLinkResolverTest {
         val fetcher = ShortLinkResolver.HopFetcher { url ->
             when (url) {
                 "https://a.co/d/abc123" -> HopResponse(301, "https://www.amazon.com/dp/B000000000")
+                // Terminal fetch confirming the resolved URL doesn't redirect further.
+                "https://www.amazon.com/dp/B000000000" -> HopResponse(200, null)
                 else -> throw AssertionError("unexpected url: $url")
             }
         }
@@ -29,6 +31,8 @@ class ShortLinkResolverTest {
                 "https://amzn.to/xyz" -> HopResponse(301, "https://www.amazon.com/gp/1")
                 "https://www.amazon.com/gp/1" -> HopResponse(302, "https://www.amazon.com/gp/2")
                 "https://www.amazon.com/gp/2" -> HopResponse(302, "https://www.amazon.com/dp/B111111111?ref=abc")
+                // Terminal fetch confirming the resolved URL doesn't redirect further.
+                "https://www.amazon.com/dp/B111111111?ref=abc" -> HopResponse(200, null)
                 else -> throw AssertionError("unexpected url: $url")
             }
         }

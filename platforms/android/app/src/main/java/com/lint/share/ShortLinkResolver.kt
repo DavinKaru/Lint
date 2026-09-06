@@ -47,8 +47,10 @@ object ShortLinkResolver {
     /**
      * Pure redirect-following logic. Starting from [startUrl], calls [fetcher] for each hop and
      * follows its Location header (resolved against the previous hop's URL) up to [maxHops]
-     * times. Returns the final resolved URL, or [startUrl] unchanged if any hop fails, returns a
-     * non-3xx response, is missing a Location header, or the hop limit is exceeded.
+     * times. A non-3xx (or Location-less) response ends the chain successfully, returning
+     * whatever URL was reached so far (confirming it doesn't redirect further). Falls back to
+     * [startUrl] unchanged if a hop throws, or if the chain still hasn't terminated after
+     * [maxHops] redirects (an unusually long or looping chain).
      */
     fun followRedirects(startUrl: String, fetcher: HopFetcher, maxHops: Int = MAX_HOPS): String {
         var currentUrl = startUrl
@@ -60,8 +62,11 @@ object ShortLinkResolver {
                 return startUrl
             }
 
-            if (response.responseCode !in 300..399) return startUrl
-            val location = response.locationHeader ?: return startUrl
+            // A non-3xx (or missing Location) response means we've reached the final
+            // destination -- not a failure. currentUrl still equals startUrl if this is the
+            // very first hop, so this correctly covers "never redirected at all" too.
+            if (response.responseCode !in 300..399) return currentUrl
+            val location = response.locationHeader ?: return currentUrl
 
             currentUrl = try {
                 URI(currentUrl).resolve(location).toString()
