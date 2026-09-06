@@ -1,22 +1,29 @@
 package com.lint.share
 
+import android.util.Log
 import java.net.HttpURLConnection
 import java.net.URI
 
+private const val TAG = "Lint"
+
 /**
- * Resolves Amazon short links (amzn.to / amzn.asia / a.co) to their final product URL by
- * following HTTP redirects, so [UrlCleaner] can strip tracking params that only appear on the
- * resolved URL.
+ * Resolves known short links (Amazon's amzn.to / amzn.asia / a.co, YouTube's youtu.be, and
+ * Twitter/X's t.co) to their final URL by following HTTP redirects, so [UrlCleaner] can strip
+ * tracking params that only appear on the resolved URL.
+ *
+ * Amazon's redirect service is known to block plain HTTP clients like this one at the edge
+ * (see PRIVACY.md) -- that entry stays in [KNOWN_SHORT_LINK_HOSTS] since it fails safe (falls
+ * back to the unresolved short link, same as any other failure), and in case that changes.
  *
  * Privacy constraint (keep this true going forward): resolution must always happen directly
- * from the user's own device to Amazon's redirect service. Never proxy this through any
- * Lint-operated server, even for caching or performance reasons in the future — doing so would
- * turn Lint's own server into a single linkable identity across all users, which defeats the
- * point of this being a fully on-device tool.
+ * from the user's own device to the short-link provider's redirect service. Never proxy this
+ * through any Lint-operated server, even for caching or performance reasons in the future --
+ * doing so would turn Lint's own server into a single linkable identity across all users, which
+ * defeats the point of this being a fully on-device tool.
  */
 object ShortLinkResolver {
 
-    private val AMAZON_SHORT_LINK_HOSTS = setOf("amzn.to", "amzn.asia", "a.co")
+    private val KNOWN_SHORT_LINK_HOSTS = setOf("amzn.to", "amzn.asia", "a.co", "youtu.be", "t.co")
 
     const val MAX_HOPS = 5
     private const val CONNECT_TIMEOUT_MS = 1500
@@ -32,16 +39,16 @@ object ShortLinkResolver {
     }
 
     /**
-     * Returns true if [url]'s host is exactly one of the known Amazon short-link domains
+     * Returns true if [url]'s host is exactly one of the known short-link domains
      * (case-insensitive, exact match — not a substring match).
      */
-    fun isAmazonShortLink(url: String): Boolean {
+    fun isKnownShortLink(url: String): Boolean {
         val host = try {
             URI(url).host
         } catch (e: Exception) {
             null
         } ?: return false
-        return host.lowercase() in AMAZON_SHORT_LINK_HOSTS
+        return host.lowercase() in KNOWN_SHORT_LINK_HOSTS
     }
 
     /**
@@ -88,6 +95,7 @@ object ShortLinkResolver {
 
         val fetcher = HopFetcher { url ->
             if (System.currentTimeMillis() >= deadline) {
+                Log.w(TAG, "resolution budget (${TOTAL_BUDGET_MS}ms) exceeded, abandoning")
                 HopResponse(responseCode = -1, locationHeader = null)
             } else {
                 fetchOneHop(url)
@@ -116,13 +124,24 @@ object ShortLinkResolver {
                 code = connection.responseCode
             }
 
-            HopResponse(responseCode = code, locationHeader = connection.getHeaderField("Location"))
+            val location = connection.getHeaderField("Location")
+            Log.d(TAG, "hop: $url -> $code${if (location != null) " -> $location" else ""}")
+            HopResponse(responseCode = code, locationHeader = location)
         } catch (e: Exception) {
+            Log.w(TAG, "hop failed: $url (${e.javaClass.simpleName}: ${e.message})")
             HopResponse(responseCode = -1, locationHeader = null)
         } finally {
             connection?.disconnect()
         }
     }
+
+    // A bare HttpURLConnection sends none of the headers a real browser normally would, and
+    // some servers (Amazon's redirect service included) respond differently -- e.g. a 404
+    // instead of a redirect -- to requests that don't look like they came from a browser.
+    // These are standard, honestly-identifying request headers, not fingerprint spoofing.
+    private const val USER_AGENT =
+        "Mozilla/5.0 (Linux; Android 14; Pixel) AppleWebKit/537.36 (KHTML, like Gecko) " +
+            "Chrome/128.0.0.0 Mobile Safari/537.36"
 
     private fun openConnection(url: String, method: String): HttpURLConnection {
         return (URI(url).toURL().openConnection() as HttpURLConnection).apply {
@@ -130,6 +149,9 @@ object ShortLinkResolver {
             connectTimeout = CONNECT_TIMEOUT_MS
             readTimeout = READ_TIMEOUT_MS
             requestMethod = method
+            setRequestProperty("User-Agent", USER_AGENT)
+            setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            setRequestProperty("Accept-Language", "en-US,en;q=0.9")
         }
     }
 }

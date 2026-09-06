@@ -35,6 +35,11 @@ object UrlCleaner {
         "__hsfp", "__hssc", "__hstc",
         // Twitter/X
         "__twitter_impression",
+        // YouTube: marks that a video link was reached via a youtu.be short link (a referral
+        // signal, same category as ref/ref_src). Somewhat generic as param names go -- flagged
+        // in case an unrelated site ever uses "?feature=" for something unrelated (e.g. a
+        // feature flag) and this turns out to be too broad.
+        "feature",
         // Matomo/Piwik legacy exact params (not a blanket "pk_*"/"piwik_*" prefix — those are too
         // generic and collide with ordinary app query params like "?pk_id=42")
         "pk_campaign", "pk_kwd", "pk_keyword", "pk_medium", "pk_source", "pk_content", "pk_cid",

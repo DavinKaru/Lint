@@ -53,4 +53,10 @@ class UrlCleanerTest {
         val input = "https://example.com/article?mtm_campaign=launch&mtm_source=newsletter&keep=1"
         assertEquals("https://example.com/article?keep=1", UrlCleaner.cleanUrl(input))
     }
+
+    @Test
+    fun `strips youtube feature referral param`() {
+        val input = "https://m.youtube.com/watch?v=jD-3zMQmjTY&feature=youtu.be"
+        assertEquals("https://m.youtube.com/watch?v=jD-3zMQmjTY", UrlCleaner.cleanUrl(input))
+    }
 }

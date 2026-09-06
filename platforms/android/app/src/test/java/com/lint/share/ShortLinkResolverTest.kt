@@ -75,17 +75,21 @@ class ShortLinkResolverTest {
     }
 
     @Test
-    fun `matches all known amazon short link domains`() {
-        assertTrue(ShortLinkResolver.isAmazonShortLink("https://amzn.to/abc123"))
-        assertTrue(ShortLinkResolver.isAmazonShortLink("https://amzn.asia/abc123"))
-        assertTrue(ShortLinkResolver.isAmazonShortLink("https://a.co/d/abc123"))
-        assertTrue(ShortLinkResolver.isAmazonShortLink("https://A.CO/d/abc123"))
+    fun `matches all known short link domains`() {
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://amzn.to/abc123"))
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://amzn.asia/abc123"))
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://a.co/d/abc123"))
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://A.CO/d/abc123"))
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://youtu.be/dQw4w9WgXcQ"))
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://t.co/abc123"))
     }
 
     @Test
-    fun `does not match lookalike or full amazon urls`() {
-        assertFalse(ShortLinkResolver.isAmazonShortLink("https://notamzn.to/abc123"))
-        assertFalse(ShortLinkResolver.isAmazonShortLink("https://a.co.evil.com/abc123"))
-        assertFalse(ShortLinkResolver.isAmazonShortLink("https://www.amazon.com/dp/B000000000"))
+    fun `does not match lookalike or already-full urls`() {
+        assertFalse(ShortLinkResolver.isKnownShortLink("https://notamzn.to/abc123"))
+        assertFalse(ShortLinkResolver.isKnownShortLink("https://a.co.evil.com/abc123"))
+        assertFalse(ShortLinkResolver.isKnownShortLink("https://www.amazon.com/dp/B000000000"))
+        assertFalse(ShortLinkResolver.isKnownShortLink("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
+        assertFalse(ShortLinkResolver.isKnownShortLink("https://twitter.com/user/status/123"))
     }
 }
