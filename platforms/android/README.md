@@ -21,13 +21,26 @@ cd platforms/android
 ./gradlew test            # runs UrlCleanerTest and ShortLinkResolverTest
 ```
 
+### Release builds
+Release builds are minified/shrunk with R8 (`isMinifyEnabled = true`) and signed with a real
+keystore, not the auto-generated debug key. The signing config reads from `keystore.properties`
+at the Gradle root (`platforms/android/keystore.properties`) — a local, gitignored file, never
+committed — which in turn points at a gitignored `.keystore` file. Neither exists in a fresh
+checkout; generate them once with `keytool` and point `keystore.properties` at the result
+(`storeFile`, `storePassword`, `keyAlias`, `keyPassword`) before running:
+```
+./gradlew assembleRelease   # -> app/build/outputs/apk/release/app-release.apk
+```
+Without `keystore.properties` present, `assembleRelease` fails fast with a clear error rather than
+silently producing an unsigned APK.
+
 ## Installing
 ```
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb install -r app/build/outputs/apk/debug/app-debug.apk     # debug build
+adb install -r app/build/outputs/apk/release/app-release.apk # release build
 ```
 
 Since there's no launcher icon, you won't see it in the app drawer, but it shows up as an option in the OS share sheet from any app (browser, Messages, etc.) once installed.
 
 ## Status
-Working prototype (debug-signed APK — see [GitHub Releases](https://github.com/DavinKaru/Lint/releases) for the current version). Not yet using a
-proper release signing key.
+Working prototype (see [GitHub Releases](https://github.com/DavinKaru/Lint/releases) for the current version), now built and signed as a proper release (R8-minified, real signing key) rather than a debug-signed APK.
