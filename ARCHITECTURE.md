@@ -35,3 +35,19 @@ LICENSE
 - **Placeholders** (`/platforms/ios`) exist purely so the directory structure doesn't need to
   change shape later — adding a platform means filling in an existing folder, not restructuring
   the repo.
+
+## Releases
+
+Each platform is versioned and released independently, even for releases intended to ship the
+same feature set "in tandem" — Android (`versionCode`/`versionName`) and iOS
+(`CFBundleVersion`/`CFBundleShortVersionString`) are separate store-facing mechanisms with their
+own review/rollout timelines, and forcing a single shared release moment across both is fragile
+(e.g. an App Store rejection shouldn't block or get entangled with an Android release).
+
+Git tags and GitHub Releases are scoped per platform with a prefix: `android-v0.1.0`,
+`ios-v0.1.0`, etc. The semver number itself is still chosen to reflect feature parity where it
+exists (e.g. both platforms' `v0.1.0` ship the same feature set), but each platform's tag,
+release notes, and rollout are independent — never a single bare `v0.1.0` tag covering both.
+
+The existing `v0.1.0` tag predates this convention (it was Android's only release, before iOS
+was a real consideration) and is left as-is rather than retroactively renamed.

@@ -1,5 +1,5 @@
 # Lint
-[![GitHub release](https://img.shields.io/github/v/release/DavinKaru/Lint)](https://github.com/DavinKaru/Lint/releases)
+[![Android release](https://img.shields.io/github/v/tag/DavinKaru/Lint?filter=android-*&label=android)](https://github.com/DavinKaru/Lint/releases)
 
 A share-sheet-only mobile utility that strips tracking parameters from URLs when you share them.
 
