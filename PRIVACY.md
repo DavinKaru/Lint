@@ -3,7 +3,7 @@
 Lint's baseline behavior is fully offline: cleaning a shared URL never involves the network at
 all. There is one deliberate, narrow exception.
 
-## Short links (`amzn.to`, `amzn.asia`, `a.co`, `youtu.be`, `t.co`)
+## Short links (`amzn.to`, `amzn.asia`, `a.co`, `youtu.be`, `t.co`, `fb.watch`)
 
 Some tracking parameters only appear after a short link redirects to its full destination — the
 short link itself carries none. To clean those, Lint needs to know the destination first. When a
@@ -12,8 +12,8 @@ shared link's host is exactly one of the domains above:
 - Lint makes a direct, on-device HTTP request from your phone straight to that provider's
   redirect service, asking only for headers (a `HEAD` request, falling back to `GET` without
   reading the body if a server rejects `HEAD`) — no page content is ever downloaded.
-- This request goes straight from your device to the provider (Amazon, YouTube, or X/Twitter,
-  depending on the domain). No Lint-operated server is involved, and none ever will be for this
+- This request goes straight from your device to the provider (Amazon, YouTube, X/Twitter, or
+  Facebook, depending on the domain). No Lint-operated server is involved, and none ever will be for this
   feature (routing it through a Lint server, even just for caching or performance, would turn
   that server into a single point that could see every user's links, which defeats the purpose
   of an otherwise fully on-device tool).
@@ -36,8 +36,8 @@ other resolution failure. That code path stays in place in case Amazon's behavio
 
 **`youtu.be` confirmed working:** unlike Amazon, YouTube's redirect chain (`youtu.be` →
 `youtube.com` → `m.youtube.com`) resolves successfully with this same plain, headers-only
-request — no blocking observed. `t.co` was added at the same time but not yet confirmed either
-way — see the main [`README.md`](README.md) for current status.
+request — no blocking observed. `t.co` and `fb.watch` were added later but not yet confirmed
+either way — see the main [`README.md`](README.md) for current status.
 
 Every other link Lint handles — everything that isn't one of the domains above — stays fully
 offline, exactly as described in the main [`README.md`](README.md).

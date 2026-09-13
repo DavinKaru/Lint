@@ -7,9 +7,9 @@ import java.net.URI
 private const val TAG = "Lint"
 
 /**
- * Resolves known short links (Amazon's amzn.to / amzn.asia / a.co, YouTube's youtu.be, and
- * Twitter/X's t.co) to their final URL by following HTTP redirects, so [UrlCleaner] can strip
- * tracking params that only appear on the resolved URL.
+ * Resolves known short links (Amazon's amzn.to / amzn.asia / a.co, YouTube's youtu.be,
+ * Twitter/X's t.co, and Facebook's fb.watch) to their final URL by following HTTP redirects, so
+ * [UrlCleaner] can strip tracking params that only appear on the resolved URL.
  *
  * Amazon's redirect service is known to block plain HTTP clients like this one at the edge
  * (see PRIVACY.md) -- that entry stays in [KNOWN_SHORT_LINK_HOSTS] since it fails safe (falls
@@ -23,7 +23,8 @@ private const val TAG = "Lint"
  */
 object ShortLinkResolver {
 
-    private val KNOWN_SHORT_LINK_HOSTS = setOf("amzn.to", "amzn.asia", "a.co", "youtu.be", "t.co")
+    private val KNOWN_SHORT_LINK_HOSTS =
+        setOf("amzn.to", "amzn.asia", "a.co", "youtu.be", "t.co", "fb.watch")
 
     const val MAX_HOPS = 5
     private const val CONNECT_TIMEOUT_MS = 1500

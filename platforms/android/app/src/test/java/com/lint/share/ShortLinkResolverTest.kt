@@ -82,6 +82,7 @@ class ShortLinkResolverTest {
         assertTrue(ShortLinkResolver.isKnownShortLink("https://A.CO/d/abc123"))
         assertTrue(ShortLinkResolver.isKnownShortLink("https://youtu.be/dQw4w9WgXcQ"))
         assertTrue(ShortLinkResolver.isKnownShortLink("https://t.co/abc123"))
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://fb.watch/abc123"))
     }
 
     @Test
@@ -91,5 +92,22 @@ class ShortLinkResolverTest {
         assertFalse(ShortLinkResolver.isKnownShortLink("https://www.amazon.com/dp/B000000000"))
         assertFalse(ShortLinkResolver.isKnownShortLink("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
         assertFalse(ShortLinkResolver.isKnownShortLink("https://twitter.com/user/status/123"))
+        assertFalse(ShortLinkResolver.isKnownShortLink("https://www.facebook.com/watch/?v=123"))
+    }
+
+    @Test
+    fun `resolves a facebook fb-watch redirect`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://fb.watch/abc123" -> HopResponse(301, "https://www.facebook.com/watch/?v=1234567890")
+                // Terminal fetch confirming the resolved URL doesn't redirect further.
+                "https://www.facebook.com/watch/?v=1234567890" -> HopResponse(200, null)
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        val result = ShortLinkResolver.followRedirects("https://fb.watch/abc123", fetcher)
+
+        assertEquals("https://www.facebook.com/watch/?v=1234567890", result)
     }
 }
