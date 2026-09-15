@@ -22,6 +22,8 @@ which is the actual enforcement point.
 | `youtu.be` | YouTube | Confirmed working | Full redirect chain (`youtu.be` → `youtube.com` → `m.youtube.com`) resolves successfully and consistently on a real device, no blocking observed. |
 | `t.co` | X/Twitter | Not yet confirmed | Added alongside `youtu.be`; not yet tested on a real device. |
 | `fb.watch` | Facebook | Not yet confirmed | Added later for Facebook Watch video shares; not yet tested on a real device. |
+| `spoti.fi` | Spotify | Not yet confirmed | Resolves to an `open.spotify.com` link carrying a `si` tracking token; not yet tested on a real device. |
+| `vm.tiktok.com`, `vt.tiktok.com` | TikTok | Not yet confirmed | Resolves to a `tiktok.com/@user/video/…` link carrying several share-tracking params (`is_from_webapp`, `sender_device`, `share_app_id`, etc. — see `UrlCleaner.kt`); not yet tested on a real device. |
 
 ### How resolution works
 
