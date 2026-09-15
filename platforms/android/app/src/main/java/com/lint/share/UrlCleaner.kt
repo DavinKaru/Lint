@@ -44,6 +44,12 @@ object UrlCleaner {
         // generic and collide with ordinary app query params like "?pk_id=42")
         "pk_campaign", "pk_kwd", "pk_keyword", "pk_medium", "pk_source", "pk_content", "pk_cid",
         "piwik_campaign", "piwik_kwd",
+        // TikTok: appended to a video URL once a vm.tiktok.com/vt.tiktok.com share link
+        // resolves, identifying the sharer's device/session and how the link was copied.
+        // "_r" and "_t" are generic-looking param names as far as this list goes (same caveat as
+        // "feature" above) but are part of TikTok's actual share payload.
+        "is_from_webapp", "sender_device", "web_id",
+        "share_app_id", "share_link_id", "share_item_id", "u_code", "_r", "_t",
     )
 
     private val TRACKING_PREFIXES = listOf("utm_", "mtm_")

@@ -83,6 +83,9 @@ class ShortLinkResolverTest {
         assertTrue(ShortLinkResolver.isKnownShortLink("https://youtu.be/dQw4w9WgXcQ"))
         assertTrue(ShortLinkResolver.isKnownShortLink("https://t.co/abc123"))
         assertTrue(ShortLinkResolver.isKnownShortLink("https://fb.watch/abc123"))
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://spoti.fi/abc123"))
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://vm.tiktok.com/abc123"))
+        assertTrue(ShortLinkResolver.isKnownShortLink("https://vt.tiktok.com/abc123"))
     }
 
     @Test
@@ -93,6 +96,8 @@ class ShortLinkResolverTest {
         assertFalse(ShortLinkResolver.isKnownShortLink("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
         assertFalse(ShortLinkResolver.isKnownShortLink("https://twitter.com/user/status/123"))
         assertFalse(ShortLinkResolver.isKnownShortLink("https://www.facebook.com/watch/?v=123"))
+        assertFalse(ShortLinkResolver.isKnownShortLink("https://open.spotify.com/track/abc123"))
+        assertFalse(ShortLinkResolver.isKnownShortLink("https://www.tiktok.com/@user/video/123"))
     }
 
     @Test
@@ -109,5 +114,38 @@ class ShortLinkResolverTest {
         val result = ShortLinkResolver.followRedirects("https://fb.watch/abc123", fetcher)
 
         assertEquals("https://www.facebook.com/watch/?v=1234567890", result)
+    }
+
+    @Test
+    fun `resolves a spotify spoti-fi redirect`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://spoti.fi/abc123" -> HopResponse(301, "https://open.spotify.com/track/1a2b3c?si=xyz789")
+                // Terminal fetch confirming the resolved URL doesn't redirect further.
+                "https://open.spotify.com/track/1a2b3c?si=xyz789" -> HopResponse(200, null)
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        val result = ShortLinkResolver.followRedirects("https://spoti.fi/abc123", fetcher)
+
+        assertEquals("https://open.spotify.com/track/1a2b3c?si=xyz789", result)
+    }
+
+    @Test
+    fun `resolves a tiktok vm-tiktok-com redirect`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://vm.tiktok.com/abc123" ->
+                    HopResponse(301, "https://www.tiktok.com/@user/video/1234567890?is_from_webapp=1&sender_device=pc")
+                // Terminal fetch confirming the resolved URL doesn't redirect further.
+                "https://www.tiktok.com/@user/video/1234567890?is_from_webapp=1&sender_device=pc" -> HopResponse(200, null)
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        val result = ShortLinkResolver.followRedirects("https://vm.tiktok.com/abc123", fetcher)
+
+        assertEquals("https://www.tiktok.com/@user/video/1234567890?is_from_webapp=1&sender_device=pc", result)
     }
 }

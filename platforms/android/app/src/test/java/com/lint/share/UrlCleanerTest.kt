@@ -59,4 +59,18 @@ class UrlCleanerTest {
         val input = "https://m.youtube.com/watch?v=jD-3zMQmjTY&feature=youtu.be"
         assertEquals("https://m.youtube.com/watch?v=jD-3zMQmjTY", UrlCleaner.cleanUrl(input))
     }
+
+    @Test
+    fun `strips spotify si tracking token`() {
+        val input = "https://open.spotify.com/track/1a2b3c?si=xyz789"
+        assertEquals("https://open.spotify.com/track/1a2b3c", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `strips tiktok share tracking params`() {
+        val input = "https://www.tiktok.com/@user/video/1234567890" +
+            "?is_from_webapp=1&sender_device=pc&web_id=42&share_app_id=1233" +
+            "&share_link_id=abc&share_item_id=def&u_code=ghi&_r=1&_t=8abcde"
+        assertEquals("https://www.tiktok.com/@user/video/1234567890", UrlCleaner.cleanUrl(input))
+    }
 }
