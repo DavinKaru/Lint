@@ -31,6 +31,13 @@ hs_err_pid*
 out/
 .navigation/
 
+# Xcode / Swift
+xcuserdata/
+DerivedData/
+.build/
+.swiftpm/
+*.xcuserstate
+
 # VS Code
 .vscode/
 

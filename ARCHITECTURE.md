@@ -1,14 +1,13 @@
 # Architecture
 
-Lint is structured to support multiple platforms from day one, even though only Android is
-actively being built right now.
+Lint is structured to support multiple platforms from day one: Android and iOS today.
 
 ## Layout
 
 ```
 /platforms
-  /android    <- the real, active project
-  /ios        <- placeholder, not started
+  /android    <- Gradle project (Kotlin)
+  /ios        <- Xcode project (Swift)
 /shared
   /rules      <- tracking-parameter rule catalog, shared across platforms
   /docs       <- cross-platform architecture/design notes
@@ -21,8 +20,8 @@ LICENSE
 ## Intent
 
 - **`/platforms/<os>`** — each platform is a self-contained, independently buildable project.
-  Android's Gradle project lives entirely inside `/platforms/android`; a future iOS Xcode
-  project would live entirely inside `/platforms/ios`, and so on. Nothing platform-specific
+  Android's Gradle project lives entirely inside `/platforms/android`; the iOS Xcode project
+  lives entirely inside `/platforms/ios`, and so on. Nothing platform-specific
   leaks outside its own directory.
 
 - **`/shared`** — anything genuinely platform-agnostic lives here instead of being duplicated
@@ -32,9 +31,10 @@ LICENSE
   its own toolchain (bundled asset, generated source, etc.). `/shared/docs` holds design notes
   that apply across platforms rather than to one specific implementation.
 
-- **Placeholders** (`/platforms/ios`) exist purely so the directory structure doesn't need to
-  change shape later — adding a platform means filling in an existing folder, not restructuring
-  the repo.
+- **Until `/shared/rules` exists**, the tracking-parameter lists and short-link domains are
+  hand-copied between `UrlCleaner.kt`/`ShortLinkResolver.kt` (Android) and
+  `UrlCleaner.swift`/`ShortLinkResolver.swift` (iOS). Any change to one must be made to the
+  other in the same PR; each platform's tests are ports of each other, so keep those in step too.
 
 ## Releases
 
