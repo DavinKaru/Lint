@@ -17,7 +17,7 @@ object UrlCleaner {
         "vero_id", "vero_conv",
         "mc_cid", "mc_eid",
         "mkt_tok", "_hsenc", "_hsmi",
-        "ref", "ref_src", "si", "cid", "epik",
+        "ref", "ref_src", "cid", "epik",
         // Google (Ads/Analytics/Shopping)
         "aqs", "cd", "ei", "iflsig", "pcampaignid", "rlz", "srsltid", "sxsrf", "uact", "ved",
         "_ga", "_gl",
@@ -35,21 +35,44 @@ object UrlCleaner {
         "__hsfp", "__hssc", "__hstc",
         // Twitter/X
         "__twitter_impression",
-        // YouTube: marks that a video link was reached via a youtu.be short link (a referral
-        // signal, same category as ref/ref_src). Somewhat generic as param names go -- flagged
-        // in case an unrelated site ever uses "?feature=" for something unrelated (e.g. a
-        // feature flag) and this turns out to be too broad.
-        "feature",
         // Matomo/Piwik legacy exact params (not a blanket "pk_*"/"piwik_*" prefix — those are too
         // generic and collide with ordinary app query params like "?pk_id=42")
         "pk_campaign", "pk_kwd", "pk_keyword", "pk_medium", "pk_source", "pk_content", "pk_cid",
         "piwik_campaign", "piwik_kwd",
     )
 
+    /**
+     * Tracking params that are only stripped on specific sites, because their names are generic
+     * enough that some unrelated site could plausibly rely on them (e.g. "?feature=" as a feature
+     * flag, "?_t=" as a tab or token). Breaking a link is worse than leaving a tracker in, so
+     * anything that isn't unambiguously a tracker goes here rather than in
+     * [EXACT_TRACKING_PARAMS]. Keys match the host itself and any of its subdomains.
+     */
+    private val HOST_SCOPED_TRACKING_PARAMS = mapOf(
+        // YouTube: "feature" marks that a video was reached via a youtu.be short link; "si" is
+        // the per-share token identifying who shared it.
+        "youtube.com" to setOf("feature", "si"),
+        "youtu.be" to setOf("feature", "si"),
+        // Spotify: "si" is the per-share token identifying who shared it.
+        "spotify.com" to setOf("si"),
+        // TikTok: appended to a video URL once a vm.tiktok.com/vt.tiktok.com share link
+        // resolves, identifying the sharer's device/session and how the link was copied.
+        "tiktok.com" to setOf(
+            "is_from_webapp", "sender_device", "web_id",
+            "share_app_id", "share_link_id", "share_item_id", "u_code", "_r", "_t",
+        ),
+    )
+
     private val TRACKING_PREFIXES = listOf("utm_", "mtm_")
 
-    private fun isTrackingParam(name: String): Boolean {
-        return TRACKING_PREFIXES.any { name.startsWith(it) } || name in EXACT_TRACKING_PARAMS
+    private fun isTrackingParam(name: String, host: String?): Boolean {
+        if (TRACKING_PREFIXES.any { name.startsWith(it) } || name in EXACT_TRACKING_PARAMS) {
+            return true
+        }
+        val lowerHost = host?.lowercase() ?: return false
+        return HOST_SCOPED_TRACKING_PARAMS.any { (domain, params) ->
+            (lowerHost == domain || lowerHost.endsWith(".$domain")) && name in params
+        }
     }
 
     /** The first http(s) URL found in some text, and where it sits within that text. */
@@ -88,7 +111,7 @@ object UrlCleaner {
             .filter { it.isNotEmpty() }
             .filter { pair ->
                 val name = pair.substringBefore("=")
-                !isTrackingParam(name)
+                !isTrackingParam(name, uri.host)
             }
 
         val newQuery = keptPairs.joinToString("&")

@@ -59,4 +59,42 @@ class UrlCleanerTest {
         val input = "https://m.youtube.com/watch?v=jD-3zMQmjTY&feature=youtu.be"
         assertEquals("https://m.youtube.com/watch?v=jD-3zMQmjTY", UrlCleaner.cleanUrl(input))
     }
+
+    @Test
+    fun `strips spotify si tracking token`() {
+        val input = "https://open.spotify.com/track/1a2b3c?si=xyz789"
+        assertEquals("https://open.spotify.com/track/1a2b3c", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `strips tiktok share tracking params`() {
+        val input = "https://www.tiktok.com/@user/video/1234567890" +
+            "?is_from_webapp=1&sender_device=pc&web_id=42&share_app_id=1233" +
+            "&share_link_id=abc&share_item_id=def&u_code=ghi&_r=1&_t=8abcde"
+        assertEquals("https://www.tiktok.com/@user/video/1234567890", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `strips youtube si share token`() {
+        val input = "https://youtu.be/jD-3zMQmjTY?si=AbCdEf123"
+        assertEquals("https://youtu.be/jD-3zMQmjTY", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `host-scoped params match subdomains`() {
+        val input = "https://music.youtube.com/watch?v=abc&si=xyz&feature=share"
+        assertEquals("https://music.youtube.com/watch?v=abc", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `preserves host-scoped params on unrelated sites`() {
+        val input = "https://example.com/page?feature=beta&si=1&_t=2&_r=3&web_id=4"
+        assertEquals(input, UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `preserves host-scoped params on lookalike hosts`() {
+        val input = "https://nottiktok.com/page?_t=abc&_r=1"
+        assertEquals(input, UrlCleaner.cleanUrl(input))
+    }
 }
