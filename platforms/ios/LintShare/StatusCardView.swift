@@ -7,17 +7,18 @@ final class StatusCardModel {
     enum Phase: Equatable {
         /// A short link is being resolved over the network.
         case resolving
-        /// The result is on the clipboard. `didClean` is false if there was nothing to strip.
-        case copied(didClean: Bool)
+        /// The link has been cleaned and the share sheet is (re)opening. `didClean` is false if
+        /// there was nothing to strip.
+        case cleaned(didClean: Bool)
     }
 
     /// Nil until the share has been read, so nothing flashes up before there's anything to show.
     var phase: Phase?
 }
 
-/// The small card shown in the share extension's sheet: a spinner while a short link resolves,
-/// then a confirmation once the cleaned link is copied. Liquid Glass on iOS 26+, the standard
-/// system material before that.
+/// The small status card: a spinner while a short link resolves, then a confirmation that the
+/// link was cleaned, which stays behind the re-opened share sheet so the share extension's system
+/// sheet isn't left empty. Liquid Glass on iOS 26+, the standard system material before that.
 struct StatusCardView: View {
     let model: StatusCardModel
 
@@ -29,7 +30,7 @@ struct StatusCardView: View {
                     case .resolving:
                         ProgressView()
                             .controlSize(.large)
-                    case .copied:
+                    case .cleaned:
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 40))
                             .foregroundStyle(.tint)
@@ -41,7 +42,7 @@ struct StatusCardView: View {
                 VStack(spacing: 4) {
                     Text(title(for: phase))
                         .font(.headline)
-                    if case .copied(didClean: false) = phase {
+                    if case .cleaned(didClean: false) = phase {
                         Text("No tracking found")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
@@ -61,8 +62,8 @@ struct StatusCardView: View {
     private func title(for phase: StatusCardModel.Phase) -> String {
         switch phase {
         case .resolving: "Tumbling out the tracking…"
-        case .copied(didClean: true): "Link cleaned and copied"
-        case .copied(didClean: false): "Link copied"
+        case .cleaned(didClean: true): "Link cleaned"
+        case .cleaned(didClean: false): "Link ready to share"
         }
     }
 }
@@ -87,8 +88,8 @@ private struct CardBackground: ViewModifier {
     return StatusCardView(model: model)
 }
 
-#Preview("Copied") {
+#Preview("Cleaned") {
     let model = StatusCardModel()
-    model.phase = .copied(didClean: true)
+    model.phase = .cleaned(didClean: true)
     return StatusCardView(model: model)
 }

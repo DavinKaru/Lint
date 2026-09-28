@@ -1,6 +1,7 @@
 package com.lint.share
 
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -72,7 +73,12 @@ class ShareActivity : Activity() {
             putExtra(Intent.EXTRA_TEXT, text)
         }
 
-        startActivity(Intent.createChooser(sendIntent, null))
+        val chooser = Intent.createChooser(sendIntent, null).apply {
+            // Lint would otherwise offer itself in its own chooser, and picking it would just
+            // clean the already-clean link again.
+            putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ComponentName(this@ShareActivity, ShareActivity::class.java)))
+        }
+        startActivity(chooser)
         finish()
     }
 }

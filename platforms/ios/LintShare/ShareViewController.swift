@@ -6,17 +6,20 @@ import os
 
 private let logger = Logger(subsystem: "com.lint.share", category: "Lint")
 
-/// Share extension entry point: receives a share, cleans the URL inside it, copies the cleaned
-/// result to the clipboard, and briefly confirms that with a small card before closing itself.
+/// Share extension entry point: receives a share, cleans the URL inside it, and re-shares the
+/// cleaned link through a new share sheet -- the same flow as Android. A small status card shows
+/// a spinner while a short link is being resolved, since that involves a short network wait.
 ///
-/// Unlike Android, this doesn't re-share through a second share sheet: iOS always presents a
-/// share extension as a sheet of its own, so re-sharing from inside it leaves an empty sheet
-/// behind the new one (and lists Lint in its own share sheet). Copying is the usual iOS pattern
-/// for link tools instead.
+/// iOS always presents a share extension inside a system sheet, so the card stays up (as "Link
+/// cleaned") behind the re-opened share sheet rather than leaving that sheet empty.
+///
+/// Unlike Android, Lint still lists itself in the share sheet it re-opens: iOS has no way to
+/// exclude a third-party extension from `UIActivityViewController`, and marking the shared item
+/// so Lint's activation rule refuses it also made some other apps (e.g. Reminders) refuse it.
 final class ShareViewController: UIViewController {
 
-    /// What the share contained. A bare URL is copied as a URL (so apps that paste it get a proper
-    /// link); text is copied as text, with only its first URL cleaned.
+    /// What the share contained. A bare URL is re-shared as a URL (so the next app gets a proper
+    /// link preview); text is re-shared as text, with only its first URL cleaned.
     private enum SharedContent {
         case url(URL)
         case text(String)
@@ -28,9 +31,6 @@ final class ShareViewController: UIViewController {
             }
         }
     }
-
-    /// How long the "copied" confirmation stays up before the extension closes itself.
-    private static let confirmationDuration: Duration = .seconds(1.2)
 
     private let cardModel = StatusCardModel()
     private var hasStarted = false
@@ -50,13 +50,11 @@ final class ShareViewController: UIViewController {
             card.view.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
         card.didMove(toParent: self)
-
-        // Tapping anywhere skips the rest of the confirmation.
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissEarly)))
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        // The share sheet can only be presented once this view is on screen.
         guard !hasStarted else { return }
         hasStarted = true
         Task { await handleShare() }
@@ -92,19 +90,16 @@ final class ShareViewController: UIViewController {
             logger.debug("cleaned offline: \(cleanedText)")
         }
 
-        switch content {
-        case .url:
-            copy(url: URL(string: cleanedText), text: cleanedText)
-        case .text:
-            copy(url: nil, text: cleanedText)
+        withAnimation(.snappy) {
+            cardModel.phase = .cleaned(didClean: cleanedText != sharedText)
         }
 
-        let didClean = cleanedText != sharedText
-        withAnimation(.snappy) { cardModel.phase = .copied(didClean: didClean) }
-        UIAccessibility.post(notification: .announcement, argument: didClean ? "Link cleaned and copied" : "Link copied")
-
-        try? await Task.sleep(for: Self.confirmationDuration)
-        finish()
+        switch content {
+        case .url:
+            reshare(url: URL(string: cleanedText), text: cleanedText)
+        case .text:
+            reshare(url: nil, text: cleanedText)
+        }
     }
 
     // MARK: - Reading the share
@@ -127,35 +122,36 @@ final class ShareViewController: UIViewController {
         return nil
     }
 
-    private func loadObject<T: _ObjectiveCBridgeable & Sendable>(_ type: T.Type, from provider: NSItemProvider) async -> T?
-    where T._ObjectiveCType: NSItemProviderReading {
-        await withCheckedContinuation { continuation in
-            _ = provider.loadObject(ofClass: type) { object, _ in
-                continuation.resume(returning: object)
-            }
+    // MARK: - Re-sharing
+
+    private func reshare(url: URL?, text: String) {
+        let item: Any = url ?? text
+        let activityController = UIActivityViewController(activityItems: [item], applicationActivities: nil)
+        activityController.completionWithItemsHandler = { [weak self] _, _, _, _ in
+            self?.finish()
         }
-    }
-
-    // MARK: - Output
-
-    /// Copies the cleaned result. A URL is copied as both a URL and plain text, so it pastes as a
-    /// link where that's supported and as text everywhere else.
-    private func copy(url: URL?, text: String) {
-        if let url {
-            UIPasteboard.general.setItems([[UTType.url.identifier: url, UTType.plainText.identifier: text]])
-        } else {
-            UIPasteboard.general.string = text
-        }
-    }
-
-    @objc private func dismissEarly() {
-        // Only once the result is on the clipboard -- never cut resolution short.
-        if case .copied = cardModel.phase { finish() }
+        // iPad presents the share sheet as a popover, which needs an anchor.
+        activityController.popoverPresentationController?.sourceView = view
+        activityController.popoverPresentationController?.sourceRect = CGRect(
+            x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0
+        )
+        activityController.popoverPresentationController?.permittedArrowDirections = []
+        present(activityController, animated: true)
     }
 
     private func finish() {
         guard !hasFinished else { return }
         hasFinished = true
         extensionContext?.completeRequest(returningItems: nil)
+    }
+}
+
+@MainActor
+private func loadObject<T: _ObjectiveCBridgeable & Sendable>(_ type: T.Type, from provider: NSItemProvider) async -> T?
+where T._ObjectiveCType: NSItemProviderReading {
+    await withCheckedContinuation { continuation in
+        _ = provider.loadObject(ofClass: type) { object, _ in
+            continuation.resume(returning: object)
+        }
     }
 }

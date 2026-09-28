@@ -13,7 +13,7 @@ struct ContentView: View {
                 Section("How to use") {
                     Step(number: 1, text: "Tap Share on a link in any app.")
                     Step(number: 2, text: "Choose Lint from the share sheet.")
-                    Step(number: 3, text: "The cleaned link is copied, ready to paste wherever you like.")
+                    Step(number: 3, text: "The share sheet reopens with the cleaned link, ready to send.")
                 }
 
                 Section {
