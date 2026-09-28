@@ -17,7 +17,7 @@ Two iOS limitations, both from how iOS handles share extensions:
 
 The cleaning and resolving logic lives in `LintCore`, a local Swift package that the share extension links. It's a direct port of Android's `UrlCleaner.kt` and `ShortLinkResolver.kt`: the same parameter lists (including the params that are only stripped on their own sites), the same short-link domains, the same 5-hop limit, and the same fail-safe behavior. Any change to one platform's lists must be made to the other's too (see `ARCHITECTURE.md`).
 
-For known short links, `ShortLinkResolver` first follows the redirect (a direct, headers-only, on-device request to that provider) to find the full destination URL. Requests use an ephemeral `URLSession` (no cookies, cache or credentials kept) that refuses automatic redirects, so each hop is inspected and followed by hand. The whole resolution has a hard 3s cap; any failure or timeout falls back to the original short link unchanged.
+For known short links, `ShortLinkResolver` first follows the redirect (a direct, headers-only, on-device request to that provider) to find the full destination URL. Requests use an ephemeral `URLSession` (no cookies, cache or credentials kept) that refuses automatic redirects, so each hop is inspected and followed by hand. Like Android, resolution has a ~3s total budget checked before each hop; on any failure or timeout the chain stops at the furthest URL it reached (the original short link if the first hop fails).
 
 While that runs, the same card (`StatusCardView`) shows a spinner and "Tumbling out the tracking…" before switching to "Link cleaned". It uses Liquid Glass (`glassEffect`) on iOS 26 and `.regularMaterial` on earlier versions.
 

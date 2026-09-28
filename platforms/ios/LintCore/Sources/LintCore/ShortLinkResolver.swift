@@ -32,7 +32,7 @@ public enum ShortLinkResolver {
     ]
 
     public static let maxHops = 5
-    private static let requestTimeout: TimeInterval = 1.5
+    private static let requestTimeout: Duration = .milliseconds(1500)
     private static let totalBudget: Duration = .seconds(3)
 
     /// One hop's outcome: the HTTP status code and, if present, the Location header.
@@ -89,28 +89,39 @@ public enum ShortLinkResolver {
     }
 
     /// Resolves `startUrl` over the real network. Never throws — any timeout, error, or
-    /// unexpected response falls back to returning `startUrl` unchanged. The whole resolution is
-    /// capped at `totalBudget`, even if an individual hop is still in flight.
+    /// unexpected response falls back to the furthest URL the chain reached (the original short
+    /// link if the very first hop fails), exactly like Android.
     public static func resolveOverNetwork(_ startUrl: String) async -> String {
         let session = makeSession()
         defer { session.invalidateAndCancel() }
 
-        return await withTaskGroup(of: String?.self) { group in
-            group.addTask {
-                await followRedirects(from: startUrl) { url in try await fetchOneHop(url, session: session) }
-            }
-            group.addTask {
-                try? await Task.sleep(for: totalBudget)
-                return nil
-            }
+        return await resolve(startUrl, budget: totalBudget) { url, timeout in
+            await fetchOneHop(url, timeout: timeout, session: session)
+        }
+    }
 
-            let first = await group.next() ?? nil
-            group.cancelAll()
-            guard let resolved = first else {
-                logger.warning("resolution budget (\(totalBudget)) exceeded, abandoning")
-                return startUrl
+    /// Follows `startUrl`'s redirects within `budget`. Like Android, the budget is checked before
+    /// each hop: once it's spent, the chain ends at whatever URL it has reached so far rather than
+    /// throwing that progress away. Each hop is also given no more than the time remaining, so the
+    /// whole resolution can't overrun the budget by more than a moment.
+    ///
+    /// `fetchHop` must not throw: a failed hop reports status -1, which ends the chain at the
+    /// current URL (see `followRedirects`).
+    static func resolve(
+        _ startUrl: String,
+        budget: Duration,
+        fetchHop: @escaping @Sendable (_ url: String, _ timeout: Duration) async -> HopResponse
+    ) async -> String {
+        let clock = ContinuousClock()
+        let deadline = clock.now + budget
+
+        return await followRedirects(from: startUrl) { url in
+            let remaining = deadline - clock.now
+            guard remaining > .zero else {
+                logger.warning("resolution budget (\(budget)) exceeded, abandoning")
+                return HopResponse(statusCode: -1, location: nil)
             }
-            return resolved
+            return await fetchHop(url, min(requestTimeout, remaining))
         }
     }
 
@@ -132,23 +143,24 @@ public enum ShortLinkResolver {
     private static func makeSession() -> URLSession {
         // Ephemeral: no cookies, cache, or credentials persisted from these requests.
         let config = URLSessionConfiguration.ephemeral
-        config.timeoutIntervalForRequest = requestTimeout
-        config.timeoutIntervalForResource = requestTimeout * 2
+        config.timeoutIntervalForResource = totalBudget.timeInterval
         config.httpCookieAcceptPolicy = .never
         config.httpShouldSetCookies = false
         config.urlCache = nil
         return URLSession(configuration: config, delegate: NoRedirectDelegate(), delegateQueue: nil)
     }
 
-    private static func fetchOneHop(_ url: String, session: URLSession) async throws -> HopResponse {
-        guard let requestUrl = URL(string: url) else { throw URLError(.badURL) }
+    /// Fetches one hop. Never throws: any failure is reported as status -1 (like Android), so the
+    /// redirect chain ends at the URL it had reached rather than falling all the way back.
+    private static func fetchOneHop(_ url: String, timeout: Duration, session: URLSession) async -> HopResponse {
+        guard let requestUrl = URL(string: url) else { return HopResponse(statusCode: -1, location: nil) }
 
         do {
-            var response = try await send(requestUrl, method: "HEAD", session: session)
+            var response = try await send(requestUrl, method: "HEAD", timeout: timeout, session: session)
 
             // Some servers reject HEAD; retry with GET but never read the body.
             if response.statusCode == 405 || response.statusCode == 501 {
-                response = try await send(requestUrl, method: "GET", session: session)
+                response = try await send(requestUrl, method: "GET", timeout: timeout, session: session)
             }
 
             let location = response.value(forHTTPHeaderField: "Location")
@@ -156,7 +168,7 @@ public enum ShortLinkResolver {
             return HopResponse(statusCode: response.statusCode, location: location)
         } catch {
             logger.warning("hop failed: \(url) (\(error.localizedDescription))")
-            throw error
+            return HopResponse(statusCode: -1, location: nil)
         }
     }
 
@@ -168,8 +180,8 @@ public enum ShortLinkResolver {
         "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 " +
         "(KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
 
-    private static func send(_ url: URL, method: String, session: URLSession) async throws -> HTTPURLResponse {
-        var request = URLRequest(url: url)
+    private static func send(_ url: URL, method: String, timeout: Duration, session: URLSession) async throws -> HTTPURLResponse {
+        var request = URLRequest(url: url, timeoutInterval: timeout.timeInterval)
         request.httpMethod = method
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
@@ -181,5 +193,12 @@ public enum ShortLinkResolver {
         bytes.task.cancel()
         guard let httpResponse = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         return httpResponse
+    }
+}
+
+private extension Duration {
+    var timeInterval: TimeInterval {
+        let (seconds, attoseconds) = components
+        return TimeInterval(seconds) + TimeInterval(attoseconds) / 1e18
     }
 }

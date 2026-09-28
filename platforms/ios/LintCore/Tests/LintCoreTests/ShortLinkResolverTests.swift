@@ -177,4 +177,61 @@ struct ShortLinkResolverTests {
 
         #expect(result == "https://www.youtube.com/watch?v=abc&app=m")
     }
+
+    // Budget and failure handling, matching Android's resolveOverNetwork.
+
+    @Test func failedLaterHopKeepsTheUrlReachedSoFar() async {
+        let result = await ShortLinkResolver.resolve("https://vm.tiktok.com/abc", budget: .seconds(3)) { url, _ in
+            switch url {
+            case "https://vm.tiktok.com/abc":
+                HopResponse(statusCode: 301, location: "https://www.tiktok.com/@u/video/1?_t=x")
+            default:
+                // e.g. a timeout on the confirmation hop.
+                HopResponse(statusCode: -1, location: nil)
+            }
+        }
+
+        #expect(result == "https://www.tiktok.com/@u/video/1?_t=x")
+    }
+
+    @Test func failedFirstHopFallsBackToTheShortLink() async {
+        let result = await ShortLinkResolver.resolve("https://youtu.be/abc", budget: .seconds(3)) { _, _ in
+            HopResponse(statusCode: -1, location: nil)
+        }
+
+        #expect(result == "https://youtu.be/abc")
+    }
+
+    @Test func spentBudgetKeepsTheUrlReachedSoFar() async {
+        // Every hop redirects and takes 40ms; with a 100ms budget the chain gets partway through
+        // before the budget runs out, and should keep that progress rather than start over.
+        let result = await ShortLinkResolver.resolve("https://youtu.be/0", budget: .milliseconds(100)) { url, _ in
+            try? await Task.sleep(for: .milliseconds(40))
+            let next = Int(url.split(separator: "/").last!)! + 1
+            return HopResponse(statusCode: 301, location: "https://youtu.be/\(next)")
+        }
+
+        #expect(result != "https://youtu.be/0")
+        #expect(["https://youtu.be/1", "https://youtu.be/2", "https://youtu.be/3"].contains(result))
+    }
+
+    @Test func hopsNeverGetMoreThanTheRemainingBudget() async {
+        let timeouts = TimeoutRecorder()
+
+        _ = await ShortLinkResolver.resolve("https://youtu.be/0", budget: .milliseconds(200)) { url, timeout in
+            await timeouts.record(timeout)
+            try? await Task.sleep(for: .milliseconds(80))
+            let next = Int(url.split(separator: "/").last!)! + 1
+            return HopResponse(statusCode: 301, location: "https://youtu.be/\(next)")
+        }
+
+        let recorded = await timeouts.values
+        #expect(!recorded.isEmpty)
+        #expect(recorded.allSatisfy { $0 <= .milliseconds(200) })
+    }
+}
+
+private actor TimeoutRecorder {
+    var values: [Duration] = []
+    func record(_ value: Duration) { values.append(value) }
 }

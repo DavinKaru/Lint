@@ -7,9 +7,17 @@ final class StatusCardModel {
     enum Phase: Equatable {
         /// A short link is being resolved over the network.
         case resolving
-        /// The link has been cleaned and the share sheet is (re)opening. `didClean` is false if
-        /// there was nothing to strip.
-        case cleaned(didClean: Bool)
+        /// Done; the share sheet is (re)opening with the result.
+        case done(Outcome)
+    }
+
+    enum Outcome: Equatable {
+        /// Tracking was stripped from the link.
+        case cleaned
+        /// There was a link, but nothing to strip from it.
+        case alreadyClean
+        /// The shared text had no link in it, so it's passed on unchanged.
+        case noLink
     }
 
     /// Nil until the share has been read, so nothing flashes up before there's anything to show.
@@ -30,7 +38,7 @@ struct StatusCardView: View {
                     case .resolving:
                         ProgressView()
                             .controlSize(.large)
-                    case .cleaned:
+                    case .done:
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 40))
                             .foregroundStyle(.tint)
@@ -42,8 +50,8 @@ struct StatusCardView: View {
                 VStack(spacing: 4) {
                     Text(title(for: phase))
                         .font(.headline)
-                    if case .cleaned(didClean: false) = phase {
-                        Text("No tracking found")
+                    if let subtitle = subtitle(for: phase) {
+                        Text(subtitle)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -62,8 +70,16 @@ struct StatusCardView: View {
     private func title(for phase: StatusCardModel.Phase) -> String {
         switch phase {
         case .resolving: "Tumbling out the tracking…"
-        case .cleaned(didClean: true): "Link cleaned"
-        case .cleaned(didClean: false): "Link ready to share"
+        case .done(.cleaned): "Link cleaned"
+        case .done(.alreadyClean), .done(.noLink): "Ready to share"
+        }
+    }
+
+    private func subtitle(for phase: StatusCardModel.Phase) -> String? {
+        switch phase {
+        case .done(.alreadyClean): "No tracking found"
+        case .done(.noLink): "No link to clean"
+        case .resolving, .done(.cleaned): nil
         }
     }
 }
@@ -90,6 +106,6 @@ private struct CardBackground: ViewModifier {
 
 #Preview("Cleaned") {
     let model = StatusCardModel()
-    model.phase = .cleaned(didClean: true)
+    model.phase = .done(.cleaned)
     return StatusCardView(model: model)
 }

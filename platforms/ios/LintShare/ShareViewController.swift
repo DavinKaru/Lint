@@ -18,15 +18,16 @@ private let logger = Logger(subsystem: "com.lint.share", category: "Lint")
 /// so Lint's activation rule refuses it also made some other apps (e.g. Reminders) refuse it.
 final class ShareViewController: UIViewController {
 
-    /// What the share contained. A bare URL is re-shared as a URL (so the next app gets a proper
-    /// link preview); text is re-shared as text, with only its first URL cleaned.
+    /// What the share contained. A URL is re-shared as a URL (so the next app gets a proper link
+    /// preview), along with any separate message that came with it; text is re-shared as text,
+    /// with only its first URL cleaned -- the same as Android's EXTRA_TEXT.
     private enum SharedContent {
-        case url(URL)
+        case url(URL, message: String?)
         case text(String)
 
         var text: String {
             switch self {
-            case .url(let url): url.absoluteString
+            case .url(let url, _): url.absoluteString
             case .text(let text): text
             }
         }
@@ -90,43 +91,82 @@ final class ShareViewController: UIViewController {
             logger.debug("cleaned offline: \(cleanedText)")
         }
 
-        withAnimation(.snappy) {
-            cardModel.phase = .cleaned(didClean: cleanedText != sharedText)
-        }
+        let outcome: StatusCardModel.Outcome =
+            if UrlCleaner.findFirstUrl(in: sharedText) == nil { .noLink }
+            else if cleanedText != sharedText { .cleaned }
+            else { .alreadyClean }
+        withAnimation(.snappy) { cardModel.phase = .done(outcome) }
 
         switch content {
-        case .url:
-            reshare(url: URL(string: cleanedText), text: cleanedText)
+        case .url(_, let message):
+            let cleanedUrl: Any = URL(string: cleanedText) ?? cleanedText
+            reshare(message.map { [$0, cleanedUrl] } ?? [cleanedUrl])
         case .text:
-            reshare(url: nil, text: cleanedText)
+            reshare([cleanedText])
         }
     }
 
     // MARK: - Reading the share
 
-    /// Returns the first web URL in the share, falling back to the first piece of plain text.
+    /// Reads the share. Text that contains a link wins (it's what Android's EXTRA_TEXT carries,
+    /// and cleaning the link in place keeps the message around it); otherwise the first web URL,
+    /// keeping any separate message; otherwise plain text as-is.
     private func loadSharedContent() async -> SharedContent? {
-        let providers = (extensionContext?.inputItems as? [NSExtensionItem] ?? [])
-            .flatMap { $0.attachments ?? [] }
+        let items = extensionContext?.inputItems as? [NSExtensionItem] ?? []
+        let providers = items.flatMap { $0.attachments ?? [] }
 
+        var url: URL?
         for provider in providers where provider.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
-            if let url = await loadObject(URL.self, from: provider), ["http", "https"].contains(url.scheme?.lowercased()) {
-                return .url(url)
+            if let candidate = await loadObject(URL.self, from: provider),
+               ["http", "https"].contains(candidate.scheme?.lowercased()) {
+                url = candidate
+                break
             }
         }
+
+        var text: String?
         for provider in providers where provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier) {
-            if let text = await loadObject(String.self, from: provider), !text.isEmpty {
-                return .text(text)
+            if let candidate = await loadObject(String.self, from: provider), !isBlank(candidate) {
+                text = candidate
+                break
             }
         }
+        // Some apps put their message in the item's content text rather than an attachment.
+        if text == nil {
+            text = items.lazy.compactMap { $0.attributedContentText?.string }.first { !self.isBlank($0) }
+        }
+
+        // Many apps (Safari included) send the link's own URL string as the text too; that's not
+        // a message, so it shouldn't turn a URL share into a text share.
+        if let candidate = text, let url, isJustUrl(candidate, url) { text = nil }
+
+        if let text, UrlCleaner.findFirstUrl(in: text) != nil { return .text(text) }
+        if let url { return .url(url, message: text) }
+        if let text { return .text(text) }
         return nil
+    }
+
+    private func isBlank(_ text: String) -> Bool {
+        text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func isJustUrl(_ text: String, _ url: URL) -> Bool {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed == url.absoluteString || URL(string: trimmed) == url
     }
 
     // MARK: - Re-sharing
 
-    private func reshare(url: URL?, text: String) {
-        let item: Any = url ?? text
-        let activityController = UIActivityViewController(activityItems: [item], applicationActivities: nil)
+    private func reshare(_ items: [Any]) {
+        // If the host app has already dismissed Lint (e.g. mid-resolve), there's nothing to present
+        // on; finish rather than leave the request open until iOS kills the extension.
+        guard view.window != nil, presentedViewController == nil else {
+            logger.warning("can't present share sheet, finishing")
+            finish()
+            return
+        }
+
+        let activityController = UIActivityViewController(activityItems: items, applicationActivities: nil)
         activityController.completionWithItemsHandler = { [weak self] _, _, _, _ in
             self?.finish()
         }
