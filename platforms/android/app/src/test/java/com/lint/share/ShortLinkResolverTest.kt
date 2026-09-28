@@ -148,4 +148,21 @@ class ShortLinkResolverTest {
 
         assertEquals("https://www.tiktok.com/@user/video/1234567890?is_from_webapp=1&sender_device=pc", result)
     }
+
+    @Test
+    fun `resolves a tiktok vt-tiktok-com redirect`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://vt.tiktok.com/abc123" ->
+                    HopResponse(301, "https://www.tiktok.com/@user/video/1234567890?_r=1&_t=8abcde")
+                // Terminal fetch confirming the resolved URL doesn't redirect further.
+                "https://www.tiktok.com/@user/video/1234567890?_r=1&_t=8abcde" -> HopResponse(200, null)
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        val result = ShortLinkResolver.followRedirects("https://vt.tiktok.com/abc123", fetcher)
+
+        assertEquals("https://www.tiktok.com/@user/video/1234567890?_r=1&_t=8abcde", result)
+    }
 }
