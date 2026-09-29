@@ -13,8 +13,11 @@ before cleaning.
 This table is the single source of truth for which domains Lint resolves — nothing else in this
 repo (docs or otherwise) should re-list them. It must stay in sync with
 `ShortLinkResolver.KNOWN_SHORT_LINK_HOSTS` in
-[`platforms/android/app/src/main/java/com/lint/share/ShortLinkResolver.kt`](platforms/android/app/src/main/java/com/lint/share/ShortLinkResolver.kt),
-which is the actual enforcement point.
+[`platforms/android/app/src/main/java/com/lint/share/ShortLinkResolver.kt`](platforms/android/app/src/main/java/com/lint/share/ShortLinkResolver.kt)
+and `ShortLinkResolver.knownShortLinkHosts` in
+[`platforms/ios/LintCore/Sources/LintCore/ShortLinkResolver.swift`](platforms/ios/LintCore/Sources/LintCore/ShortLinkResolver.swift),
+which are the actual enforcement points. The Status column reflects Android device testing; iOS
+hasn't been tested on a real device yet.
 
 | Domain | Provider | Status | Notes |
 |---|---|---|---|

@@ -1,5 +1,6 @@
 # Lint
 [![Android release](https://img.shields.io/github/v/tag/DavinKaru/Lint?filter=android-*&label=android)](https://github.com/DavinKaru/Lint/releases)
+[![iOS release](https://img.shields.io/github/v/tag/DavinKaru/Lint?filter=ios-*&label=ios)](https://github.com/DavinKaru/Lint/releases)
 
 A share-sheet-only mobile utility that strips tracking parameters from URLs when you share them.
 
@@ -13,14 +14,14 @@ Lint has no visible UI beyond the OS share sheet:
 3. Lint strips known tracking parameters from the URL.
 4. The OS share sheet reopens with the cleaned link, ready to send wherever you originally intended.
 
-The one exception: for known short links, Lint briefly shows a small loading screen while it resolves the short link's real destination on-device — everything else stays instant with zero UI at all. See [`PRIVACY.md`](PRIVACY.md) for exactly which domains, what that involves, and why it's safe.
+The one exception: for known short links, Lint briefly shows a small loading screen while it resolves the short link's real destination on-device — everything else stays instant with no UI of Lint's own (on iOS, the system shows Lint's sheet behind the re-opened share sheet). See [`PRIVACY.md`](PRIVACY.md) for exactly which domains, what that involves, and why it's safe.
 
 There are no accounts and no settings screens. Almost everything happens fully offline, and on-device.
 
 ## Status
 Android has a working prototype (see the [release badge above](https://github.com/DavinKaru/Lint/releases) for the current version, and [`platforms/android/README.md`](platforms/android/README.md) for details on how it works, building, and installing).
 
-iOS support is planned but not yet started.
+iOS has a matching share extension with the same feature set (see [`platforms/ios/README.md`](platforms/ios/README.md)). It hasn't been tested on a real device yet.
 
 ## Repo layout
 The project is organised to support multiple platforms from the start (see `ARCHITECTURE.md` for the full explanation). In short: each platform lives in its own self-contained directory under `/platforms`, and anything genuinely shared across platforms (like the tracking-parameter rule catalog) lives under `/shared`.
