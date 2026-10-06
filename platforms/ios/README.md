@@ -35,4 +35,4 @@ swift test
 To try the share extension in the simulator, run the `LintShare` scheme and pick Safari (or any other app) when Xcode asks which app to run, then share a link from it.
 
 ## Status
-New and not yet tested on a real device. Tested in the iOS 26 simulator: offline cleaning, `youtu.be` resolution and re-sharing all work end to end from Safari. The version (`MARKETING_VERSION`, set once at the project level) is 0.3.1 to match the Android feature set it ports; there's no iOS release yet.
+New and not yet tested on a real device. Tested in the iOS 26 simulator: offline cleaning, `youtu.be` resolution and re-sharing all work end to end from Safari. The version (`MARKETING_VERSION`, set once at the project level) is 0.4.0 to match the Android feature set it ports; there's no iOS release yet.

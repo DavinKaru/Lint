@@ -48,7 +48,8 @@ object UrlCleaner {
      * enough that some unrelated site could plausibly rely on them (e.g. "?feature=" as a feature
      * flag, "?_t=" as a tab or token). Breaking a link is worse than leaving a tracker in, so
      * anything that isn't unambiguously a tracker goes here rather than in
-     * [EXACT_TRACKING_PARAMS]. Keys match the host itself and any of its subdomains.
+     * [EXACT_TRACKING_PARAMS]. Keys match the host itself and any of its subdomains; a key ending
+     * in ".*" matches that name on any country domain too (see [hostMatches]).
      */
     private val HOST_SCOPED_TRACKING_PARAMS = mapOf(
         // YouTube: "feature" marks that a video was reached via a youtu.be short link; "si" is
@@ -60,6 +61,10 @@ object UrlCleaner {
         // Meta/Facebook: "eid" is a Facebook tracking param, but Google Calendar uses ?eid= to
         // identify an event, so it's only stripped on Facebook.
         "facebook.com" to setOf("eid"),
+        // Eventbrite: "aff" records how a link was shared (e.g. "ebdsshandroid", "ebdsshsms") and
+        // "sg" is a long per-share token. Eventbrite uses a domain per country
+        // (eventbrite.com, eventbrite.com.au, eventbrite.co.uk, ...), hence the wildcard.
+        "eventbrite.*" to setOf("aff", "sg"),
         // TikTok: appended to a video URL once a vm.tiktok.com/vt.tiktok.com share link
         // resolves, identifying the sharer's device/session and how the link was copied.
         "tiktok.com" to setOf(
@@ -76,8 +81,21 @@ object UrlCleaner {
         }
         val lowerHost = host?.lowercase() ?: return false
         return HOST_SCOPED_TRACKING_PARAMS.any { (domain, params) ->
-            (lowerHost == domain || lowerHost.endsWith(".$domain")) && name in params
+            name in params && hostMatches(lowerHost, domain)
         }
+    }
+
+    /**
+     * True if [host] is [domain] or one of its subdomains. A [domain] ending in ".*" (e.g.
+     * "eventbrite.*") instead matches that name followed by a country ending: "com", a two-letter
+     * country code, or "com."/"co." plus one (so eventbrite.com, eventbrite.ca, eventbrite.com.au,
+     * eventbrite.co.uk), plus subdomains of those. Lookalikes like noteventbrite.com or
+     * eventbrite.evil.com don't match.
+     */
+    private fun hostMatches(host: String, domain: String): Boolean {
+        if (!domain.endsWith(".*")) return host == domain || host.endsWith(".$domain")
+        val name = Regex.escape(domain.removeSuffix(".*"))
+        return Regex("""^(.+\.)?$name\.(com|[a-z]{2}|(com|co)\.[a-z]{2})$""").matches(host)
     }
 
     /** The first http(s) URL found in some text, and where it sits within that text. */
