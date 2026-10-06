@@ -1,0 +1,57 @@
+name: Link not cleaned or resolved
+description: Lint passed a link through that still has tracking, didn't resolve a short link, or broke a link.
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Everything Lint currently supports, investigates or deliberately skips is tracked on the [Link support board](https://github.com/users/DavinKaru/projects/1); please check there first.
+
+        **Before pasting links, remove anything personal** (names, addresses, ride or order details). Replacing values with `…` is fine as long as the parameter *names* stay.
+  - type: dropdown
+    id: problem
+    attributes:
+      label: What happened?
+      options:
+        - A short link wasn't resolved
+        - A tracking parameter wasn't removed
+        - Lint broke a link (it doesn't work after cleaning)
+        - Something else
+    validations:
+      required: true
+  - type: input
+    id: app
+    attributes:
+      label: Which app did you share from?
+      placeholder: e.g. DiDi, Instagram, Chrome
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Android
+        - iOS
+        - Both
+    validations:
+      required: true
+  - type: textarea
+    id: shared
+    attributes:
+      label: What you shared to Lint
+      description: The text or link as the app shared it.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What Lint gave back
+      render: text
+  - type: textarea
+    id: destination
+    attributes:
+      label: Where the link ends up
+      description: For short links, open it in a browser and paste the full address it lands on.
+      render: text

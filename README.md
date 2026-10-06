@@ -16,6 +16,8 @@ Lint has no visible UI beyond the OS share sheet:
 
 The one exception: for known short links, Lint briefly shows a small loading screen while it resolves the short link's real destination on-device — everything else stays instant with no UI of Lint's own (on iOS, the system shows Lint's sheet behind the re-opened share sheet). See [`PRIVACY.md`](PRIVACY.md) for exactly which domains, what that involves, and why it's safe.
 
+Which links Lint handles, which are being looked into, and which it deliberately leaves alone (and why) are tracked on the [Link support board](https://github.com/users/DavinKaru/projects/1). If a link isn't cleaned, [report it](https://github.com/DavinKaru/Lint/issues/new?template=link-not-cleaned.yml).
+
 There are no accounts and no settings screens. Almost everything happens fully offline, and on-device.
 
 ## Status
