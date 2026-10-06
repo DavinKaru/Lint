@@ -97,4 +97,19 @@ struct UrlCleanerTests {
         let input = "🎉👨‍👩‍👧 https://x.com/?fbclid=1&a=b 🎉"
         #expect(UrlCleaner.cleanFirstUrl(in: input) == "🎉👨‍👩‍👧 https://x.com/?a=b 🎉")
     }
+
+    @Test func preservesGoogleMapsPlaceCid() {
+        let input = "https://maps.google.com/?cid=1234567890&utm_source=share"
+        #expect(UrlCleaner.cleanUrl(input) == "https://maps.google.com/?cid=1234567890")
+    }
+
+    @Test func preservesGoogleCalendarEventEid() {
+        let input = "https://calendar.google.com/calendar/event?eid=abc123&utm_medium=email"
+        #expect(UrlCleaner.cleanUrl(input) == "https://calendar.google.com/calendar/event?eid=abc123")
+    }
+
+    @Test func stripsFacebookEidTrackingParam() {
+        let input = "https://www.facebook.com/events/123?eid=ARBxyz&ref=share"
+        #expect(UrlCleaner.cleanUrl(input) == "https://www.facebook.com/events/123")
+    }
 }
