@@ -14,12 +14,14 @@ public enum UrlCleaner {
         "vero_id", "vero_conv",
         "mc_cid", "mc_eid",
         "mkt_tok", "_hsenc", "_hsmi",
-        "ref", "ref_src", "cid", "epik",
+        // Not "cid": generic enough that Google Maps uses it to identify a place (?cid=…), so
+        // stripping it broke shared Maps links, and there's no single site to scope it to.
+        "ref", "ref_src", "epik",
         // Google (Ads/Analytics/Shopping)
         "aqs", "cd", "ei", "iflsig", "pcampaignid", "rlz", "srsltid", "sxsrf", "uact", "ved",
         "_ga", "_gl",
         // Meta/Facebook
-        "comment_tracking", "eav", "eid", "mibextid", "__tn__",
+        "comment_tracking", "eav", "mibextid", "__tn__",
         // Snapchat
         "ScCid",
         // Reddit
@@ -50,6 +52,9 @@ public enum UrlCleaner {
         "youtu.be": ["feature", "si"],
         // Spotify: "si" is the per-share token identifying who shared it.
         "spotify.com": ["si"],
+        // Meta/Facebook: "eid" is a Facebook tracking param, but Google Calendar uses ?eid= to
+        // identify an event, so it's only stripped on Facebook.
+        "facebook.com": ["eid"],
         // TikTok: appended to a video URL once a vm.tiktok.com/vt.tiktok.com share link
         // resolves, identifying the sharer's device/session and how the link was copied.
         "tiktok.com": [
