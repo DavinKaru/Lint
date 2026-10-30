@@ -44,7 +44,8 @@ public enum UrlCleaner {
     /// enough that some unrelated site could plausibly rely on them (e.g. "?feature=" as a feature
     /// flag, "?_t=" as a tab or token). Breaking a link is worse than leaving a tracker in, so
     /// anything that isn't unambiguously a tracker goes here rather than in
-    /// `exactTrackingParams`. Keys match the host itself and any of its subdomains.
+    /// `exactTrackingParams`. Keys match the host itself and any of its subdomains; a key ending
+    /// in ".*" matches that name on any country domain too (see `hostMatches`).
     private static let hostScopedTrackingParams: [String: Set<String>] = [
         // YouTube: "feature" marks that a video was reached via a youtu.be short link; "si" is
         // the per-share token identifying who shared it.
@@ -55,6 +56,10 @@ public enum UrlCleaner {
         // Meta/Facebook: "eid" is a Facebook tracking param, but Google Calendar uses ?eid= to
         // identify an event, so it's only stripped on Facebook.
         "facebook.com": ["eid"],
+        // Eventbrite: "aff" records how a link was shared (e.g. "ebdsshandroid", "ebdsshsms") and
+        // "sg" is a long per-share token. Eventbrite uses a domain per country
+        // (eventbrite.com, eventbrite.com.au, eventbrite.co.uk, ...), hence the wildcard.
+        "eventbrite.*": ["aff", "sg"],
         // TikTok: appended to a video URL once a vm.tiktok.com/vt.tiktok.com share link
         // resolves, identifying the sharer's device/session and how the link was copied.
         "tiktok.com": [
@@ -71,8 +76,20 @@ public enum UrlCleaner {
         }
         guard let lowerHost = host?.lowercased() else { return false }
         return hostScopedTrackingParams.contains { domain, params in
-            (lowerHost == domain || lowerHost.hasSuffix(".\(domain)")) && params.contains(name)
+            params.contains(name) && hostMatches(lowerHost, domain)
         }
+    }
+
+    /// True if `host` is `domain` or one of its subdomains. A `domain` ending in ".*" (e.g.
+    /// "eventbrite.*") instead matches that name followed by a country ending: "com", a two-letter
+    /// country code, or "com."/"co." plus one (so eventbrite.com, eventbrite.ca, eventbrite.com.au,
+    /// eventbrite.co.uk), plus subdomains of those. Lookalikes like noteventbrite.com or
+    /// eventbrite.evil.com don't match.
+    private static func hostMatches(_ host: String, _ domain: String) -> Bool {
+        guard domain.hasSuffix(".*") else { return host == domain || host.hasSuffix(".\(domain)") }
+        let name = NSRegularExpression.escapedPattern(for: String(domain.dropLast(2)))
+        let pattern = #"^(.+\.)?"# + name + #"\.(com|[a-z]{2}|(com|co)\.[a-z]{2})$"#
+        return host.range(of: pattern, options: .regularExpression) != nil
     }
 
     /// The first http(s) URL found in some text, and where it sits within that text.

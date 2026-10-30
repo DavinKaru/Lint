@@ -112,4 +112,33 @@ struct UrlCleanerTests {
         let input = "https://www.facebook.com/events/123?eid=ARBxyz&ref=share"
         #expect(UrlCleaner.cleanUrl(input) == "https://www.facebook.com/events/123")
     }
+
+    @Test func stripsEventbriteAffFromAnOrganiserLink() {
+        let input = "https://www.eventbrite.com/o/55943994763?aff=ebdsshandroid"
+        #expect(UrlCleaner.cleanUrl(input) == "https://www.eventbrite.com/o/55943994763")
+    }
+
+    @Test func stripsEventbriteShareParamsFromAnEventSharedAsText() {
+        let input = "South Asian Queerspace October Meet Up\n\nDate: 17 oct • 13:00\n\n" +
+            "https://www.eventbrite.com.au/e/south-asian-queerspace-october-meet-up-tickets-2002707650494" +
+            "?aff=ebdsshsms&utm_share_source=listing_android&sg=3de21ae99fe972aeffdddd25fd1744bc49bc3ce1f698a860d0c15acf48c78b311617f2f8a2a569aae6be479a1146e57d98d07f3a60a63faa195df17671643f110c8d45e59dcdb050059ea6378eec"
+        let expected = "South Asian Queerspace October Meet Up\n\nDate: 17 oct • 13:00\n\n" +
+            "https://www.eventbrite.com.au/e/south-asian-queerspace-october-meet-up-tickets-2002707650494"
+        #expect(UrlCleaner.cleanFirstUrl(in: input) == expected)
+    }
+
+    @Test func stripsEventbriteParamsOnOtherCountryDomains() {
+        #expect(UrlCleaner.cleanUrl("https://www.eventbrite.co.uk/e/1?aff=x&sg=y") == "https://www.eventbrite.co.uk/e/1")
+        #expect(UrlCleaner.cleanUrl("https://www.eventbrite.ca/e/1?aff=x") == "https://www.eventbrite.ca/e/1")
+        #expect(UrlCleaner.cleanUrl("https://eventbrite.com.br/e/1?sg=y") == "https://eventbrite.com.br/e/1")
+    }
+
+    @Test(arguments: [
+        "https://example.com/page?aff=partner1&sg=group2",
+        "https://noteventbrite.com/e/1?aff=x&sg=y",
+        "https://eventbrite.evil.com/e/1?aff=x&sg=y",
+    ])
+    func preservesAffAndSgOutsideEventbrite(_ input: String) {
+        #expect(UrlCleaner.cleanUrl(input) == input)
+    }
 }
