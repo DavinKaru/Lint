@@ -1,0 +1,40 @@
+name: iOS
+
+# Runs the LintCore tests (the Swift UrlCleaner and ShortLinkResolver) whenever iOS or shared code
+# changes. LintCore holds all the cleaning logic; the Xcode app and share extension aren't built here.
+on:
+  pull_request:
+    paths:
+      - "platforms/ios/**"
+      - "shared/**"
+      - ".github/workflows/ios.yml"
+  push:
+    branches: [main]
+    paths:
+      - "platforms/ios/**"
+      - "shared/**"
+      - ".github/workflows/ios.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: LintCore tests
+    runs-on: macos-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: platforms/ios/LintCore
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: swift --version
+
+      - name: Run LintCore tests
+        run: swift test
