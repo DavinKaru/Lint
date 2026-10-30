@@ -1,0 +1,47 @@
+name: Android
+
+# Runs the Android unit tests (UrlCleaner, ShortLinkResolver) whenever Android or shared code changes.
+on:
+  pull_request:
+    paths:
+      - "platforms/android/**"
+      - "shared/**"
+      - ".github/workflows/android.yml"
+  push:
+    branches: [main]
+    paths:
+      - "platforms/android/**"
+      - "shared/**"
+      - ".github/workflows/android.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: platforms/android
+    steps:
+      - uses: actions/checkout@v4
+
+      # Release signing is only configured when keystore.properties exists, which it never does
+      # in CI, so the build and tests run without any secrets.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+          cache-dependency-path: |
+            platforms/android/**/*.gradle.kts
+            platforms/android/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Run unit tests
+        run: ./gradlew test --no-daemon
