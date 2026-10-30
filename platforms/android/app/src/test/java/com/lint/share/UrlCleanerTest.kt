@@ -149,4 +149,22 @@ class UrlCleanerTest {
             assertEquals(input, UrlCleaner.cleanUrl(input))
         }
     }
+
+    @Test
+    fun `strips fever share params`() {
+        val input = "https://feverup.com/m/471615?cp_smn_source=secretmelbourne&cp_smn_content=guided-dome-promenade-tour-royal-exhibition-building&cp_smn_term=profile_card_buy_button&suid=abe77647-acea-49d4-b5d6-023aa1b71674"
+        assertEquals("https://feverup.com/m/471615", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `strips secret media network cp_smn params on any site`() {
+        val input = "https://example.com/tickets?id=7&cp_smn_source=secretlondon&cp_smn_medium=newsletter"
+        assertEquals("https://example.com/tickets?id=7", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `preserves suid outside fever`() {
+        val input = "https://example.com/account?suid=42"
+        assertEquals(input, UrlCleaner.cleanUrl(input))
+    }
 }
