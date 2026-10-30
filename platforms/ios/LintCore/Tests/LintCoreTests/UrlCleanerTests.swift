@@ -141,4 +141,19 @@ struct UrlCleanerTests {
     func preservesAffAndSgOutsideEventbrite(_ input: String) {
         #expect(UrlCleaner.cleanUrl(input) == input)
     }
+
+    @Test func stripsFeverShareParams() {
+        let input = "https://feverup.com/m/471615?cp_smn_source=secretmelbourne&cp_smn_content=guided-dome-promenade-tour-royal-exhibition-building&cp_smn_term=profile_card_buy_button&suid=abe77647-acea-49d4-b5d6-023aa1b71674"
+        #expect(UrlCleaner.cleanUrl(input) == "https://feverup.com/m/471615")
+    }
+
+    @Test func stripsSecretMediaNetworkCpSmnParamsOnAnySite() {
+        let input = "https://example.com/tickets?id=7&cp_smn_source=secretlondon&cp_smn_medium=newsletter"
+        #expect(UrlCleaner.cleanUrl(input) == "https://example.com/tickets?id=7")
+    }
+
+    @Test func preservesSuidOutsideFever() {
+        let input = "https://example.com/account?suid=42"
+        #expect(UrlCleaner.cleanUrl(input) == input)
+    }
 }

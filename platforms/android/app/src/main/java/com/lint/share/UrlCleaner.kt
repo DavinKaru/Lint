@@ -65,6 +65,8 @@ object UrlCleaner {
         // "sg" is a long per-share token. Eventbrite uses a domain per country
         // (eventbrite.com, eventbrite.com.au, eventbrite.co.uk, ...), hence the wildcard.
         "eventbrite.*" to setOf("aff", "sg"),
+        // Fever (feverup.com): "suid" looks like a per-user/session ID on shared event links.
+        "feverup.com" to setOf("suid"),
         // TikTok: appended to a video URL once a vm.tiktok.com/vt.tiktok.com share link
         // resolves, identifying the sharer's device/session and how the link was copied.
         "tiktok.com" to setOf(
@@ -73,7 +75,13 @@ object UrlCleaner {
         ),
     )
 
-    private val TRACKING_PREFIXES = listOf("utm_", "mtm_")
+    private val TRACKING_PREFIXES = listOf(
+        "utm_", "mtm_",
+        // Secret Media Network (Secret Melbourne, Secret London, ...): campaign tags it adds to
+        // partner links, e.g. Fever tickets (cp_smn_source, cp_smn_content, cp_smn_term).
+        // Distinctive enough to strip on every site, like utm_.
+        "cp_smn_",
+    )
 
     private fun isTrackingParam(name: String, host: String?): Boolean {
         if (TRACKING_PREFIXES.any { name.startsWith(it) } || name in EXACT_TRACKING_PARAMS) {

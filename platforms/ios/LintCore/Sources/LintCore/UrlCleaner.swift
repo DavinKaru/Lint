@@ -60,6 +60,8 @@ public enum UrlCleaner {
         // "sg" is a long per-share token. Eventbrite uses a domain per country
         // (eventbrite.com, eventbrite.com.au, eventbrite.co.uk, ...), hence the wildcard.
         "eventbrite.*": ["aff", "sg"],
+        // Fever (feverup.com): "suid" looks like a per-user/session ID on shared event links.
+        "feverup.com": ["suid"],
         // TikTok: appended to a video URL once a vm.tiktok.com/vt.tiktok.com share link
         // resolves, identifying the sharer's device/session and how the link was copied.
         "tiktok.com": [
@@ -68,7 +70,13 @@ public enum UrlCleaner {
         ],
     ]
 
-    private static let trackingPrefixes = ["utm_", "mtm_"]
+    private static let trackingPrefixes = [
+        "utm_", "mtm_",
+        // Secret Media Network (Secret Melbourne, Secret London, ...): campaign tags it adds to
+        // partner links, e.g. Fever tickets (cp_smn_source, cp_smn_content, cp_smn_term).
+        // Distinctive enough to strip on every site, like utm_.
+        "cp_smn_",
+    ]
 
     private static func isTrackingParam(_ name: String, host: String?) -> Bool {
         if trackingPrefixes.contains(where: { name.hasPrefix($0) }) || exactTrackingParams.contains(name) {
