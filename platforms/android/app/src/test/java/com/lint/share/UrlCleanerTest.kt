@@ -115,4 +115,38 @@ class UrlCleanerTest {
         val input = "https://www.facebook.com/events/123?eid=ARBxyz&ref=share"
         assertEquals("https://www.facebook.com/events/123", UrlCleaner.cleanUrl(input))
     }
+
+    @Test
+    fun `strips eventbrite aff from an organiser link`() {
+        val input = "https://www.eventbrite.com/o/55943994763?aff=ebdsshandroid"
+        assertEquals("https://www.eventbrite.com/o/55943994763", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `strips eventbrite share params from an event shared as text`() {
+        val input = "South Asian Queerspace October Meet Up\n\nDate: 17 oct • 13:00\n\n" +
+            "https://www.eventbrite.com.au/e/south-asian-queerspace-october-meet-up-tickets-2002707650494" +
+            "?aff=ebdsshsms&utm_share_source=listing_android&sg=3de21ae99fe972aeffdddd25fd1744bc49bc3ce1f698a860d0c15acf48c78b311617f2f8a2a569aae6be479a1146e57d98d07f3a60a63faa195df17671643f110c8d45e59dcdb050059ea6378eec"
+        val expected = "South Asian Queerspace October Meet Up\n\nDate: 17 oct • 13:00\n\n" +
+            "https://www.eventbrite.com.au/e/south-asian-queerspace-october-meet-up-tickets-2002707650494"
+        assertEquals(expected, UrlCleaner.cleanFirstUrl(input))
+    }
+
+    @Test
+    fun `strips eventbrite params on other country domains`() {
+        assertEquals("https://www.eventbrite.co.uk/e/1", UrlCleaner.cleanUrl("https://www.eventbrite.co.uk/e/1?aff=x&sg=y"))
+        assertEquals("https://www.eventbrite.ca/e/1", UrlCleaner.cleanUrl("https://www.eventbrite.ca/e/1?aff=x"))
+        assertEquals("https://eventbrite.com.br/e/1", UrlCleaner.cleanUrl("https://eventbrite.com.br/e/1?sg=y"))
+    }
+
+    @Test
+    fun `preserves aff and sg outside eventbrite`() {
+        for (input in listOf(
+            "https://example.com/page?aff=partner1&sg=group2",
+            "https://noteventbrite.com/e/1?aff=x&sg=y",
+            "https://eventbrite.evil.com/e/1?aff=x&sg=y",
+        )) {
+            assertEquals(input, UrlCleaner.cleanUrl(input))
+        }
+    }
 }
