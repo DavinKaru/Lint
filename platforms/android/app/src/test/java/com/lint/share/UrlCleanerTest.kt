@@ -97,4 +97,22 @@ class UrlCleanerTest {
         val input = "https://nottiktok.com/page?_t=abc&_r=1"
         assertEquals(input, UrlCleaner.cleanUrl(input))
     }
+
+    @Test
+    fun `preserves google maps place cid`() {
+        val input = "https://maps.google.com/?cid=1234567890&utm_source=share"
+        assertEquals("https://maps.google.com/?cid=1234567890", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `preserves google calendar event eid`() {
+        val input = "https://calendar.google.com/calendar/event?eid=abc123&utm_medium=email"
+        assertEquals("https://calendar.google.com/calendar/event?eid=abc123", UrlCleaner.cleanUrl(input))
+    }
+
+    @Test
+    fun `strips facebook eid tracking param`() {
+        val input = "https://www.facebook.com/events/123?eid=ARBxyz&ref=share"
+        assertEquals("https://www.facebook.com/events/123", UrlCleaner.cleanUrl(input))
+    }
 }
