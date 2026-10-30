@@ -53,9 +53,22 @@ android {
             }
         }
     }
+
+    testOptions {
+        unitTests.all { test ->
+            // The link-case test set shared with iOS (see shared/tests/README.md). Declared as an
+            // input so Gradle re-runs the tests when it changes.
+            val sharedLinkCases = rootProject.file("../../shared/tests/link-cases.json")
+            test.inputs.file(sharedLinkCases)
+            test.systemProperty("lint.sharedLinkCases", sharedLinkCases.absolutePath)
+        }
+    }
 }
 
 dependencies {
     implementation("com.google.android.material:material:1.14.0")
     testImplementation("junit:junit:4.13.2")
+    // Real org.json for reading shared/tests/link-cases.json: the copy in android.jar is a stub in
+    // JVM unit tests.
+    testImplementation("org.json:json:20240303")
 }
