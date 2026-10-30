@@ -8,11 +8,11 @@ private let logger = Logger(subsystem: "com.lint.share", category: "Lint")
 /// vt.tiktok.com) to their final URL by following HTTP redirects, so `UrlCleaner` can strip
 /// tracking params that only appear on the resolved URL.
 ///
-/// Swift port of Android's `ShortLinkResolver.kt` -- `knownShortLinkHosts` must stay in sync with
-/// it and with the table in PRIVACY.md.
+/// Swift port of Android's `ShortLinkResolver.kt`. Which hosts it resolves lives in
+/// shared/rules/rules.json (and the table in PRIVACY.md).
 ///
 /// Amazon's redirect service is known to block plain HTTP clients like this one at the edge
-/// (see PRIVACY.md) -- that entry stays in `knownShortLinkHosts` since it fails safe (falls
+/// (see PRIVACY.md) -- that entry stays in `GeneratedRules.shortLinkHosts` since it fails safe (falls
 /// back to the unresolved short link, same as any other failure), and in case that changes.
 ///
 /// Privacy constraint (keep this true going forward): resolution must always happen directly
@@ -22,14 +22,8 @@ private let logger = Logger(subsystem: "com.lint.share", category: "Lint")
 /// defeats the point of this being a fully on-device tool.
 public enum ShortLinkResolver {
 
-    private static let knownShortLinkHosts: Set<String> = [
-        "amzn.to", "amzn.asia", "a.co",
-        "youtu.be",
-        "t.co",
-        "fb.watch",
-        "spoti.fi",
-        "vm.tiktok.com", "vt.tiktok.com",
-    ]
+    // Which hosts count as short links lives in shared/rules/rules.json, generated into
+    // GeneratedRules.shortLinkHosts.
 
     public static let maxHops = 5
     private static let requestTimeout: Duration = .milliseconds(1500)
@@ -53,7 +47,7 @@ public enum ShortLinkResolver {
     /// (case-insensitive, exact match — not a substring match).
     public static func isKnownShortLink(_ url: String) -> Bool {
         guard let host = URLComponents(string: url)?.host else { return false }
-        return knownShortLinkHosts.contains(host.lowercased())
+        return GeneratedRules.shortLinkHosts.contains(host.lowercased())
     }
 
     /// Pure redirect-following logic. Starting from `startUrl`, calls `fetcher` for each hop and

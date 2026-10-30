@@ -13,7 +13,7 @@ private const val TAG = "Lint"
  * tracking params that only appear on the resolved URL.
  *
  * Amazon's redirect service is known to block plain HTTP clients like this one at the edge
- * (see PRIVACY.md) -- that entry stays in [KNOWN_SHORT_LINK_HOSTS] since it fails safe (falls
+ * (see PRIVACY.md) -- that entry stays in GeneratedRules.SHORT_LINK_HOSTS since it fails safe (falls
  * back to the unresolved short link, same as any other failure), and in case that changes.
  *
  * Privacy constraint (keep this true going forward): resolution must always happen directly
@@ -24,15 +24,8 @@ private const val TAG = "Lint"
  */
 object ShortLinkResolver {
 
-    private val KNOWN_SHORT_LINK_HOSTS =
-        setOf(
-            "amzn.to", "amzn.asia", "a.co",
-            "youtu.be",
-            "t.co",
-            "fb.watch",
-            "spoti.fi",
-            "vm.tiktok.com", "vt.tiktok.com",
-        )
+    // Which hosts count as short links lives in shared/rules/rules.json, generated into
+    // GeneratedRules.SHORT_LINK_HOSTS.
 
     const val MAX_HOPS = 5
     private const val CONNECT_TIMEOUT_MS = 1500
@@ -57,7 +50,7 @@ object ShortLinkResolver {
         } catch (e: Exception) {
             null
         } ?: return false
-        return host.lowercase() in KNOWN_SHORT_LINK_HOSTS
+        return host.lowercase() in GeneratedRules.SHORT_LINK_HOSTS
     }
 
     /**
