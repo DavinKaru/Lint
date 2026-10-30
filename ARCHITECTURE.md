@@ -36,6 +36,10 @@ LICENSE
   `UrlCleaner.swift`/`ShortLinkResolver.swift` (iOS). Any change to one must be made to the
   other in the same PR; each platform's tests are ports of each other, so keep those in step too.
 
+- **`/shared/tests/link-cases.json`** is the test set of real shared links that both platforms'
+  tests load and check, so a rule change that breaks a case fails on both. Add a case for every
+  source Lint supports or deliberately skips (see `shared/tests/README.md`).
+
 ## Releases
 
 Each platform is versioned and released independently, even for releases intended to ship the
