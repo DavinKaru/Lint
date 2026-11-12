@@ -1,0 +1,9 @@
+! Hand-written fixture for the research tests. Not taken from any real list.
+!#if env_mobile
+$doc,removeparam=zz_click
+!#endif
+$removeparam=zz_mailref
+$removeparam=vs_share,to=videosite.test|vid.example
+||www.exampleshop.$doc,removeparam=shop_sess
+||exampleshop.com/out?$doc,urlskip=?to
+||jump.example^$doc,urlskip=?u

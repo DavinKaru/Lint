@@ -1,0 +1,6 @@
+{
+  "data": [
+    {"stripList": ["zz_click", "zz_global"], "allowList": []},
+    {"stripList": ["fixture_known"], "allowList": ["allowed.example"]}
+  ]
+}

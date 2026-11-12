@@ -1,0 +1,6 @@
+{
+  "targets": [
+    {"name": "Example Shop", "category": "Shopping", "priority": "first", "breakRisk": false, "sources": ["Example Shop"]},
+    {"name": "Video Site", "category": "Video & music", "priority": "first", "breakRisk": false, "sources": ["Video Site"]}
+  ]
+}

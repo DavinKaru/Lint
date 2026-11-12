@@ -10,6 +10,8 @@ Lint is structured to support multiple platforms from day one: Android and iOS t
   /ios        <- Xcode project (Swift)
 /shared
   /rules      <- tracking-parameter rule catalog, shared across platforms
+  /tests      <- shared link test cases and the 1.0 target list
+  /research   <- monthly report of leads from public tracking-param lists
   /docs       <- cross-platform architecture/design notes
 ARCHITECTURE.md
 README.md
@@ -39,6 +41,12 @@ LICENSE
 - **`/shared/tests/link-cases.json`** is the test set of real shared links that both platforms'
   tests load and check, so a rule change that breaks a case fails on both. Add a case for every
   source Lint supports or deliberately skips (see `shared/tests/README.md`).
+
+- **`/shared/research`** finds leads for new rules from public tracking-param lists (ClearURLs,
+  AdGuard, uBlock Origin, Firefox) ranked by the Tranco top list, never from Lint's users. A monthly
+  workflow posts them to one GitHub issue. It never changes `rules.json` itself: each lead still
+  needs a real share, a test case and a check that the cleaned link works (see
+  `shared/research/README.md`).
 
 ## Releases
 

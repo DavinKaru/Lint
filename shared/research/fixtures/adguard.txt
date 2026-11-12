@@ -1,0 +1,18 @@
+! Hand-written fixture for the research tests. Not taken from any real list.
+! Title: Fixture tracking filter
+$removeparam=zz_click
+$removeparam=zz_mailid
+$removeparam=amp;zz_global
+$removeparam=/^zz_rx_/
+$removeparam=/^zz_exact=/
+$removeparam=/(complicated|regex)\d{2,}/
+||exampleshop.com^$removeparam=shop_trk
+||exampleshop.com^$removeparam=keepme
+||www.videosite.test^$removeparam=vs_share
+||videosite.test/watch$document,removeparam=vs_extra
+$removeparam=site_only,domain=newsy.example|~sub.newsy.example
+@@||exampleshop.com/cart^$removeparam=shop_trk
+||everything.example^$removeparam
+example.org##.cosmetic-rule
+this line is $removeparam= broken [[[
+||*.weird*host^$removeparam=lost
