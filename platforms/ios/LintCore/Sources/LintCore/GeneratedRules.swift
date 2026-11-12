@@ -193,7 +193,7 @@ enum GeneratedRules {
     static let sitePathParams: [SitePathParams] = [
         // Amazon product pages
         //   keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query. /-/<lang>/ paths are the same pages in another language.
-        SitePathParams(sites: ["amazon.*"], paths: ["/dp/*/**", "/*/dp/*/**", "/gp/product/*/**", "/gp/aw/d/*/**", "/-/*/dp/*/**", "/-/*/*/dp/*/**"], params: ["keywords"]),
+        SitePathParams(sites: ["amazon.*"], paths: ["/dp/*/**", "/*/dp/*/**", "/gp/product/*/**", "/gp/aw/d/*/**", "/-/*/dp/*/**", "/-/*/*/dp/*/**", "/-/*/gp/product/*/**", "/-/*/gp/aw/d/*/**"], params: ["keywords"]),
         // Pinterest pin pages
         //   Who shared the pin. Only stripped on /pin/<id>/ pages: on group-board and sign-up links they are the invite.
         SitePathParams(sites: ["pinterest.*"], paths: ["/pin/*/**"], params: ["invite_code", "sender"]),

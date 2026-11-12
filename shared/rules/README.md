@@ -32,6 +32,10 @@ So `/dp/*/**` matches `/dp/B0ABCDEF12` and `/dp/B0ABCDEF12/ref=sr_1_3`, but not 
 `/s`, and `/**` matches every path. (`redirectWrappers` paths are simpler: exact, or a prefix
 when they end in `*`.)
 
+Patterns only hold characters a URL path keeps unencoded (no `?`, `#`, `%` or spaces), since
+anything else could never match. A `siteParams` path needs at least one named segment: `/*/**`
+would also cover search pages like Amazon's `/s`, where the same param is the search itself.
+
 ## Changing the rules
 
 1. Edit `rules.json`. Prefer a `siteParams` entry over a global one unless the name can't mean

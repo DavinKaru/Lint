@@ -197,7 +197,7 @@ internal object GeneratedRules {
     val SITE_PATH_PARAMS: List<SitePathParams> = listOf(
         // Amazon product pages
         //   keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query. /-/<lang>/ paths are the same pages in another language.
-        SitePathParams(listOf("amazon.*"), listOf("/dp/*/**", "/*/dp/*/**", "/gp/product/*/**", "/gp/aw/d/*/**", "/-/*/dp/*/**", "/-/*/*/dp/*/**"), setOf("keywords")),
+        SitePathParams(listOf("amazon.*"), listOf("/dp/*/**", "/*/dp/*/**", "/gp/product/*/**", "/gp/aw/d/*/**", "/-/*/dp/*/**", "/-/*/*/dp/*/**", "/-/*/gp/product/*/**", "/-/*/gp/aw/d/*/**"), setOf("keywords")),
         // Pinterest pin pages
         //   Who shared the pin. Only stripped on /pin/<id>/ pages: on group-board and sign-up links they are the invite.
         SitePathParams(listOf("pinterest.*"), listOf("/pin/*/**"), setOf("invite_code", "sender")),

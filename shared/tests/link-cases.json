@@ -1292,6 +1292,22 @@
     {
       "source": "Amazon",
       "category": "Shopping",
+      "input": "https://www.amazon.com/-/es/gp/product/B0ABCDEF12?keywords=kettle&th=1",
+      "expected": "https://www.amazon.com/-/es/gp/product/B0ABCDEF12?th=1",
+      "verified": null,
+      "notes": "A /gp/product/ page in another language (/-/es/). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/-/es/s?keywords=kettle",
+      "expected": "https://www.amazon.com/-/es/s?keywords=kettle",
+      "verified": null,
+      "notes": "A search in another language (/-/es/s): keywords is the search itself, so it stays. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
       "input": "https://www.amazon.com/dp/?keywords=kettle",
       "expected": "https://www.amazon.com/dp/?keywords=kettle",
       "verified": null,

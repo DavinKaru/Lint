@@ -113,8 +113,11 @@ def validate(rules: dict) -> None:
             continue
         if not group["sites"] or not group["params"]:
             fail(f'siteParams "{group["source"]}" needs sites and params')
-        if any(path.strip("/") == "**" for path in group["paths"]):
-            fail(f'siteParams "{group["source"]}": a "/**" path is the whole site, so leave out paths instead')
+        # A pattern of only "*" and "**" segments ("/*/**", "/*") would also cover search pages like
+        # Amazon's /s, where the same param is the content.
+        if any(all(seg in ("*", "**") for seg in path.strip("/").split("/")) for path in group["paths"]):
+            fail(f'siteParams "{group["source"]}": every path needs at least one named segment; '
+                 'one made only of "*" and "**" covers almost the whole site')
         for site in group["sites"]:
             wide = {p for g in rules["siteParams"] if "paths" not in g
                     for s in g["sites"] if sites_overlap(site, s) for p in g["params"]}
@@ -164,8 +167,17 @@ def sites_overlap(a: str, b: str) -> bool:
             return host == key or host.endswith("." + key)
         name = re.escape(key[:-2])
         return re.fullmatch(rf"(.+\.)?{name}\.(com|[a-z]{{2}}|(com|co)\.[a-z]{{2}})", host) is not None
-    concrete = lambda key: key[:-2] + ".com" if key.endswith(".*") else key
-    return matches(concrete(a), b) or matches(concrete(b), a)
+    def hosts(key: str, other: str) -> list:
+        """Hosts key matches, tried against other: a wildcard gets .com and the other key's own
+        ending, so www.amazon.* meets amazon.co.uk (at www.amazon.co.uk)."""
+        if not key.endswith(".*"):
+            return [key]
+        endings = {"com"}
+        if not other.endswith(".*"):
+            labels = other.split(".")
+            endings |= {labels[-1], ".".join(labels[-2:])}
+        return [f"{key[:-2]}.{ending}" for ending in endings]
+    return any(matches(h, b) for h in hosts(a, b)) or any(matches(h, a) for h in hosts(b, a))
 
 
 def normal_path(path: str) -> str:
@@ -181,8 +193,10 @@ def check_segment_paths(paths: list, label: str) -> None:
         segments = path.strip("/").split("/")
         if not path.startswith("/") or any(not s or ("*" in s and s not in ("*", "**")) for s in segments) or "**" in segments[:-1]:
             fail(f'{label}: "{path}" should be "/"-separated segments, each a name or a whole "*", optionally ending in "**"')
-        if any(c in path for c in "?#%"):
-            fail(f'{label}: "{path}" can\'t contain "?", "#" or "%": paths are matched before the query, still percent-encoded')
+        # Paths are matched before the query and still percent-encoded, so a pattern with "?", "#",
+        # "%", a space or other characters a URL path never holds unencoded could never match.
+        if not re.fullmatch(r"[A-Za-z0-9._~!&'()*+,;=:@/-]+", path):
+            fail(f'{label}: "{path}" can only hold characters a URL path keeps unencoded (no "?", "#", "%" or spaces)')
 
 
 def check_literals(rules: dict) -> None:
