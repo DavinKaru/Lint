@@ -183,7 +183,7 @@ internal object GeneratedRules {
         //   Recommendation and search tracking on event links.
         "meetup.com" to setOf("recId", "recSource", "searchId", "eventOrigin", "_xtd"),
         // Klook
-        //   Page tracking. aid (affiliate) is kept for now, see the affiliate-ID decision.
+        //   Page tracking. aid (affiliate) is kept for now, see #28.
         "klook.com" to setOf("spm", "clickId"),
         // Yelp
         //   uid identifies the Yelp member who shared the link.

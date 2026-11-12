@@ -511,7 +511,7 @@
       "input": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3?crid=2ABCDEF&dib=eyJ2IjoiMSJ9&dib_tag=se&keywords=noise+cancelling+headphones&qid=1730000000&sprefix=noise%2Caps%2C250&sr=8-3",
       "expected": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3?keywords=noise+cancelling+headphones",
       "verified": null,
-      "notes": "Search context including the search terms. The /ref=... path segment is left for now. Format from public documentation and observed behaviour, not yet checked against a real share from the phone. keywords is kept for now (it's the query on search links); stripping it only on /dp/ links needs path-scoped rules."
+      "notes": "Search context including the search terms. The /ref=... path segment is left for now. Format from public documentation and observed behaviour, not yet checked against a real share from the phone. keywords is kept for now (it's the query on search links); stripping it only on /dp/ links needs path-scoped rules (#29)."
     },
     {
       "source": "Amazon",

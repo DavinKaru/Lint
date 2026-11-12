@@ -712,7 +712,7 @@
         "clickId"
       ],
       "source": "Klook",
-      "notes": "Page tracking. aid (affiliate) is kept for now, see the affiliate-ID decision."
+      "notes": "Page tracking. aid (affiliate) is kept for now, see #28."
     },
     {
       "sites": [
