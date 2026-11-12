@@ -166,6 +166,11 @@ class HelperTests(unittest.TestCase):
         rows = {r.name: r.note for r in research.compare(lists, catalog, {}, 2)["site"]}
         self.assertEqual(rows["ref"], "")  # an exception on a subdomain isn't the whole site's
         self.assertEqual(rows["zz"], "A exempts every param on `archive.example`")
+        # A global row isn't noted with every site that exempts every param, only its own param.
+        lists["A"].params.add(("param", "zz_everywhere", None))
+        lists["A"].exempt.add(("zz_everywhere", "news.example"))
+        globals_ = {r.name: r.note for r in research.compare(lists, catalog, {}, 1)["global"]}
+        self.assertEqual(globals_["zz_everywhere"], "A exempts it on `news.example`")
 
     def test_targets_by_name_only_without_case_links(self):
         cases = {"clean": [{"source": "Bigco Chat", "input": "", "expected": "https://chat.bigco.example/x"}]}

@@ -716,10 +716,17 @@ def compare(lists: dict, catalog: Catalog, ranks: dict, min_lists: int) -> dict:
     def exemptions(name, sites) -> str:
         """Where a list says stripping name breaks a site: worth knowing before adding a rule."""
         # An exception counts for a row's site if it covers that site (not just a subdomain of it).
+        # A global row notes every site that exempts the param itself, but not the sites that
+        # exempt every param: those say nothing about this one.
+        def applies(param, site):
+            if None in sites:
+                return param != "*" or site is None
+            return site is None or any(site_matches(s, site) for s in sites)
+
         found = sorted({f"{list_name} exempts {'it' if param != '*' else 'every param'} on `{site or 'every site'}`"
                         for param in (name.lower(), "*")
                         for list_name, site in exempt.get(param, ())
-                        if None in sites or site is None or any(site_matches(s, site) for s in sites)})
+                        if applies(param, site)})
         return "; ".join(found[:2]) + (f" (+{len(found) - 2} more)" if len(found) > 2 else "")
 
     def kept_reason(kind, name, sites) -> str | None:
