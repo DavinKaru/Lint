@@ -68,6 +68,7 @@ struct SharedLinkCasesTests {
 
     @Test(arguments: cases.shortLinks)
     func matchesSharedShortLinkCase(_ testCase: ShortLinkCase) {
-        #expect(ShortLinkResolver.isKnownShortLink(testCase.url) == testCase.known)
+        // Unwrapped first, as the share flow does, so a short link inside a redirect link counts.
+        #expect(ShortLinkResolver.isKnownShortLink(UrlCleaner.unwrap(testCase.url)) == testCase.known)
     }
 }

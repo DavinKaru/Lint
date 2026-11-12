@@ -42,7 +42,9 @@ object ShortLinkResolver {
 
     /**
      * Returns true if [url]'s host is exactly one of the known short-link domains
-     * (case-insensitive, exact match — not a substring match).
+     * (case-insensitive, exact match — not a substring match), or its host and whole path match
+     * one of the short-link path rules (e.g. reddit.com/r/<sub>/s/<code>). Pass it the link after
+     * [UrlCleaner.unwrap], as the share flow does.
      */
     fun isKnownShortLink(url: String): Boolean {
         val uri = try {

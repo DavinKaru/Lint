@@ -54,7 +54,7 @@ class SharedLinkCasesTest {
         val failures = (0 until shortLinks.length()).map { shortLinks.getJSONObject(it) }.mapNotNull { case ->
             val url = case.getString("url")
             val expected = case.getBoolean("known")
-            if (ShortLinkResolver.isKnownShortLink(url) == expected) null
+            if (ShortLinkResolver.isKnownShortLink(UrlCleaner.unwrap(url)) == expected) null
             else "${case.getString("source")}: $url should ${if (expected) "" else "not "}be a known short link"
         }
         assertEquals("Failing shared short link cases:\n" + failures.joinToString("\n"), 0, failures.size)

@@ -275,14 +275,14 @@ enum GeneratedRules {
         //   Bing's result links carry the real link in u= as "a1" followed by unpadded base64url.
         RedirectWrapper(sites: ["bing.com"], paths: ["/ck/a"], params: ["u"], base64Prefix: "a1"),
         // Google cookie consent
-        //   Resolving a maps.app.goo.gl or youtu.be link from a cookie-less device (e.g. in the EU) can land here; continue= is the real link.
-        RedirectWrapper(sites: ["consent.google.com", "consent.youtube.com"], paths: ["/ml", "/m"], params: ["continue"]),
+        //   Resolving a maps.app.goo.gl or youtu.be link from a cookie-less device (e.g. in the EU) can land here; continue= is the real link. Google only continues to its own sites, so other targets are left alone.
+        RedirectWrapper(sites: ["consent.google.com", "consent.youtube.com"], paths: ["/ml", "/m"], params: ["continue"], targetSites: ["google.*", "youtube.com"]),
         // Facebook sign-in
-        //   Resolving a Facebook short link without being signed in can land here; next= is the real link.
-        RedirectWrapper(sites: ["facebook.com"], paths: ["/login/", "/login.php"], params: ["next"]),
+        //   Resolving a Facebook short link without being signed in can land here; next= is the real link. Facebook only continues to its own pages, so other targets are left alone.
+        RedirectWrapper(sites: ["facebook.com"], paths: ["/login/", "/login.php"], params: ["next"], targetSites: ["facebook.com"]),
         // AliExpress share page
         //   Where a.aliexpress.com share links land: a share page whose redirectUrl= is the product link.
-        RedirectWrapper(sites: ["star.aliexpress.com"], paths: ["/share/share.htm"], params: ["redirectUrl"]),
+        RedirectWrapper(sites: ["star.aliexpress.com"], paths: ["/share/share.htm"], params: ["redirectUrl"], targetSites: ["aliexpress.*"]),
     ]
 
     /// Redirect links that carry the real link in their path; unwrapped offline.
@@ -295,11 +295,13 @@ enum GeneratedRules {
 
 /// A redirect on `sites` at `paths` (a trailing "*" matches any rest) whose first valid `params` value is the real
 /// link: percent-encoded, or if `base64Prefix` is set, that prefix followed by the link in unpadded base64url.
+/// If `targetSites` is set, the real link must be on one of them, or the wrapper is left alone.
 struct RedirectWrapper: Sendable {
     let sites: [String]
     let paths: [String]
     let params: [String]
     var base64Prefix: String? = nil
+    var targetSites: [String]? = nil
 }
 
 /// Short links on `sites` whose path matches one of `paths` ("*" = one segment).

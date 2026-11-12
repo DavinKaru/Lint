@@ -1046,7 +1046,11 @@
         "continue"
       ],
       "source": "Google cookie consent",
-      "notes": "Resolving a maps.app.goo.gl or youtu.be link from a cookie-less device (e.g. in the EU) can land here; continue= is the real link."
+      "notes": "Resolving a maps.app.goo.gl or youtu.be link from a cookie-less device (e.g. in the EU) can land here; continue= is the real link. Google only continues to its own sites, so other targets are left alone.",
+      "targetSites": [
+        "google.*",
+        "youtube.com"
+      ]
     },
     {
       "sites": [
@@ -1060,7 +1064,10 @@
         "next"
       ],
       "source": "Facebook sign-in",
-      "notes": "Resolving a Facebook short link without being signed in can land here; next= is the real link."
+      "notes": "Resolving a Facebook short link without being signed in can land here; next= is the real link. Facebook only continues to its own pages, so other targets are left alone.",
+      "targetSites": [
+        "facebook.com"
+      ]
     },
     {
       "sites": [
@@ -1073,7 +1080,10 @@
         "redirectUrl"
       ],
       "source": "AliExpress share page",
-      "notes": "Where a.aliexpress.com share links land: a share page whose redirectUrl= is the product link."
+      "notes": "Where a.aliexpress.com share links land: a share page whose redirectUrl= is the product link.",
+      "targetSites": [
+        "aliexpress.*"
+      ]
     }
   ],
   "pathWrappers": [

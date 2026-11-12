@@ -279,14 +279,14 @@ internal object GeneratedRules {
         //   Bing's result links carry the real link in u= as "a1" followed by unpadded base64url.
         RedirectWrapper(listOf("bing.com"), listOf("/ck/a"), listOf("u"), base64Prefix = "a1"),
         // Google cookie consent
-        //   Resolving a maps.app.goo.gl or youtu.be link from a cookie-less device (e.g. in the EU) can land here; continue= is the real link.
-        RedirectWrapper(listOf("consent.google.com", "consent.youtube.com"), listOf("/ml", "/m"), listOf("continue")),
+        //   Resolving a maps.app.goo.gl or youtu.be link from a cookie-less device (e.g. in the EU) can land here; continue= is the real link. Google only continues to its own sites, so other targets are left alone.
+        RedirectWrapper(listOf("consent.google.com", "consent.youtube.com"), listOf("/ml", "/m"), listOf("continue"), targetSites = listOf("google.*", "youtube.com")),
         // Facebook sign-in
-        //   Resolving a Facebook short link without being signed in can land here; next= is the real link.
-        RedirectWrapper(listOf("facebook.com"), listOf("/login/", "/login.php"), listOf("next")),
+        //   Resolving a Facebook short link without being signed in can land here; next= is the real link. Facebook only continues to its own pages, so other targets are left alone.
+        RedirectWrapper(listOf("facebook.com"), listOf("/login/", "/login.php"), listOf("next"), targetSites = listOf("facebook.com")),
         // AliExpress share page
         //   Where a.aliexpress.com share links land: a share page whose redirectUrl= is the product link.
-        RedirectWrapper(listOf("star.aliexpress.com"), listOf("/share/share.htm"), listOf("redirectUrl")),
+        RedirectWrapper(listOf("star.aliexpress.com"), listOf("/share/share.htm"), listOf("redirectUrl"), targetSites = listOf("aliexpress.*")),
     )
 
     /** Redirect links that carry the real link in their path; unwrapped offline. */
@@ -300,12 +300,14 @@ internal object GeneratedRules {
 /**
  * A redirect on [sites] at [paths] (a trailing "*" matches any rest) whose first valid [params] value is the real
  * link: percent-encoded, or if [base64Prefix] is set, that prefix followed by the link in unpadded base64url.
+ * If [targetSites] is set, the real link must be on one of them, or the wrapper is left alone.
  */
 internal data class RedirectWrapper(
     val sites: List<String>,
     val paths: List<String>,
     val params: List<String>,
     val base64Prefix: String? = null,
+    val targetSites: List<String>? = null,
 )
 
 /** A redirect on [sites] whose path after [prefix] is the real link, without its [scheme]. */

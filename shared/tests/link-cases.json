@@ -1430,6 +1430,18 @@
       "source": "Mailchimp",
       "url": "https://list-manage.com.evil.example/track/click?u=1",
       "known": false
+    },
+    {
+      "source": "YouTube",
+      "url": "https://www.google.com/url?q=https://youtu.be/dQw4w9WgXcQ&sa=D",
+      "known": true,
+      "notes": "A short link inside a redirect link is unwrapped first, then resolved."
+    },
+    {
+      "source": "Facebook (remaining)",
+      "url": "https://www.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Fshare%2Fp%2FAbCdEf%2F",
+      "known": true,
+      "notes": "A sign-in page wrapping a share link is unwrapped to the share link."
     }
   ],
   "unwrap": [
@@ -1513,6 +1525,36 @@
       "input": "https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005001234567890.html%3FsourceType%3D1%26spm%3Dabc",
       "expected": "https://www.aliexpress.com/item/1005001234567890.html?sourceType=1&spm=abc",
       "notes": "Where a.aliexpress.com share links land; the inner link is cleaned afterwards. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook (remaining)",
+      "input": "https://www.facebook.com/login/?next=https%3A%2F%2Fevil.example%2Fphish",
+      "expected": "https://www.facebook.com/login/?next=https%3A%2F%2Fevil.example%2Fphish",
+      "notes": "Facebook's sign-in page only continues to Facebook, so an outside next= is left alone rather than made into a direct link."
+    },
+    {
+      "source": "Google Maps short links",
+      "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fevil.example%2Fphish&gl=AU",
+      "expected": "https://consent.google.com/ml?continue=https%3A%2F%2Fevil.example%2Fphish&gl=AU",
+      "notes": "Google's consent page only continues to Google's own sites, so an outside continue= is left alone."
+    },
+    {
+      "source": "AliExpress",
+      "input": "https://star.aliexpress.com/share/share.htm?redirectUrl=https%3A%2F%2Fevil.example%2Fphish",
+      "expected": "https://star.aliexpress.com/share/share.htm?redirectUrl=https%3A%2F%2Fevil.example%2Fphish",
+      "notes": "AliExpress's share page is only unwrapped to AliExpress links."
+    },
+    {
+      "source": "Gmail / Google Docs",
+      "input": "https://www.google.com/url?q=https://example.com/%E2%80%AEtxt.exe&sa=D",
+      "expected": "https://www.google.com/url?q=https://example.com/%E2%80%AEtxt.exe&sa=D",
+      "notes": "U+202E (right-to-left override) would disguise the link, so it isn't unwrapped."
+    },
+    {
+      "source": "Gmail / Google Docs",
+      "input": "https://www.google.com/url?q=https%3A%2F%2Fexample.com%2F%٣F&sa=D",
+      "expected": "https://www.google.com/url?q=https%3A%2F%2Fexample.com%2F%٣F&sa=D",
+      "notes": "Only ASCII hex digits count in a percent escape; this one is malformed, so it's left alone."
     }
   ]
 }

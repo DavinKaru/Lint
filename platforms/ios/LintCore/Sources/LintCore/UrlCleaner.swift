@@ -91,9 +91,16 @@ public enum UrlCleaner {
             for param in wrapper.params {
                 guard let pair = pairs.first(where: { $0.hasPrefix(param + "=") }) else { continue }
                 let value = String(pair.dropFirst(param.count + 1))
-                let decoded = wrapper.base64Prefix.map { base64UrlDecode(value, prefix: $0) } ?? percentDecode(value)
-                guard let target = decoded else { continue }
-                if let valid = validTarget(target) { return valid }
+                // A base64 wrapper never falls back to percent-decoding.
+                let decoded: String?
+                if let prefix = wrapper.base64Prefix {
+                    decoded = base64UrlDecode(value, prefix: prefix)
+                } else {
+                    decoded = percentDecode(value)
+                }
+                guard let target = decoded, let valid = validTarget(target) else { continue }
+                if let sites = wrapper.targetSites, !onSite(valid, sites) { continue }
+                return valid
             }
         }
         return nil
@@ -103,7 +110,14 @@ public enum UrlCleaner {
         pattern.hasSuffix("*") ? path.hasPrefix(String(pattern.dropLast())) : path == pattern
     }
 
-    /// `target` if it's an http(s) link that parses with a host, otherwise nil.
+    /// True if `url`'s host matches one of `sites` (same matching as site rules).
+    private static func onSite(_ url: String, _ sites: [String]) -> Bool {
+        guard let host = URLComponents(string: url)?.host?.lowercased() else { return false }
+        return sites.contains { hostMatches(host, $0) }
+    }
+
+    /// `target` if it's an http(s) link that parses with a host, otherwise nil. Whitespace, control
+    /// and invisible format characters (e.g. U+202E) are refused.
     private static func validTarget(_ target: String) -> String? {
         let lower = target.lowercased()
         guard lower.hasPrefix("http://") || lower.hasPrefix("https://") else { return nil }

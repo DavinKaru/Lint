@@ -93,7 +93,8 @@ object UrlCleaner {
                 val value = pair.substringAfter("=")
                 val prefix = wrapper.base64Prefix
                 val target = (if (prefix != null) base64UrlDecode(value, prefix) else percentDecode(value)) ?: continue
-                validTarget(target)?.let { return it }
+                val valid = validTarget(target) ?: continue
+                if (wrapper.targetSites == null || onSite(valid, wrapper.targetSites)) return valid
             }
         }
         return null
@@ -102,11 +103,22 @@ object UrlCleaner {
     private fun pathMatches(path: String, pattern: String): Boolean =
         if (pattern.endsWith("*")) path.startsWith(pattern.dropLast(1)) else path == pattern
 
-    /** [target] if it's an http(s) link that parses with a host, otherwise null. */
+    /** True if [url]'s host matches one of [sites] (same matching as site rules). */
+    private fun onSite(url: String, sites: List<String>): Boolean {
+        val host = try { URI(url).host?.lowercase() } catch (e: URISyntaxException) { null } ?: return false
+        return sites.any { hostMatches(host, it) }
+    }
+
+    /**
+     * [target] if it's an http(s) link that parses with a host, otherwise null. Whitespace, control
+     * and invisible format characters (e.g. U+202E, which reverses how text displays) are refused,
+     * matching iOS's CharacterSet.controlCharacters.
+     */
     private fun validTarget(target: String): String? {
         val lower = target.lowercase()
         if (!lower.startsWith("http://") && !lower.startsWith("https://")) return null
         if (target.any { it.isWhitespace() || it.isISOControl() }) return null
+        if (target.codePoints().anyMatch { Character.getType(it) == Character.FORMAT.toInt() }) return null
         val uri = try { URI(target) } catch (e: URISyntaxException) { return null }
         return if (uri.host.isNullOrEmpty()) null else target
     }
@@ -146,6 +158,14 @@ object UrlCleaner {
         }
     }
 
+    /** An ASCII hex digit's value, or -1. (Character.digit would also accept non-ASCII digits.) */
+    private fun hexValue(c: Char): Int = when (c) {
+        in '0'..'9' -> c - '0'
+        in 'a'..'f' -> c - 'a' + 10
+        in 'A'..'F' -> c - 'A' + 10
+        else -> -1
+    }
+
     /** Strict percent-decoding ("+" stays "+"): null if malformed or not valid UTF-8. */
     private fun percentDecode(value: String): String? {
         val bytes = ByteArrayOutputStream()
@@ -153,8 +173,8 @@ object UrlCleaner {
         while (i < value.length) {
             if (value[i] == '%') {
                 if (i + 2 >= value.length) return null
-                val hi = Character.digit(value[i + 1], 16)
-                val lo = Character.digit(value[i + 2], 16)
+                val hi = hexValue(value[i + 1])
+                val lo = hexValue(value[i + 2])
                 if (hi < 0 || lo < 0) return null
                 bytes.write(hi * 16 + lo)
                 i += 3
