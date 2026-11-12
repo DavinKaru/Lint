@@ -35,6 +35,7 @@ hasn't been tested on a real device yet.
 | `a.aliexpress.com` | AliExpress | Not yet confirmed | AliExpress app share links. Not yet tested on a real device. |
 | `flip.it` | Flipboard | Not yet confirmed | Flipboard's short links. Not yet tested on a real device. |
 | `link.deezer.com` | Deezer | Not yet confirmed | Deezer's share links. Not yet tested on a real device. |
+| `<account>.<dc>.list-manage.com/track/click` | Mailchimp | Not yet confirmed | Newsletter click links. Their `e=` param identifies you as the subscriber, so the link is resolved to its destination instead of being shared as is. Resolving it counts as a click by you in the sender's stats, much like opening it would. Only the `/track/click` path is resolved. Not yet tested on a real device. |
 
 ### How resolution works
 

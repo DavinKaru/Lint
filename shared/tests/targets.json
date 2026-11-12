@@ -293,7 +293,9 @@
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Mailchimp click links"
+      ]
     },
     {
       "name": "Medium",

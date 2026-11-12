@@ -1208,6 +1208,22 @@
       "expected": "Found this https://www.example.com.au/some-page?id=42",
       "verified": null,
       "notes": "Unwrapped, then the inner link is cleaned. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Flipboard",
+      "category": "News & newsletters",
+      "input": "https://flipboard.com/@someone/some-magazine-a1b2c3d4z?utm_source=share&utm_medium=ios",
+      "expected": "https://flipboard.com/@someone/some-magazine-a1b2c3d4z",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Mailchimp click links",
+      "category": "News & newsletters",
+      "input": "https://shop.example.com.au/sale?utm_source=newsletter&utm_campaign=spring&mc_cid=a1b2c3d4e5&mc_eid=f6e5d4c3b2",
+      "expected": "https://shop.example.com.au/sale",
+      "verified": null,
+      "notes": "Where a resolved list-manage.com click link lands: mc_cid and mc_eid identify the campaign and subscriber. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     }
   ],
   "shortLinks": [
@@ -1383,6 +1399,21 @@
       "source": "Deezer",
       "url": "https://link.deezer.com/s/AbCdEfGh",
       "known": true
+    },
+    {
+      "source": "Mailchimp",
+      "url": "https://example.us12.list-manage.com/track/click?u=0123abcd&id=4567ef&e=89abcd",
+      "known": true
+    },
+    {
+      "source": "Mailchimp",
+      "url": "https://example.us12.list-manage.com/subscribe?u=0123abcd&id=4567ef",
+      "known": false
+    },
+    {
+      "source": "Mailchimp",
+      "url": "https://list-manage.com.evil.example/track/click?u=1",
+      "known": false
     }
   ],
   "unwrap": [

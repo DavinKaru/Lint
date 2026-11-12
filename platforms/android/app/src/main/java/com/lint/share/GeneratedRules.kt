@@ -242,6 +242,9 @@ internal object GeneratedRules {
         // Facebook
         //   Share links like facebook.com/share/p/<code>/ and /share/r/<code>/.
         ShortLinkPath(listOf("facebook.com"), listOf("/share/*", "/share/*/*")),
+        // Mailchimp
+        //   Newsletter click links on <account>.<dc>.list-manage.com. The e= param identifies the subscriber, so resolving replaces it with the destination. Resolving counts as a click by the person sharing.
+        ShortLinkPath(listOf("list-manage.com"), listOf("/track/click")),
     )
 
     /** Redirect links that carry the real link in a query param; unwrapped offline. */
