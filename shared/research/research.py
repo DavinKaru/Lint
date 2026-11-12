@@ -39,6 +39,8 @@ TARGETS = ROOT / "shared/tests/targets.json"
 USER_AGENT = "Lint-param-research (+https://github.com/DavinKaru/Lint)"
 MAX_DOWNLOAD = 64 * 1024 * 1024
 ATTEMPTS = 3  # per mirror; big downloads sometimes arrive cut short
+DEADLINE = 8 * 60  # seconds for all downloads together, well inside the CI job's 15 minutes
+CHUNK = 1024 * 1024
 ISSUE_LIMIT = 65536
 
 
@@ -77,12 +79,27 @@ TRANCO = Source("tranco", "Tranco top 1M", "free to use, cite Tranco", "https://
 
 # --- Fetching -------------------------------------------------------------------------------
 
-def fetch(url: str, timeout: float) -> bytes:
-    """Downloads url. Raises RuntimeError naming the url on any failure."""
+def fetch(url: str, timeout: float, deadline: float) -> bytes:
+    """Downloads url, giving up at `deadline` (time.monotonic()) even if the server keeps sending
+    a trickle. Raises RuntimeError naming the url on any failure."""
+    def left():
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("ran out of time for downloads")
+        return remaining
+
     try:
         request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            data = response.read(MAX_DOWNLOAD + 1)
+        with urllib.request.urlopen(request, timeout=min(timeout, left())) as response:
+            chunks, size = [], 0
+            while size <= MAX_DOWNLOAD:
+                left()
+                chunk = response.read(CHUNK)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                size += len(chunk)
+            data = b"".join(chunks)
     except Exception as error:  # noqa: BLE001 - every failure is reported, none is fatal
         raise RuntimeError(f"{url}: {type(error).__name__}: {error}") from error
     if len(data) > MAX_DOWNLOAD:
@@ -108,7 +125,7 @@ def verify_filter_text(url: str, data: bytes) -> None:
         raise RuntimeError(f"{url}: doesn't end with a newline (download cut short?)")
 
 
-def load(source: Source, parse, offline: Path | None, save: Path | None, timeout: float):
+def load(source: Source, parse, offline: Path | None, save: Path | None, timeout: float, deadline: float):
     """Returns parse(data) for the first mirror that downloads and parses (a download cut short
     usually fails to parse, so the next mirror is tried). Raises if none works."""
     if offline is not None:
@@ -122,7 +139,7 @@ def load(source: Source, parse, offline: Path | None, save: Path | None, timeout
     for mirror in source.mirrors:
         for attempt in range(ATTEMPTS):
             try:
-                parts = [fetch(url, timeout) for url in mirror]
+                parts = [fetch(url, timeout, deadline) for url in mirror]
                 if source.kind == "filter":
                     for url, part in zip(mirror, parts):
                         verify_filter_text(url, part)
@@ -130,6 +147,8 @@ def load(source: Source, parse, offline: Path | None, save: Path | None, timeout
                 parsed = parse(data)
             except Exception as error:  # noqa: BLE001 - retry, then try the next mirror
                 last = str(error) if isinstance(error, RuntimeError) else f"{' + '.join(mirror)}: {error}"
+                if time.monotonic() + 2 * (attempt + 1) >= deadline:
+                    break
                 if attempt + 1 < ATTEMPTS:
                     time.sleep(2 * (attempt + 1))
                 continue
@@ -272,6 +291,7 @@ class ListData:
     params: set = field(default_factory=set)       # (kind, name, site|None), kind = param|prefix
     redirects: set = field(default_factory=set)    # sites with redirect/unwrap rules
     referral: set = field(default_factory=set)     # (name, site|None): affiliate IDs (ClearURLs)
+    exempt: set = field(default_factory=set)       # (lowercase name, site|None): @@ exceptions
     plain: int = 0
     regex: int = 0
     other: int = 0
@@ -435,9 +455,10 @@ def parse_filter(data: bytes) -> ListData:
             continue
         if "removeparam" not in line and "urlskip" not in line:
             continue
-        if line.startswith("@@"):
-            out.other += 1
-            continue
+        # An @@ exception is the list saying "stripping this breaks this site".
+        exception = line.startswith("@@")
+        if exception:
+            line = line[2:]
         match = re.match(r"^(.*?)\$(.*(?:removeparam|urlskip).*)$", line)
         if not match:
             out.other += 1
@@ -458,6 +479,13 @@ def parse_filter(data: bytes) -> ListData:
             out.other += 1
             continue
         key, value = action
+        if exception:
+            parsed = filter_param(value) if key == "removeparam" and value and not value.startswith("~") else None
+            if parsed is None:
+                out.other += 1
+            else:
+                out.exempt.update((parsed[1].lower(), site) for site in sites)
+            continue
         if key == "urlskip":
             out.redirects.update(s for s in sites if s)
             continue
@@ -512,7 +540,14 @@ class Catalog:
     def __init__(self, rules: dict, cases: dict | None = None, targets: dict | None = None):
         self.prefixes = [p.lower() for g in rules["trackingPrefixes"] for p in g["prefixes"]]
         self.params = {p.lower() for g in rules["trackingParams"] for p in g["params"]}
-        self.entries = [(g["sites"], {p.lower() for p in g["params"]}, g["source"]) for g in rules["siteParams"]]
+        self.entries = [(g["sites"], {p.lower() for p in g["params"]}, g["source"])
+                        for g in rules["siteParams"] if "paths" not in g]
+        # Params Lint strips only on some pages of a site (Amazon's keywords on product pages).
+        self.scoped = [(g["sites"], {p.lower() for p in g["params"]}, g["source"], g["paths"])
+                       for g in rules["siteParams"] if "paths" in g]
+        # Affiliate IDs Lint keeps on purpose (#28).
+        self.affiliates = [(g["sites"], {p.lower() for p in g["params"]}, g["source"])
+                           for g in rules.get("affiliateParams", [])]
         self.never = {p.lower() for g in rules.get("neverStrip", []) for p in g["params"]}
         self.unwrap_sites = [s for key in ("redirectWrappers", "pathWrappers", "shortLinkPaths")
                              for g in rules.get(key, []) for s in g["sites"]]
@@ -522,9 +557,9 @@ class Catalog:
         self.target_names = []
         hosts_by_source = defaultdict(set)
         cases = cases or {}
-        # Where each source's links live, to match list sites to targets. Unwrap cases only count
-        # the wrapper's host, and only short links Lint knows.
-        inputs = [(c["source"], c["input"]) for c in cases.get("clean", []) + cases.get("unwrap", [])]
+        # Where each source's links live, to match list sites to targets: clean cases' cleaned links
+        # and short links Lint knows. Not wrappers: a google.com/url link isn't where YouTube lives.
+        inputs = [(c["source"], c["expected"]) for c in cases.get("clean", [])]
         inputs += [(c["source"], c["url"]) for c in cases.get("shortLinks", []) if c.get("known")]
         for source, text in inputs:
             for url in URL.findall(text):
@@ -551,7 +586,25 @@ class Catalog:
         n = name.lower()
         if any(n.startswith(p) for p in self.prefixes):
             return True
-        return kind == "param" and n in self.params
+        if kind == "prefix":
+            return n + "_" in self.prefixes  # a list's utm* is Lint's utm_
+        return n in self.params
+
+    def affiliate(self, name: str, sites) -> str | None:
+        """The affiliate group keeping name on any of sites (None in sites: on any site)."""
+        n = name.lower()
+        for keys, params, source in self.affiliates:
+            if n in params and any(s is None or any(site_matches(s, k) for k in keys) for s in sites):
+                return source
+        return None
+
+    def scoped_on(self, name: str, sites) -> tuple | None:
+        """(source, paths) if Lint strips name on all of sites, but only on some pages."""
+        n = name.lower()
+        for keys, params, source, paths in self.scoped:
+            if n in params and all(s is not None and any(site_matches(s, k) for k in keys) for s in sites):
+                return source, paths
+        return None
 
     def strips_on(self, kind: str, name: str, site: str) -> bool:
         if self.strips_globally(kind, name):
@@ -581,9 +634,16 @@ class Catalog:
         return None
 
     def targets_for(self, sites) -> list:
+        """Targets whose links live on one of sites. A list's site counts only if it's the target's
+        host or inside it: google.com params aren't Google Calendar's (calendar.google.com)."""
+        def inside(site, host):
+            if site.endswith(".*"):
+                return host.startswith(site[:-1]) and host_matches(host, site)
+            return host_matches(site, host)
+
         found = []
         for name, hosts in self.target_hosts:
-            if any(host_matches(h, s) or site_matches(s, h) for h in hosts for s in sites):
+            if any(s is not None and inside(s, h) for h in hosts for s in sites):
                 found.append(name)
         if not found:
             brands = {brand(s) for s in sites}
@@ -612,6 +672,10 @@ def display(kind: str, name: str) -> str:
 def compare(lists: dict, catalog: Catalog, ranks: dict, min_lists: int) -> dict:
     """Builds every report table. `lists` maps list name -> ListData."""
     spelling = defaultdict(Counter)
+    exempt = defaultdict(set)                                # lower name -> {(list, site|None)}
+    for list_name, data in lists.items():
+        for name, site in data.exempt:
+            exempt[name].add((list_name, site))
     global_flags = defaultdict(set)                          # (kind, lower) -> {list}
     site_flags = defaultdict(lambda: (set(), set()))         # (kind, lower, group) -> ({list}, {site})
     group_label = {}
@@ -636,14 +700,41 @@ def compare(lists: dict, catalog: Catalog, ranks: dict, min_lists: int) -> dict:
     def spelled(key):
         return spelling[key].most_common(1)[0][0]
 
+    def exemptions(name, sites) -> str:
+        """Where a list says stripping name breaks a site: worth knowing before adding a rule."""
+        found = sorted({f"{list_name} exempts it on `{site or 'every site'}`"
+                        for list_name, site in exempt.get(name.lower(), ())
+                        if None in sites or site is None or any(site_matches(site, s) or site_matches(s, site)
+                                                                 for s in sites)})
+        return "; ".join(found[:2]) + (f" (+{len(found) - 2} more)" if len(found) > 2 else "")
+
+    def kept_reason(kind, name, sites) -> str | None:
+        """Why Lint keeps a param the lists strip on sites, or None if it doesn't on purpose."""
+        if kind != "param":
+            return None
+        if name.lower() in catalog.never:
+            return "in neverStrip"
+        source = catalog.affiliate(name, sites)
+        if source:
+            return f"affiliate ID ({source}, #28)"
+        scoped = catalog.scoped_on(name, sites)
+        if scoped:
+            shown = ", ".join(f"`{p}`" for p in scoped[1][:2]) + (" ..." if len(scoped[1]) > 2 else "")
+            return f"Lint strips it only on some pages ({scoped[0]}: {shown})"
+        return None
+
     kept, global_rows, site_rows, single_rows = [], [], [], []
     for key, flagged in global_flags.items():
         kind, _ = key
         name = spelled(key)
-        if kind == "param" and key[1] in catalog.never:
-            kept.append(Row(kind, name, ["every site"], flagged, note="in neverStrip"))
+        if catalog.strips_globally(kind, name):
             continue
-        if catalog.strips_globally(kind, name) or len(flagged) < min_lists:
+        # An affiliate ID kept on one site is never stripped everywhere either.
+        reason = kept_reason(kind, name, [None])
+        if reason:
+            kept.append(Row(kind, name, ["every site"], flagged, note=reason))
+            continue
+        if len(flagged) < min_lists:
             continue
         source = catalog.kept_by_case(name, [None])
         if source:
@@ -651,6 +742,7 @@ def compare(lists: dict, catalog: Catalog, ranks: dict, min_lists: int) -> dict:
             continue
         on_sites = catalog.sites_stripping(kind, name)
         note = ("Lint strips it on: " + ", ".join(on_sites[:3])) if on_sites else ""
+        note = "; ".join(filter(None, [note, exemptions(name, [None])]))
         global_rows.append(Row(kind, name, ["every site"], flagged, note=note))
 
     for (kind, lower, group), (flagged, sites) in site_flags.items():
@@ -660,9 +752,11 @@ def compare(lists: dict, catalog: Catalog, ranks: dict, min_lists: int) -> dict:
         sites = sorted(sites)
         if all(catalog.strips_on(kind, name, s) for s in sites):
             continue
-        row = Row(kind, name, sites, everyone, group_label[group], best_rank(sites), catalog.targets_for(sites))
-        if kind == "param" and lower in catalog.never:
-            kept.append(Row(kind, name, sites, everyone, note="in neverStrip"))
+        row = Row(kind, name, sites, everyone, group_label[group], best_rank(sites), catalog.targets_for(sites),
+                  exemptions(name, sites))
+        reason = kept_reason(kind, name, sites)
+        if reason:
+            kept.append(Row(kind, name, sites, everyone, note=reason))
             continue
         source = catalog.kept_by_case(name, sites)
         if source:
@@ -681,8 +775,8 @@ def compare(lists: dict, catalog: Catalog, ranks: dict, min_lists: int) -> dict:
                 continue
             if site is not None and catalog.strips_on("param", name, site):
                 continue
-            kept.append(Row("param", name, [site or "every site"], {list_name},
-                            note="affiliate or referral ID (Lint keeps these for now, #28)"))
+            note = kept_reason("param", name, [site]) or "affiliate or referral ID, no Lint rule strips it (#28)"
+            kept.append(Row("param", name, [site or "every site"], {list_name}, note=note))
 
     # Share sources: sites several lists have rules for, with no Lint site rules and no target.
     sources = defaultdict(lambda: [set(), set(), set()])  # brand -> [lists, params, sites]
@@ -759,7 +853,7 @@ from this report.
 
 
 def esc(text: str) -> str:
-    return text.replace("|", "\\|")
+    return text.replace("|", "\\|").replace("\n", " ").replace("\r", " ")
 
 
 def short_sites(sites, limit=3) -> str:
@@ -793,7 +887,8 @@ def target_cell(row):
 def render(tables: dict, status: list, extra: list, limit: int, min_lists: int, date: str) -> str:
     param_cols = [("Param", lambda r: display(r.kind, r.name)), ("Lists", lists_cell), ("Notes", lambda r: r.note or "-")]
     site_cols = [("Param", lambda r: display(r.kind, r.name)), ("Site", lambda r: short_sites(r.sites)),
-                 ("Lists", lists_cell), ("Tranco", rank_cell), ("Target", target_cell)]
+                 ("Lists", lists_cell), ("Tranco", rank_cell), ("Target", target_cell),
+                 ("Notes", lambda r: r.note or "-")]
     out = [HEADER.format(date=date), "## Sources", "",
            "| List | Licence | Status | Plain rules | Regex rules skipped | Other lines skipped |", "|---|---|---|---|---|---|"]
     out += status + [""] + extra + [""]
@@ -830,8 +925,12 @@ def build(lists_status: dict, lists: dict, catalog: Catalog, ranks: dict, args, 
         if len(report) <= args.max_chars or limit <= 5:
             break
         limit = max(5, limit * 3 // 4)
+    # Nothing in the report may @-mention anyone on GitHub, whatever a list or server sent: a word
+    # joiner after every @ stops the mention without changing how it reads.
+    report = report.replace("@", "@\u2060")
     if len(report) > args.max_chars:
-        report = report[:args.max_chars - 60] + "\n\n_Report cut short to fit the issue size limit._\n"
+        cut = report.rfind("\n", 0, args.max_chars - 60)
+        report = report[:cut] + "\n\n_Report cut short to fit the issue size limit._\n"
     return report
 
 
@@ -855,6 +954,7 @@ def main(argv=None) -> int:
     parser.add_argument("--min-lists", type=int, default=2, help="lists that must agree (default 2)")
     parser.add_argument("--max-chars", type=int, default=ISSUE_LIMIT - 1536, help="report size cap")
     parser.add_argument("--timeout", type=float, default=60, help="seconds per download")
+    parser.add_argument("--deadline", type=float, default=DEADLINE, help="seconds for all downloads together")
     parser.add_argument("--date", help="date shown in the report (default today)")
     parser.add_argument("--rules", type=Path, default=RULES)
     parser.add_argument("--cases", type=Path, default=CASES)
@@ -865,22 +965,25 @@ def main(argv=None) -> int:
                       json.loads(args.cases.read_text(encoding="utf-8")) if args.cases.exists() else None,
                       json.loads(args.targets.read_text(encoding="utf-8")) if args.targets.exists() else None)
     lists, status, extra, ranks = {}, [], [], {}
+    deadline = time.monotonic() + args.deadline
     for source in SOURCES + [TRANCO]:
         link = f"[{source.name}]({source.homepage})"
         try:
             if source.kind == "tranco":
-                ranks, origin = load(source, checked(parse_tranco), args.offline, args.save, args.timeout)
+                ranks, origin = load(source, checked(parse_tranco), args.offline, args.save, args.timeout, deadline)
                 status.append(f"| {link} | {source.licence} | ok via {origin} ({len(ranks):,} names) | - | - | - |")
                 continue
             if source.kind == "clearurls":
-                (parsed, unmapped), origin = load(source, checked(parse_clearurls), args.offline, args.save, args.timeout)
+                (parsed, unmapped), origin = load(source, checked(parse_clearurls), args.offline, args.save, args.timeout, deadline)
                 if unmapped:
+                    # Provider names come from the list: only plain ones are shown, inside code.
+                    shown = sorted(n for n in unmapped if re.fullmatch(r"[\w .-]{1,60}", n))
                     extra.append(f"ClearURLs providers whose site couldn't be read ({len(unmapped)}): "
-                                 + ", ".join(f"`{n}`" for n in sorted(unmapped)[:20])
-                                 + (" ..." if len(unmapped) > 20 else ""))
+                                 + ", ".join(f"`{n}`" for n in shown[:20])
+                                 + (" ..." if len(unmapped) > min(len(shown), 20) else ""))
             else:
                 parser = parse_filter if source.kind == "filter" else parse_firefox
-                parsed, origin = load(source, checked(parser), args.offline, args.save, args.timeout)
+                parsed, origin = load(source, checked(parser), args.offline, args.save, args.timeout, deadline)
             lists[source.name] = parsed
             status.append(f"| {link} | {source.licence} | ok via {origin} | {parsed.plain:,} | {parsed.regex:,} | {parsed.other:,} |")
         except Exception as error:  # noqa: BLE001 - a failed source is reported and skipped

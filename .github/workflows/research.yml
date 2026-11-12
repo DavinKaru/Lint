@@ -2,7 +2,7 @@ name: Param research
 
 # Once a month, compares Lint's rules with public tracking-param lists and posts the leads to one
 # "Param research report" issue (see shared/research/README.md). It never changes the rules. The
-# tests run on every PR that touches the script, without the network.
+# tests run on every PR that touches the script or the catalog, without the network.
 on:
   schedule:
     - cron: "23 5 1 * *"
@@ -10,6 +10,9 @@ on:
   pull_request:
     paths:
       - "shared/research/**"
+      # The tests also load the real catalog, so a rules or cases change can't break the report.
+      - "shared/rules/**"
+      - "shared/tests/**"
       - ".github/workflows/research.yml"
 
 permissions:

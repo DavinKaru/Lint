@@ -4,7 +4,7 @@
 
 The project currently uses a placeholder MIT license for the code (see `LICENSE`).
 
-If we later decide to bundle a GPL-3.0-licensed tracking-parameter ruleset directly (e.g. the
+If we later decide to bundle a GPL- or LGPL-licensed tracking-parameter ruleset directly (e.g. the
 rules from [ClearURLs](https://github.com/ClearURLs/Rules), which are LGPL-3.0, or AdGuard's and
 uBlock Origin's filters, which are GPL-3.0), that would likely
 require relicensing the project (or at least the affected module) under GPL-3.0 or a

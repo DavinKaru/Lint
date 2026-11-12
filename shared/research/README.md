@@ -39,7 +39,13 @@ rank:
 - Popular sites several lists have rules for that aren't targets yet (possible new share sources).
 - Redirect links the lists unwrap that Lint doesn't (compared by site, not path).
 - Params Lint keeps on purpose that lists strip: `neverStrip`, params a link case keeps in its
-  expected output (content IDs, variant selectors), and affiliate IDs (#28). For information only.
+  expected output (content IDs, variant selectors), affiliate IDs (`affiliateParams`, #28), and
+  params Lint strips only on some pages of a site (`siteParams` with `paths`). For information only.
+
+When a filter list has an exception (`@@...$removeparam=`) for a lead's param on that site, the lead
+says so: it's the list saying that stripping it there breaks something. A list's site matches a
+target only if it's one of the target's hosts or inside one (`google.com` rules aren't Google
+Calendar's).
 
 Plain param names are compared. Simple regexes (`(?:%3F)?name`, `name[a-z]*`, `/^name_/`) are read as
 a name or a prefix; anything more complex is counted in the Sources table and skipped. Names are
@@ -59,7 +65,8 @@ python3 shared/research/research.py --offline DIR    # reuse them: clearurls.jso
 `--min-lists` (default 2) sets how many lists must agree, `--limit` (default 60) the rows per table.
 A source that fails to download (each is tried 3 times, then its mirror) is listed as failed in the
 report and skipped. Downloads cut short are caught by the list's checksum or a missing final
-newline. The script exits with 2 only if no tracking list could be loaded.
+newline. All downloads together stop after 8 minutes (`--deadline`), so the monthly job always
+finishes and posts what it has. The script exits with 2 only if no tracking list could be loaded.
 
 Tests (no network):
 

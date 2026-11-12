@@ -12,6 +12,10 @@ $removeparam=/(complicated|regex)\d{2,}/
 ||videosite.test/watch$document,removeparam=vs_extra
 $removeparam=site_only,domain=newsy.example|~sub.newsy.example
 @@||exampleshop.com/cart^$removeparam=shop_trk
+@@||videosite.test^$removeparam=vs_share
+||exampleshop.com^$removeparam=shop_aff
+||exampleshop.com^$removeparam=shop_kw
+$removeparam=/^utm/
 ||everything.example^$removeparam
 example.org##.cosmetic-rule
 this line is $removeparam= broken [[[

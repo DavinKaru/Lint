@@ -104,6 +104,27 @@ class HelperTests(unittest.TestCase):
                          ["doc", "removeparam=/a{1,2}/", "domain=x.com"])
 
 
+    def test_targets_only_match_a_list_site_inside_them(self):
+        cases = {"clean": [{"source": "Planner", "input": "", "expected": "https://planner.bigco.example/e?x=1"},
+                           {"source": "Shop", "input": "https://bigco.example/url?q=x", "expected": "https://shopco.com/i/1"}]}
+        targets = {"targets": [{"name": "Planner", "sources": ["Planner"]}, {"name": "Shop", "sources": ["Shop"]}]}
+        catalog = research.Catalog(json.loads((FIXTURES / "rules.json").read_text(encoding="utf-8")), cases, targets)
+        # Search params on bigco.example aren't the planner's, and a wrapper isn't where Shop lives.
+        self.assertEqual(catalog.targets_for(["bigco.example"]), [])
+        self.assertEqual(catalog.targets_for(["planner.bigco.example"]), ["Planner"])
+        self.assertEqual(catalog.targets_for(["shopco.*"]), ["Shop"])
+        self.assertEqual(catalog.targets_for(["m.shopco.com"]), ["Shop"])
+
+    def test_a_list_prefix_lint_covers_with_an_underscore(self):
+        catalog = research.Catalog(json.loads((FIXTURES / "rules.json").read_text(encoding="utf-8")))
+        self.assertTrue(catalog.strips_globally("prefix", "utm"))
+        self.assertFalse(catalog.strips_globally("prefix", "ut"))
+
+    def test_downloads_stop_at_the_deadline(self):
+        with self.assertRaisesRegex(RuntimeError, "ran out of time"):
+            research.fetch("http://127.0.0.1:9/", 5, research.time.monotonic() - 1)
+
+
 class ParserTests(unittest.TestCase):
     def test_filter_list(self):
         data = research.parse_filter((FIXTURES / "adguard.txt").read_bytes())
@@ -117,8 +138,10 @@ class ParserTests(unittest.TestCase):
         self.assertIn(("param", "site_only", "newsy.example"), data.params)
         self.assertNotIn(("param", "site_only", "sub.newsy.example"), data.params)
         self.assertEqual(data.regex, 1)
-        # The exception, the remove-everything rule, the broken line and the wildcard host.
-        self.assertEqual(data.other, 4)
+        # Exceptions are kept apart: they're where stripping a param breaks a site.
+        self.assertEqual(data.exempt, {("shop_trk", "exampleshop.com"), ("vs_share", "videosite.test")})
+        # The remove-everything rule, the broken line and the wildcard host.
+        self.assertEqual(data.other, 3)
 
     def test_ublock_list(self):
         data = research.parse_filter((FIXTURES / "ublock.txt").read_bytes())
@@ -128,7 +151,7 @@ class ParserTests(unittest.TestCase):
 
     def test_clearurls(self):
         data, unmapped = research.parse_clearurls((FIXTURES / "clearurls.json").read_bytes())
-        self.assertEqual(unmapped, ["unreadable"])
+        self.assertEqual(sorted(unmapped), ["unreadable", "x` @someone `"])
         self.assertIn(("param", "zz_click", None), data.params)
         self.assertIn(("param", "zz_mailref", None), data.params)
         self.assertIn(("prefix", "shop_sess", "exampleshop.*"), data.params)
@@ -172,8 +195,10 @@ class ReportTests(unittest.TestCase):
 
         site = section(report, "Site params flagged")
         # videosite.test is in Lint's Video Site entry; vid.example isn't, so it's its own row.
-        self.assertIn("| `vs_share` | `videosite.test` | 3: AdGuard URL Tracking, ClearURLs, uBlock Origin privacy | 1 | Video Site |", site)
-        self.assertIn("| `vs_share` | `vid.example` | 2: ClearURLs, uBlock Origin privacy | - | - |", site)
+        # A list's exception for the site is noted next to the lead.
+        self.assertIn("| `vs_share` | `videosite.test` | 3: AdGuard URL Tracking, ClearURLs, uBlock Origin privacy | 1 "
+                      "| Video Site | AdGuard URL Tracking exempts it on `videosite.test` |", site)
+        self.assertIn("| `vs_share` | `vid.example` | 2: ClearURLs, uBlock Origin privacy | - | - | - |", site)
         self.assertNotIn("shop_trk", report)         # Lint strips it on exampleshop.*
 
         single = section(report, "Target sites")
@@ -189,7 +214,14 @@ class ReportTests(unittest.TestCase):
         self.assertIn("`zz_mailid`", kept)
         self.assertIn("| `keepme` | `exampleshop.*`, `exampleshop.com` | 2: AdGuard URL Tracking, ClearURLs | kept in the Example Shop link case |", kept)
         self.assertIn("`zz_partner`", kept)
+        self.assertIn("| `shop_aff` | `exampleshop.com` | 1: AdGuard URL Tracking | affiliate ID (Example Shop affiliates, #28) |", kept)
+        self.assertIn("| `shop_kw` | `exampleshop.com` | 1: AdGuard URL Tracking | Lint strips it only on some pages (Example Shop items: `/item/*/**`) |", kept)
+        self.assertNotIn("utm", report)              # Lint strips utm_
         self.assertIn("`unreadable`", report)
+        # A provider name that would end the code span and @-mention someone isn't shown, and no
+        # @ anywhere in the report can mention anyone.
+        self.assertNotIn("someone", report)
+        self.assertNotRegex(report, "@(?!\u2060)")
 
     def test_failed_source_is_reported_not_fatal(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -210,6 +242,17 @@ class ReportTests(unittest.TestCase):
         code, report = run(FIXTURES, "--max-chars", "3000", "--limit", "1")
         self.assertEqual(code, 0)
         self.assertLessEqual(len(report), 3000)
+        # Cut at a line break, so no table row or code span is left half open.
+        body = report.split("\n\n_Report cut short")[0]
+        self.assertTrue(all(line.endswith("|") for line in body.splitlines() if line.startswith("|")))
+
+    def test_mentions_in_status_lines_are_defused(self):
+        args = research.argparse.Namespace(min_lists=2, date="2026-01-01", limit=5, max_chars=100000)
+        catalog = research.Catalog(json.loads((FIXTURES / "rules.json").read_text(encoding="utf-8")))
+        report = research.build(["| x | y | **failed**: server said @someone @org/team | - | - | - |"],
+                                {"Fixture": research.ListData()}, catalog, {}, args, [])
+        self.assertIn("@\u2060someone", report)
+        self.assertNotRegex(report, "@(?!\u2060)")
 
     def test_runs_against_the_real_catalog(self):
         """The real rules.json, link-cases.json and targets.json load and compare without errors."""

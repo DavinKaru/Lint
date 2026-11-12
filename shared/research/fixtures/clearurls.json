@@ -23,6 +23,7 @@
       "completeProvider": true,
       "rules": ["never_seen"]
     },
+    "x` @someone `": {"urlPattern": "^https?:\\/\\/[a-z]+\\d\\.example\\.net", "rules": ["lost"]},
     "unreadable": {
       "urlPattern": "^https?:\\/\\/[a-z]+\\d\\.example\\.org",
       "rules": ["lost"]

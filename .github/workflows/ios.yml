@@ -7,12 +7,14 @@ on:
     paths:
       - "platforms/ios/**"
       - "shared/**"
+      - "!shared/research/**"
       - ".github/workflows/ios.yml"
   push:
     branches: [main]
     paths:
       - "platforms/ios/**"
       - "shared/**"
+      - "!shared/research/**"
       - ".github/workflows/ios.yml"
 
 permissions:
