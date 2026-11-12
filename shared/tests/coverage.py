@@ -3,7 +3,8 @@
 those cases are verified against a real share.
 
     python3 shared/tests/coverage.py            # summary
-    python3 shared/tests/coverage.py --missing  # also list targets with no cases yet
+    python3 shared/tests/coverage.py --missing  # also list targets with no cases yet, and ⚠
+                                                #   targets with no case verified from a real share
 
 Reads link-cases.json (the shared test set) and targets.json (the 1.0 target list).
 """
@@ -58,11 +59,11 @@ def main() -> None:
     if "--missing" in sys.argv:
         print("\n⚠ with cases but no real share yet:")
         for target in sorted(risky_unverified, key=lambda t: (t["category"] or "", t["name"])):
-            print(f"  {target['category']}: {target['name']}")
+            print(f"  {target['category'] or 'Uncategorised'}: {target['name']}")
         print("\nNo cases yet (first batch first):")
         for target in sorted(missing, key=lambda t: (t["priority"] != "first", t["category"] or "", t["name"])):
             flag = " ⚠" if target["breakRisk"] else ""
-            print(f"  [{target['priority']}] {target['category']}: {target['name']}{flag}")
+            print(f"  [{target['priority']}] {target['category'] or 'Uncategorised'}: {target['name']}{flag}")
 
 
 if __name__ == "__main__":

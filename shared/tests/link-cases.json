@@ -1492,18 +1492,18 @@
     {
       "source": "Airbnb",
       "category": "Events & travel",
-      "input": "https://www.airbnb.com.au/rooms/12345678?adults=2&children=1&check_in=2027-01-10&check_out=2027-01-14&photo_id=1234567&viralityEntryPoint=1&unique_share_id=ABC123&slcid=abc123&s=76&utm_source=ABC123",
-      "expected": "https://www.airbnb.com.au/rooms/12345678?adults=2&children=1&check_in=2027-01-10&check_out=2027-01-14&photo_id=1234567&viralityEntryPoint=1&unique_share_id=ABC123&slcid=abc123&s=76",
+      "input": "https://www.airbnb.com.au/rooms/12345678?adults=2&children=1&check_in=2027-01-10&check_out=2027-01-14&photo_id=1234567&viralityEntryPoint=1&unique_share_id=00000000-0000-4000-8000-000000000000&slcid=0123456789abcdef0123456789abcdef&s=76&utm_source=ABC123",
+      "expected": "https://www.airbnb.com.au/rooms/12345678?adults=2&children=1&check_in=2027-01-10&check_out=2027-01-14&photo_id=1234567&viralityEntryPoint=1&unique_share_id=00000000-0000-4000-8000-000000000000&slcid=0123456789abcdef0123456789abcdef&s=76",
       "verified": null,
       "notes": "Guests, dates and photo_id pick what the link shows and must stay. unique_share_id, viralityEntryPoint, slcid and s look like share tracking but are left in until a real share is checked. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
     },
     {
       "source": "Booking.com",
       "category": "Events & travel",
-      "input": "https://www.booking.com/hotel/au/example.html?aid=1234567&label=ABC123&sid=abc123&checkin=2027-01-10&checkout=2027-01-12&group_adults=2&group_children=1&age=7&no_rooms=1&utm_medium=ABC123",
-      "expected": "https://www.booking.com/hotel/au/example.html?aid=1234567&label=ABC123&sid=abc123&checkin=2027-01-10&checkout=2027-01-12&group_adults=2&group_children=1&age=7&no_rooms=1",
+      "input": "https://www.booking.com/hotel/au/example.html?aid=1234567&label=gen000nr-1AAAAAAAAAAAAAAAA&sid=0123456789abcdef0123456789abcdef&checkin=2027-01-10&checkout=2027-01-12&group_adults=2&group_children=1&age=7&no_rooms=1&utm_medium=ABC123",
+      "expected": "https://www.booking.com/hotel/au/example.html?aid=1234567&label=gen000nr-1AAAAAAAAAAAAAAAA&sid=0123456789abcdef0123456789abcdef&checkin=2027-01-10&checkout=2027-01-12&group_adults=2&group_children=1&age=7&no_rooms=1",
       "verified": null,
-      "notes": "Dates, guests, ages and rooms must stay; aid (the affiliate ID) and label (the partner's sub-ID for it) are kept (#28). sid is a session ID but is left in: no Booking.com rules yet, only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+      "notes": "Dates, guests, ages and rooms must stay; aid (the affiliate ID) and label (the partner's sub-ID for it) are kept (#28). On ordinary shares from Booking's own site, aid and label may be Booking's own defaults rather than a partner's; check against a real share. sid is a session ID but is left in: no Booking.com strip rules yet, only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
     },
     {
       "source": "Expedia",
@@ -1543,7 +1543,7 @@
       "input": "https://www.lyft.com/sr/AbCdEf123456",
       "expected": "https://www.lyft.com/sr/AbCdEf123456",
       "verified": null,
-      "notes": "The path token is the ride; left unchanged. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+      "notes": "The path token is the ride; left unchanged. The lyft.com/sr/ format was only seen in a 2017 user post, so the current format is unconfirmed. No site rules yet: only Lint's global rules apply until a real share is checked."
     },
     {
       "source": "Ola trip share",
@@ -1559,7 +1559,7 @@
       "input": "https://www.smh.com.au/national/example-article-20270110-p5abcd.html?ref=rss&utm_medium=rss&utm_source=rss_feed",
       "expected": "https://www.smh.com.au/national/example-article-20270110-p5abcd.html?ref=rss",
       "verified": null,
-      "notes": "utm_* is stripped; ref=rss is left in until gift links are checked (ref is only stripped on known sites, #15). Gift and share links haven't been seen yet. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+      "notes": "utm_* is stripped; ref=rss is left in until gift links are checked (ref is only stripped on known sites, #15). This case doesn't exercise gift links, the reason SMH is a break risk: those haven't been seen yet. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
     },
     {
       "source": "Shopify stores",
