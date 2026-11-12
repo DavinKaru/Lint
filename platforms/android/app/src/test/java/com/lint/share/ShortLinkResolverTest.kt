@@ -235,4 +235,34 @@ class ShortLinkResolverTest {
 
         assertEquals("https://www.youtube.com/watch?v=dQw4w9WgXcQ", ShortLinkResolver.followRedirects("https://youtu.be/dQw4w9WgXcQ", fetcher))
     }
+
+    @Test
+    fun `never shares a tracking hop on another site before a sign-in page`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://t.co/abc123" -> HopResponse(301, "https://trk.example.com/c?sub=SUB123")
+                "https://trk.example.com/c?sub=SUB123" -> HopResponse(302, "https://accounts.google.com/ServiceLogin?continue=x")
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals("https://t.co/abc123", ShortLinkResolver.followRedirects("https://t.co/abc123", fetcher))
+    }
+
+    @Test
+    fun `an empty Location header ends the chain`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            if (url == "https://youtu.be/v1") HopResponse(302, "") else throw AssertionError("unexpected url: $url")
+        }
+
+        assertEquals("https://youtu.be/v1", ShortLinkResolver.followRedirects("https://youtu.be/v1", fetcher))
+    }
+
+    @Test
+    fun `same site means the same last two labels, or three for country domains`() {
+        assertTrue(ShortLinkResolver.sameSite("https://www.youtube.com/watch", "https://consent.youtube.com/m"))
+        assertTrue(ShortLinkResolver.sameSite("https://www.amazon.co.uk/dp/x", "https://amazon.co.uk/ap/signin"))
+        assertFalse(ShortLinkResolver.sameSite("https://www.amazon.co.uk/dp/x", "https://www.example.co.uk/"))
+        assertFalse(ShortLinkResolver.sameSite("https://trk.example.com/c", "https://accounts.google.com/"))
+    }
 }

@@ -287,6 +287,32 @@ struct ShortLinkResolverTests {
         )
         #expect(result == "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
     }
+
+    @Test func neverSharesATrackingHopOnAnotherSiteBeforeASignInPage() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://t.co/abc123",
+            fetcher: fetcher([
+                "https://t.co/abc123": HopResponse(statusCode: 301, location: "https://trk.example.com/c?sub=SUB123"),
+                "https://trk.example.com/c?sub=SUB123": HopResponse(statusCode: 302, location: "https://accounts.google.com/ServiceLogin?continue=x"),
+            ])
+        )
+        #expect(result == "https://t.co/abc123")
+    }
+
+    @Test func anEmptyLocationHeaderEndsTheChain() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://youtu.be/v1",
+            fetcher: fetcher(["https://youtu.be/v1": HopResponse(statusCode: 302, location: "")])
+        )
+        #expect(result == "https://youtu.be/v1")
+    }
+
+    @Test func sameSiteMeansTheSameLastTwoLabelsOrThreeForCountryDomains() {
+        #expect(ShortLinkResolver.sameSite("https://www.youtube.com/watch", "https://consent.youtube.com/m"))
+        #expect(ShortLinkResolver.sameSite("https://www.amazon.co.uk/dp/x", "https://amazon.co.uk/ap/signin"))
+        #expect(!ShortLinkResolver.sameSite("https://www.amazon.co.uk/dp/x", "https://www.example.co.uk/"))
+        #expect(!ShortLinkResolver.sameSite("https://trk.example.com/c", "https://accounts.google.com/"))
+    }
 }
 
 private actor TimeoutRecorder {

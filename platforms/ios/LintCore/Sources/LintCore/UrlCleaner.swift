@@ -143,7 +143,10 @@ public enum UrlCleaner {
     private static func validTarget(_ target: String) -> String? {
         let lower = target.lowercased()
         guard lower.hasPrefix("http://") || lower.hasPrefix("https://") else { return nil }
-        guard !target.unicodeScalars.contains(where: { CharacterSet.whitespacesAndNewlines.contains($0) || CharacterSet.controlCharacters.contains($0) })
+        // A backslash is refused too: browsers read it as "/", so evil.example\@site.com opens evil.example.
+        guard !target.unicodeScalars.contains(where: {
+            CharacterSet.whitespacesAndNewlines.contains($0) || CharacterSet.controlCharacters.contains($0) || $0 == "\\"
+        })
         else { return nil }
         guard let host = URLComponents(string: target)?.host, !host.isEmpty else { return nil }
         return target

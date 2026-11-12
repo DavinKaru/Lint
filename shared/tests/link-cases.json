@@ -1624,6 +1624,12 @@
       "input": "https://www.google.com/url?q=https%3A%2F%2Fexample.com%2F%٣F&sa=D",
       "expected": "https://www.google.com/url?q=https%3A%2F%2Fexample.com%2F%٣F&sa=D",
       "notes": "Only ASCII hex digits count in a percent escape; this one is malformed, so it's left alone."
+    },
+    {
+      "source": "YouTube",
+      "input": "https://consent.youtube.com/m?continue=https%3A%2F%2Fevil.example%5C%40www.youtube.com%2Fwatch%3Fv%3Dabc",
+      "expected": "https://consent.youtube.com/m?continue=https%3A%2F%2Fevil.example%5C%40www.youtube.com%2Fwatch%3Fv%3Dabc",
+      "notes": "A backslash target is left alone: browsers read \\ as /, so this would open evil.example even though it looks like youtube.com."
     }
   ],
   "deadEnds": [
@@ -1761,6 +1767,16 @@
       "source": "Google",
       "url": "https://accounts.google.com.evil.example/ServiceLogin",
       "deadEnd": false
+    },
+    {
+      "source": "Google",
+      "url": "https://accounts.google.com/CheckCookie?continue=https%3A%2F%2Fwww.google.com%2Fmaps",
+      "deadEnd": false
+    },
+    {
+      "source": "Google",
+      "url": "https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fdocs.google.com%2F",
+      "deadEnd": true
     }
   ]
 }

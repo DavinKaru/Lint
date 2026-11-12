@@ -307,7 +307,8 @@ enum GeneratedRules {
         // Google and YouTube cookie consent
         SitePaths(sites: ["consent.google.com", "consent.youtube.com"], paths: ["/**"]),
         // Google sign-in
-        SitePaths(sites: ["accounts.google.com"], paths: ["/**"]),
+        //   Only the interactive sign-in pages: other accounts.google.com pages (CheckCookie, ...) can pass a browser straight on to the content.
+        SitePaths(sites: ["accounts.google.com"], paths: ["/ServiceLogin/**", "/signin/**", "/v3/signin/**", "/AccountChooser/**", "/InteractiveLogin/**"]),
         // Facebook sign-in
         SitePaths(sites: ["facebook.com"], paths: ["/login/**", "/login.php"]),
         // Instagram sign-in

@@ -57,6 +57,22 @@ object ShortLinkResolver {
         return GeneratedRules.SHORT_LINK_PATHS.any { UrlCleaner.onPage(host, uri.rawPath, it.sites, it.paths) }
     }
 
+    /**
+     * True if [a] and [b] are on the same site: the same last two host labels, or three for
+     * country domains like example.com.au or example.co.uk.
+     */
+    internal fun sameSite(a: String, b: String): Boolean {
+        fun site(url: String): String? {
+            val labels = (try { URI(url).host } catch (e: Exception) { null } ?: return null).lowercase().split('.')
+            val keep = if (labels.size >= 3 && labels.last().length == 2 && labels[labels.size - 2] in SECOND_LEVEL) 3 else 2
+            return labels.takeLast(keep).joinToString(".")
+        }
+        val siteA = site(a) ?: return false
+        return siteA == site(b)
+    }
+
+    private val SECOND_LEVEL = setOf("com", "co", "net", "org", "gov", "edu", "ac")
+
     /** True if [url] is a short link that identifies the person sharing it (see ShortLinkPath.identifiesYou). */
     private fun identifiesYou(url: String): Boolean {
         val uri = try { URI(url) } catch (e: Exception) { return false }
@@ -85,8 +101,9 @@ object ShortLinkResolver {
      * A redirect to a sign-in or consent page ([isDeadEnd]) ends the chain without requesting it.
      * If that page carries the real link in full (a consent page's continue=, see
      * [UrlCleaner.unwrap]) and it isn't another sign-in page, that's the result. Otherwise it's the
-     * hop before, unless that link identifies the person sharing it (a Mailchimp click link); then
-     * the sign-in page itself, which still leads to the content once signed in.
+     * hop before if it's on the same site as the sign-in page (else the original short link), unless
+     * that link identifies the person sharing it (a Mailchimp click link); then the sign-in page
+     * itself, which still leads to the content once signed in.
      */
     fun followRedirects(startUrl: String, fetcher: HopFetcher, maxHops: Int = MAX_HOPS): String {
         var currentUrl = startUrl
@@ -102,7 +119,7 @@ object ShortLinkResolver {
             // destination -- not a failure. currentUrl still equals startUrl if this is the
             // very first hop, so this correctly covers "never redirected at all" too.
             if (response.responseCode !in 300..399) return currentUrl
-            val location = response.locationHeader ?: return currentUrl
+            val location = response.locationHeader?.takeIf { it.isNotBlank() } ?: return currentUrl
 
             val next = try {
                 URI(currentUrl).resolve(location).toString()
@@ -111,11 +128,10 @@ object ShortLinkResolver {
             }
             if (isDeadEnd(next)) {
                 val unwrapped = UrlCleaner.unwrap(next)
-                return when {
-                    unwrapped != next && !isDeadEnd(unwrapped) -> unwrapped
-                    identifiesYou(currentUrl) -> next
-                    else -> currentUrl
-                }
+                if (unwrapped != next && !isDeadEnd(unwrapped)) return unwrapped
+                // A hop on another site (a tracker, say) is only a redirect, never the content.
+                val before = if (currentUrl == startUrl || sameSite(currentUrl, next)) currentUrl else startUrl
+                return if (identifiesYou(before)) next else before
             }
             currentUrl = next
         }

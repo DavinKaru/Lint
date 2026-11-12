@@ -57,8 +57,8 @@ hasn't been tested on a real device yet.
   [`shared/rules/rules.json`](shared/rules/rules.json)), Lint stops there without requesting it:
   - if the page carries the full link it continues to (a consent page's `continue=`, a Facebook
     sign-in page's `next=`) and that isn't another sign-in page, Lint uses that link;
-  - otherwise it keeps the link from the step before, or the original short link if there was no
-    step before;
+  - otherwise it keeps the link from the step before when that's on the same site as the sign-in
+    page (the post or video it was protecting), and the original short link if not;
   - except when that link identifies you (a Mailchimp click link carries your subscriber ID): then
     Lint shares the sign-in page itself, which still leads to the content once signed in.
 

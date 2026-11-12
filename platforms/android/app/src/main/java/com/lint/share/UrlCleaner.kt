@@ -139,7 +139,8 @@ object UrlCleaner {
     private fun validTarget(target: String): String? {
         val lower = target.lowercase()
         if (!lower.startsWith("http://") && !lower.startsWith("https://")) return null
-        if (target.any { it.isWhitespace() || it.isISOControl() }) return null
+        // A backslash is refused too: browsers read it as "/", so evil.example\@site.com opens evil.example.
+        if (target.any { it.isWhitespace() || it.isISOControl() || it == '\\' }) return null
         if (target.codePoints().anyMatch { Character.getType(it) == Character.FORMAT.toInt() }) return null
         val uri = try { URI(target) } catch (e: URISyntaxException) { return null }
         return if (uri.host.isNullOrEmpty()) null else target

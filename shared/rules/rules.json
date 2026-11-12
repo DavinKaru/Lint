@@ -1179,9 +1179,14 @@
         "accounts.google.com"
       ],
       "paths": [
-        "/**"
+        "/ServiceLogin/**",
+        "/signin/**",
+        "/v3/signin/**",
+        "/AccountChooser/**",
+        "/InteractiveLogin/**"
       ],
-      "source": "Google sign-in"
+      "source": "Google sign-in",
+      "notes": "Only the interactive sign-in pages: other accounts.google.com pages (CheckCookie, ...) can pass a browser straight on to the content."
     },
     {
       "sites": [

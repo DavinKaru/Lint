@@ -311,7 +311,8 @@ internal object GeneratedRules {
         // Google and YouTube cookie consent
         SitePaths(listOf("consent.google.com", "consent.youtube.com"), listOf("/**")),
         // Google sign-in
-        SitePaths(listOf("accounts.google.com"), listOf("/**")),
+        //   Only the interactive sign-in pages: other accounts.google.com pages (CheckCookie, ...) can pass a browser straight on to the content.
+        SitePaths(listOf("accounts.google.com"), listOf("/ServiceLogin/**", "/signin/**", "/v3/signin/**", "/AccountChooser/**", "/InteractiveLogin/**")),
         // Facebook sign-in
         SitePaths(listOf("facebook.com"), listOf("/login/**", "/login.php")),
         // Instagram sign-in
