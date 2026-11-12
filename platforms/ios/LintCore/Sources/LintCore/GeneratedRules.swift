@@ -45,8 +45,8 @@ enum GeneratedRules {
         //   Generic names, under review in #15.
         "refId", "trackingId", "trk",
         // Amazon
-        //   camp, creative, qid, smid and srs are generic names, under review in #15.
-        "ascsubtag", "camp", "creative", "dchild", "qid", "refRID", "smid", "spIA", "srs",
+        //   qid, smid and srs are generic names, under review in #15.
+        "dchild", "qid", "refRID", "smid", "spIA", "srs",
         // Twitter / X
         "__twitter_impression",
         // Matomo / Piwik (legacy)
@@ -91,10 +91,10 @@ enum GeneratedRules {
         //   Added to links resolved from maps.app.goo.gl: g_st is the share type and g_ep encodes the share context. entry= is left alone.
         "google.*": ["g_st", "g_ep"],
         // Amazon (full links, every country domain)
-        //   Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query.
-        "amazon.*": ["crid", "dib", "dib_tag", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "linkCode", "linkId", "creativeASIN", "social_share", "_encoding", "ref_"],
+        //   Search and recommendation context on product links (sprefix carries what you searched for). Variant selectors th and psc are kept. Affiliate link params (tag, linkCode, linkId, ascsubtag, creativeASIN, camp, creative) are kept, see affiliateParams. keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query.
+        "amazon.*": ["crid", "dib", "dib_tag", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "social_share", "_encoding", "ref_"],
         // Apple Music, Podcasts and App Store
-        //   uo and ct are campaign/origin tracking. i= (the track or episode), mt= and app= are kept; the at= affiliate token is kept too.
+        //   uo and ct are origin and campaign tracking (the share sheet adds ct=share). i= (the track or episode), mt= and app= are kept, and so is the at= affiliate token (see affiliateParams).
         "music.apple.com": ["uo", "ct"],
         "podcasts.apple.com": ["uo", "ct"],
         "apps.apple.com": ["uo", "ct"],
@@ -148,11 +148,11 @@ enum GeneratedRules {
         //   utlId is a per-share link ID (alongside utm_*). The view token in the path is kept.
         "canva.com": ["utlId"],
         // eBay
-        //   Search, share-sheet (sss*) and partner-network (mk*, campid) tracking. var= picks the variation and epid= the product, so both are kept.
-        "ebay.*": ["_trkparms", "_trksid", "_from", "hash", "mkcid", "mkevt", "mkrid", "campid", "toolid", "customid", "ssspo", "sssrc", "ssuid", "widget_ver", "amdata"],
+        //   Search and share-sheet (sss*) tracking. var= picks the variation and epid= the product, so both are kept, and so are the eBay Partner Network params (see affiliateParams).
+        "ebay.*": ["_trkparms", "_trksid", "_from", "hash", "ssspo", "sssrc", "ssuid", "widget_ver", "amdata"],
         // AliExpress
-        //   Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price.
-        "aliexpress.*": ["spm", "scm", "scm_id", "scm-url", "pvid", "algo_pvid", "algo_exp_id", "aff_platform", "aff_trace_key", "aff_fcid", "aff_fsk", "sk", "terminal_id", "afSmartRedirect", "gatewayAdapt", "sourceType", "srcSns", "businessType", "social_params", "tt", "utparam", "gps-id", "curPageLogUid", "bizType", "mp", "_randl_shipto"],
+        //   Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price. The aff_* and sk affiliate params are kept (see affiliateParams).
+        "aliexpress.*": ["spm", "scm", "scm_id", "scm-url", "pvid", "algo_pvid", "algo_exp_id", "terminal_id", "afSmartRedirect", "gatewayAdapt", "sourceType", "srcSns", "businessType", "social_params", "tt", "utparam", "gps-id", "curPageLogUid", "bizType", "mp", "_randl_shipto"],
         // Etsy
         //   Search and share tracking on listing links. variation0/variation1 pick the options and are kept.
         "etsy.com": ["click_key", "click_sum", "ga_order", "ga_search_type", "ga_view_type", "ga_search_query", "organic_search_click", "plkey", "sts", "frs", "pro", "sr_prefetch", "pf_from", "logging_key", "content_source", "share_time"],
@@ -163,8 +163,8 @@ enum GeneratedRules {
         //   Session, sharer (share_uin) and ad tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept.
         "temu.com": ["refer_page_name", "refer_page_id", "refer_page_sn", "_x_sessn_id", "share_uin", "_x_vst_scene", "_x_ads_channel", "_x_ads_sub_channel", "_x_ads_account", "_x_ads_set", "_x_ads_id", "_x_ads_creative_id"],
         // Walmart
-        //   ath* are recommendation-carousel tracking. classType and selected are kept.
-        "walmart.com": ["athbdg", "athcpid", "athpgid", "athznid", "athieid", "athstid", "athguid", "athwpid", "athena", "athancid", "sourceid", "veh", "wmlspartner"],
+        //   ath* are recommendation-carousel tracking. classType and selected are kept, and so are the affiliate params (see affiliateParams).
+        "walmart.com": ["athbdg", "athcpid", "athpgid", "athznid", "athieid", "athstid", "athguid", "athwpid", "athena", "athancid"],
         // Vinted
         //   Where the item was opened from. referrer is generic, so it's only stripped here.
         "vinted.*": ["referrer", "homepage_session_id"],
@@ -179,7 +179,7 @@ enum GeneratedRules {
         //   Recommendation and search tracking on event links.
         "meetup.com": ["recId", "recSource", "searchId", "eventOrigin", "_xtd"],
         // Klook
-        //   Page tracking. aid (affiliate) is kept for now, see #28.
+        //   Page tracking. aid (affiliate) is kept, see affiliateParams.
         "klook.com": ["spm", "clickId"],
         // Yelp
         //   uid identifies the Yelp member who shared the link.

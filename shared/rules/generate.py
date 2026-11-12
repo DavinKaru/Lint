@@ -125,6 +125,22 @@ def validate(rules: dict) -> None:
                 if param in params or param in wide or any(param.startswith(x) for x in prefixes):
                     fail(f'siteParams "{group["source"]}": "{param}" is already stripped everywhere on {site}')
 
+    check_affiliates(rules, params, prefixes)
+
+
+def check_affiliates(rules: dict, params: list, prefixes: list) -> None:
+    """Lint keeps affiliate IDs (#28): no rule may strip an affiliateParams param on its site."""
+    for group in rules.get("affiliateParams", []):
+        for site in group["sites"]:
+            if not SITE_KEY.match(site):
+                fail(f'affiliate params "{group["source"]}": site "{site}" should be a lowercase domain')
+        for param in group["params"]:
+            if param in params or any(param.startswith(x) for x in prefixes):
+                fail(f'"{param}" is an affiliate param ({group["source"]}), so it can\'t be stripped on every site')
+            for rule in rules["siteParams"]:
+                if param in rule["params"] and any(sites_overlap(s, a) for s in rule["sites"] for a in group["sites"]):
+                    fail(f'siteParams "{rule["source"]}" strips "{param}", an affiliate param ({group["source"]}) that Lint keeps')
+
 
 def check_listed_once(groups: list, keys, message: str) -> None:
     """Fails if any key (e.g. a (site, path) pair) comes from more than one place."""
@@ -144,6 +160,7 @@ ALLOWED_KEYS = {
     "pathWrappers": {"sites", "prefix", "scheme", "source", "notes"},
     "shortLinkPaths": {"sites", "paths", "identifiesYou", "provider", "notes"},
     "deadEndPages": {"sites", "paths", "source", "notes"},
+    "affiliateParams": {"sites", "params", "source", "notes"},
 }
 
 

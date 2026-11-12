@@ -3,6 +3,16 @@
 Lint's baseline behavior is fully offline: cleaning a shared URL never involves the network at
 all. There is one deliberate, narrow exception.
 
+## What Lint leaves in
+
+Lint removes parameters that track you: who shared a link, from which app, what you searched
+for, which ad you clicked. It deliberately keeps **affiliate IDs**, the parameters that credit
+whoever recommended a product (see `affiliateParams` in
+[`shared/rules/rules.json`](shared/rules/rules.json)). Some of them, like Walmart's `sourceid`,
+are per-click IDs, so the affiliate network can connect a purchase to that click. That's the
+point of a referral, and it's a deliberate trade-off: Lint won't take money away from the person
+who made the recommendation.
+
 ## Short links
 
 Some tracking parameters only appear after a short link redirects to its full destination — the

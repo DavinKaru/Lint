@@ -140,9 +140,6 @@
     },
     {
       "params": [
-        "ascsubtag",
-        "camp",
-        "creative",
         "dchild",
         "qid",
         "refRID",
@@ -151,7 +148,7 @@
         "srs"
       ],
       "source": "Amazon",
-      "notes": "camp, creative, qid, smid and srs are generic names, under review in #15."
+      "notes": "qid, smid and srs are generic names, under review in #15."
     },
     {
       "params": [
@@ -309,15 +306,12 @@
         "pf_rd_i",
         "pf_rd_m",
         "content-id",
-        "linkCode",
-        "linkId",
-        "creativeASIN",
         "social_share",
         "_encoding",
         "ref_"
       ],
       "source": "Amazon (full links, every country domain)",
-      "notes": "Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query."
+      "notes": "Search and recommendation context on product links (sprefix carries what you searched for). Variant selectors th and psc are kept. Affiliate link params (tag, linkCode, linkId, ascsubtag, creativeASIN, camp, creative) are kept, see affiliateParams. keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query."
     },
     {
       "sites": [
@@ -351,7 +345,7 @@
         "ct"
       ],
       "source": "Apple Music, Podcasts and App Store",
-      "notes": "uo and ct are campaign/origin tracking. i= (the track or episode), mt= and app= are kept; the at= affiliate token is kept too."
+      "notes": "uo and ct are origin and campaign tracking (the share sheet adds ct=share). i= (the track or episode), mt= and app= are kept, and so is the at= affiliate token (see affiliateParams)."
     },
     {
       "sites": [
@@ -542,12 +536,6 @@
         "_trksid",
         "_from",
         "hash",
-        "mkcid",
-        "mkevt",
-        "mkrid",
-        "campid",
-        "toolid",
-        "customid",
         "ssspo",
         "sssrc",
         "ssuid",
@@ -555,7 +543,7 @@
         "amdata"
       ],
       "source": "eBay",
-      "notes": "Search, share-sheet (sss*) and partner-network (mk*, campid) tracking. var= picks the variation and epid= the product, so both are kept."
+      "notes": "Search and share-sheet (sss*) tracking. var= picks the variation and epid= the product, so both are kept, and so are the eBay Partner Network params (see affiliateParams)."
     },
     {
       "sites": [
@@ -569,11 +557,6 @@
         "pvid",
         "algo_pvid",
         "algo_exp_id",
-        "aff_platform",
-        "aff_trace_key",
-        "aff_fcid",
-        "aff_fsk",
-        "sk",
         "terminal_id",
         "afSmartRedirect",
         "gatewayAdapt",
@@ -590,7 +573,7 @@
         "_randl_shipto"
       ],
       "source": "AliExpress",
-      "notes": "Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price."
+      "notes": "Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price. The aff_* and sk affiliate params are kept (see affiliateParams)."
     },
     {
       "sites": [
@@ -669,13 +652,10 @@
         "athguid",
         "athwpid",
         "athena",
-        "athancid",
-        "sourceid",
-        "veh",
-        "wmlspartner"
+        "athancid"
       ],
       "source": "Walmart",
-      "notes": "ath* are recommendation-carousel tracking. classType and selected are kept."
+      "notes": "ath* are recommendation-carousel tracking. classType and selected are kept, and so are the affiliate params (see affiliateParams)."
     },
     {
       "sites": [
@@ -746,7 +726,7 @@
         "clickId"
       ],
       "source": "Klook",
-      "notes": "Page tracking. aid (affiliate) is kept for now, see #28."
+      "notes": "Page tracking. aid (affiliate) is kept, see affiliateParams."
     },
     {
       "sites": [
@@ -1258,6 +1238,100 @@
         "/ap/signin/**"
       ],
       "source": "Amazon sign-in"
+    }
+  ],
+  "affiliateParams": [
+    {
+      "sites": [
+        "amazon.*"
+      ],
+      "params": [
+        "tag",
+        "linkCode",
+        "linkId",
+        "ascsubtag",
+        "creativeASIN",
+        "camp",
+        "creative"
+      ],
+      "source": "Amazon Associates",
+      "notes": "tag credits the associate; the rest are parts of the affiliate link Amazon generates or the associate's own sub-ID."
+    },
+    {
+      "sites": [
+        "apple.com"
+      ],
+      "params": [
+        "at"
+      ],
+      "source": "Apple Services Performance Partners",
+      "notes": "at credits the affiliate. ct (campaign text) is still stripped: Apple's share sheet uses it for its own share tracking (ct=share), and at alone credits the affiliate."
+    },
+    {
+      "sites": [
+        "ebay.*"
+      ],
+      "params": [
+        "campid",
+        "customid",
+        "toolid",
+        "mkcid",
+        "mkrid",
+        "mkevt"
+      ],
+      "source": "eBay Partner Network",
+      "notes": "campid identifies the partner and customid is their sub-ID; EPN needs mkcid, mkrid and mkevt with it to credit the click."
+    },
+    {
+      "sites": [
+        "aliexpress.*"
+      ],
+      "params": [
+        "aff_platform",
+        "aff_trace_key",
+        "aff_fcid",
+        "aff_fsk",
+        "sk"
+      ],
+      "source": "AliExpress Portals"
+    },
+    {
+      "sites": [
+        "walmart.com"
+      ],
+      "params": [
+        "wmlspartner",
+        "sourceid",
+        "veh"
+      ],
+      "source": "Walmart affiliates (Impact)"
+    },
+    {
+      "sites": [
+        "klook.com"
+      ],
+      "params": [
+        "aid"
+      ],
+      "source": "Klook affiliates"
+    },
+    {
+      "sites": [
+        "getyourguide.com"
+      ],
+      "params": [
+        "partner_id"
+      ],
+      "source": "GetYourGuide partners"
+    },
+    {
+      "sites": [
+        "booking.com"
+      ],
+      "params": [
+        "aid"
+      ],
+      "source": "Booking.com affiliates"
     }
   ]
 }

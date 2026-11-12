@@ -535,7 +535,7 @@
       "input": "https://www.amazon.com/dp/B0ABCDEF12?th=1&psc=1&pd_rd_w=abc&pf_rd_p=def&pd_rd_r=ghi&content-id=amzn1.sym.x&tag=someone-20",
       "expected": "https://www.amazon.com/dp/B0ABCDEF12?th=1&psc=1&tag=someone-20",
       "verified": null,
-      "notes": "th and psc pick the product variant and must stay; the tag affiliate ID is kept pending a decision. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+      "notes": "th and psc pick the product variant and must stay; the tag affiliate ID is kept (affiliate IDs are kept, #28). Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
       "source": "Amazon",
@@ -834,12 +834,20 @@
       "notes": "var= picks the variation and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
+      "source": "eBay",
+      "category": "Shopping",
+      "input": "https://www.ebay.com/itm/123456789012?mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5330000000&customid=example&toolid=10001&mkevt=1&_trksid=p123.m456",
+      "expected": "https://www.ebay.com/itm/123456789012?mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5330000000&customid=example&toolid=10001&mkevt=1",
+      "verified": null,
+      "notes": "An eBay Partner Network link: EPN needs campid with mkcid, mkrid and mkevt to credit the partner, so all stay (#28). Written for the test set, not taken from a real share."
+    },
+    {
       "source": "AliExpress",
       "category": "Shopping",
       "input": "https://www.aliexpress.com/item/1005001234567890.html?spm=a2g0o.productlist.main.1.abc&algo_pvid=abc-123&aff_platform=link-c-tool&sk=_dAbCdE&gatewayAdapt=glo2aus&pdp_npi=4%40dis%21AUD%2110.00",
-      "expected": "https://www.aliexpress.com/item/1005001234567890.html?pdp_npi=4%40dis%21AUD%2110.00",
+      "expected": "https://www.aliexpress.com/item/1005001234567890.html?aff_platform=link-c-tool&sk=_dAbCdE&pdp_npi=4%40dis%21AUD%2110.00",
       "verified": null,
-      "notes": "pdp_npi can carry the price shown and is kept. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+      "notes": "pdp_npi can carry the price shown and is kept. aff_platform and sk are affiliate params and are kept too (#28). Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
       "source": "Etsy",
@@ -872,6 +880,14 @@
       "expected": "https://www.walmart.com/ip/Some-Product/123456789?classType=VARIANT",
       "verified": null,
       "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Walmart",
+      "category": "Shopping",
+      "input": "https://www.walmart.com/ip/Example-Product/123456789?athcpid=123&wmlspartner=imp_1234567&sourceid=imp_ABC123&veh=aff",
+      "expected": "https://www.walmart.com/ip/Example-Product/123456789?wmlspartner=imp_1234567&sourceid=imp_ABC123&veh=aff",
+      "verified": null,
+      "notes": "An affiliate link: wmlspartner, sourceid and veh credit the partner and stay (#28). Written for the test set, not taken from a real share."
     },
     {
       "source": "Target",
@@ -1312,6 +1328,14 @@
       "expected": "https://www.amazon.com/dp/?keywords=kettle",
       "verified": null,
       "notes": "/dp/ without a product isn't a product page, so keywords stays. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/dp/B0ABCDEF12?crid=2ABCDEF&linkCode=ll1&tag=examplecreator-20&linkId=0123456789abcdef0123456789abcdef&language=en_US&ref_=as_li_ss_tl",
+      "expected": "https://www.amazon.com/dp/B0ABCDEF12?linkCode=ll1&tag=examplecreator-20&linkId=0123456789abcdef0123456789abcdef&language=en_US",
+      "verified": null,
+      "notes": "An Associates link: tag, linkCode and linkId are the creator's affiliate link and stay (#28); crid and ref_ are tracking. Written for the test set, not taken from a real share."
     },
     {
       "source": "Google Maps short links",
