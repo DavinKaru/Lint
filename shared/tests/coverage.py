@@ -1,36 +1,60 @@
 #!/usr/bin/env python3
-"""Summarises shared/tests/link-cases.json: cases per category and per source.
+"""Reports progress towards 1.0: which target share sources have test cases, and how many of
+those cases are verified against a real share.
 
-Once the 1.0 target list of share sources exists, this is where coverage against it (sources
-with no cases yet) gets reported.
+    python3 shared/tests/coverage.py            # summary
+    python3 shared/tests/coverage.py --missing  # also list targets with no cases yet
+
+Reads link-cases.json (the shared test set) and targets.json (the 1.0 target list).
 """
 import json
-from collections import Counter, defaultdict
+import sys
+from collections import defaultdict
 from pathlib import Path
 
-CASES = Path(__file__).with_name("link-cases.json")
+HERE = Path(__file__).parent
 
 
 def main() -> None:
-    data = json.loads(CASES.read_text(encoding="utf-8"))
-    clean = data["clean"]
+    cases = json.loads((HERE / "link-cases.json").read_text(encoding="utf-8"))
+    targets = json.loads((HERE / "targets.json").read_text(encoding="utf-8"))["targets"]
+    clean = cases["clean"]
 
-    by_category = Counter(case["category"] for case in clean)
-    sources = defaultdict(set)
+    by_source = defaultdict(list)
     for case in clean:
-        sources[case["category"]].add(case["source"])
+        by_source[case["source"]].append(case)
 
-    unverified = sum(1 for case in clean if not case.get("verified"))
-    print(f"{len(clean)} clean cases ({unverified} not yet verified from a phone), "
-          f"{len(data.get('unwrap', []))} unwrap cases, {len(data['shortLinks'])} short-link cases\n")
-    print(f"{'Category':<22}{'Cases':>6}  Sources")
-    for category, count in sorted(by_category.items(), key=lambda item: (-item[1], item[0])):
-        print(f"{category:<22}{count:>6}  {', '.join(sorted(sources[category]))}")
+    rows = defaultdict(lambda: {"total": 0, "covered": 0, "verified": 0})
+    missing = []
+    for target in targets:
+        own = [c for source in target["sources"] or [target["name"]] for c in by_source.get(source, [])]
+        row = rows[target["category"] or "Uncategorised"]
+        row["total"] += 1
+        if own:
+            row["covered"] += 1
+            if any(c.get("verified") for c in own):
+                row["verified"] += 1
+        else:
+            missing.append(target)
 
-    verified = [case for case in clean if case.get("verified")]
-    if verified:
-        oldest = min(verified, key=lambda case: case["verified"])
-        print(f"\nOldest verification: {oldest['verified']} ({oldest['source']})")
+    total = sum(r["total"] for r in rows.values())
+    covered = sum(r["covered"] for r in rows.values())
+    verified = sum(r["verified"] for r in rows.values())
+    unverified_cases = sum(1 for c in clean if not c.get("verified"))
+
+    print(f"Target sources: {covered}/{total} have test cases ({covered * 100 // total}%), "
+          f"{verified} verified against a real share ({verified * 100 // total}%). 1.0 needs 95%.")
+    print(f"Test set: {len(clean)} clean cases ({unverified_cases} not yet verified from a phone), "
+          f"{len(cases.get('unwrap', []))} unwrap cases, {len(cases['shortLinks'])} short-link cases.\n")
+    print(f"{'Category':<22}{'Targets':>8}{'Covered':>9}{'Verified':>10}")
+    for category, row in sorted(rows.items(), key=lambda item: item[0]):
+        print(f"{category:<22}{row['total']:>8}{row['covered']:>9}{row['verified']:>10}")
+
+    if "--missing" in sys.argv:
+        print("\nNo cases yet (first batch first):")
+        for target in sorted(missing, key=lambda t: (t["priority"] != "first", t["category"] or "", t["name"])):
+            flag = " ⚠" if target["breakRisk"] else ""
+            print(f"  [{target['priority']}] {target['category']}: {target['name']}{flag}")
 
 
 if __name__ == "__main__":

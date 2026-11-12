@@ -7,119 +7,120 @@
       "category": "All sites",
       "input": "https://example.com/article?utm_source=twitter&utm_medium=social&fbclid=abc123",
       "expected": "https://example.com/article",
-      "verified": "2026-10-30"
+      "verified": null,
+      "notes": "Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/search?q=kotlin&utm_source=twitter",
       "expected": "https://example.com/search?q=kotlin",
-      "verified": "2026-10-30",
-      "notes": "Unknown params are kept."
+      "verified": null,
+      "notes": "Unknown params are kept. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/article?utm_source=twitter#section-2",
       "expected": "https://example.com/article#section-2",
-      "verified": "2026-10-30",
-      "notes": "Fragment is kept."
+      "verified": null,
+      "notes": "Fragment is kept. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "Check this out: https://example.com/page?gclid=xyz&keep=1 thanks!",
       "expected": "Check this out: https://example.com/page?keep=1 thanks!",
-      "verified": "2026-10-30",
-      "notes": "Only the link inside shared text is changed."
+      "verified": null,
+      "notes": "Only the link inside shared text is changed. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/article?mtm_campaign=launch&mtm_source=newsletter&keep=1",
       "expected": "https://example.com/article?keep=1",
-      "verified": "2026-10-30",
-      "notes": "Matomo mtm_ prefix."
+      "verified": null,
+      "notes": "Matomo mtm_ prefix. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/a%20b?z=1&q=caf%C3%A9&utm_source=x&a=%2F#frag%20ment",
       "expected": "https://example.com/a%20b?z=1&q=caf%C3%A9&a=%2F#frag%20ment",
-      "verified": "2026-10-30",
-      "notes": "Percent-encoding and param order are kept byte-for-byte."
+      "verified": null,
+      "notes": "Percent-encoding and param order are kept byte-for-byte. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "🎉👨‍👩‍👧 https://x.com/?fbclid=1&a=b 🎉",
       "expected": "🎉👨‍👩‍👧 https://x.com/?a=b 🎉",
-      "verified": "2026-10-30",
-      "notes": "Emoji around the link."
+      "verified": null,
+      "notes": "Emoji around the link. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "a https://x.com/?fbclid=1 b https://y.com/?fbclid=2",
       "expected": "a https://x.com/ b https://y.com/?fbclid=2",
-      "verified": "2026-10-30",
-      "notes": "Only the first link is cleaned (matches Android's single-URL share)."
+      "verified": null,
+      "notes": "Only the first link is cleaned (matches Android's single-URL share). Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "just some text, no link here",
       "expected": "just some text, no link here",
-      "verified": "2026-10-30",
-      "notes": "No link: passed through unchanged."
+      "verified": null,
+      "notes": "No link: passed through unchanged. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/page?feature=beta&si=1&_t=2&_r=3&web_id=4",
       "expected": "https://example.com/page?feature=beta&si=1&_t=2&_r=3&web_id=4",
-      "verified": "2026-10-30",
-      "notes": "Site-specific names (YouTube/Spotify/TikTok) are kept on other sites."
+      "verified": null,
+      "notes": "Site-specific names (YouTube/Spotify/TikTok) are kept on other sites. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/page?aff=partner1&sg=group2&suid=42",
       "expected": "https://example.com/page?aff=partner1&sg=group2&suid=42",
-      "verified": "2026-10-30",
-      "notes": "Eventbrite/Fever names are kept on other sites."
+      "verified": null,
+      "notes": "Eventbrite/Fever names are kept on other sites. Written for the test set, not taken from a real share."
     },
     {
       "source": "Lookalike",
       "category": "All sites",
       "input": "https://nottiktok.com/page?_t=abc&_r=1",
       "expected": "https://nottiktok.com/page?_t=abc&_r=1",
-      "verified": "2026-10-30",
-      "notes": "Lookalike domain doesn't get TikTok's rules."
+      "verified": null,
+      "notes": "Lookalike domain doesn't get TikTok's rules. Written for the test set, not taken from a real share."
     },
     {
       "source": "Lookalike",
       "category": "All sites",
       "input": "https://noteventbrite.com/e/1?aff=x&sg=y",
       "expected": "https://noteventbrite.com/e/1?aff=x&sg=y",
-      "verified": "2026-10-30",
-      "notes": "Lookalike domain doesn't get Eventbrite's rules."
+      "verified": null,
+      "notes": "Lookalike domain doesn't get Eventbrite's rules. Written for the test set, not taken from a real share."
     },
     {
       "source": "Lookalike",
       "category": "All sites",
       "input": "https://eventbrite.evil.com/e/1?aff=x&sg=y",
       "expected": "https://eventbrite.evil.com/e/1?aff=x&sg=y",
-      "verified": "2026-10-30",
-      "notes": "Eventbrite's name as a subdomain of another site doesn't count."
+      "verified": null,
+      "notes": "Eventbrite's name as a subdomain of another site doesn't count. Written for the test set, not taken from a real share."
     },
     {
       "source": "Secret Media Network",
       "category": "All sites",
       "input": "https://example.com/tickets?id=7&cp_smn_source=secretlondon&cp_smn_medium=newsletter",
       "expected": "https://example.com/tickets?id=7",
-      "verified": "2026-10-30",
-      "notes": "cp_smn_ prefix is stripped on every site."
+      "verified": null,
+      "notes": "cp_smn_ prefix is stripped on every site. Written for the test set, not taken from a real share."
     },
     {
       "source": "Google Shopping",
@@ -141,54 +142,56 @@
       "category": "Video & music",
       "input": "https://youtu.be/jD-3zMQmjTY?si=AbCdEf123",
       "expected": "https://youtu.be/jD-3zMQmjTY",
-      "verified": "2026-10-30",
-      "notes": "Unresolved youtu.be link still loses si."
+      "verified": null,
+      "notes": "Unresolved youtu.be link still loses si. Written for the test set, not taken from a real share."
     },
     {
       "source": "YouTube Music",
       "category": "Video & music",
       "input": "https://music.youtube.com/watch?v=abc&si=xyz&feature=share",
       "expected": "https://music.youtube.com/watch?v=abc",
-      "verified": "2026-10-30"
+      "verified": null,
+      "notes": "Written for the test set, not taken from a real share."
     },
     {
       "source": "Spotify",
       "category": "Video & music",
       "input": "https://open.spotify.com/track/1a2b3c?si=xyz789",
       "expected": "https://open.spotify.com/track/1a2b3c",
-      "verified": "2026-10-30"
+      "verified": null,
+      "notes": "Written for the test set, not taken from a real share."
     },
     {
       "source": "TikTok",
       "category": "Social",
       "input": "https://www.tiktok.com/@user/video/1234567890?is_from_webapp=1&sender_device=pc&web_id=42&share_app_id=1233&share_link_id=abc&share_item_id=def&u_code=ghi&_r=1&_t=8abcde",
       "expected": "https://www.tiktok.com/@user/video/1234567890",
-      "verified": "2026-10-30",
-      "notes": "Where vm/vt.tiktok.com resolve to."
+      "verified": null,
+      "notes": "Where vm/vt.tiktok.com resolve to. Written for the test set, not taken from a real share."
     },
     {
       "source": "Facebook",
       "category": "Social",
       "input": "https://www.facebook.com/events/123?eid=ARBxyz&ref=share",
       "expected": "https://www.facebook.com/events/123",
-      "verified": "2026-10-30",
-      "notes": "eid is only stripped on Facebook."
+      "verified": null,
+      "notes": "eid is only stripped on Facebook. Written for the test set, not taken from a real share."
     },
     {
       "source": "Google Maps",
       "category": "Maps & ride-share",
       "input": "https://maps.google.com/?cid=1234567890&utm_source=share",
       "expected": "https://maps.google.com/?cid=1234567890",
-      "verified": "2026-10-30",
-      "notes": "cid identifies the place: must be kept (#2)."
+      "verified": null,
+      "notes": "cid identifies the place: must be kept (#2). Written for the test set, not taken from a real share."
     },
     {
       "source": "Google Calendar",
       "category": "Maps & ride-share",
       "input": "https://calendar.google.com/calendar/event?eid=abc123&utm_medium=email",
       "expected": "https://calendar.google.com/calendar/event?eid=abc123",
-      "verified": "2026-10-30",
-      "notes": "eid identifies the event: must be kept (#2)."
+      "verified": null,
+      "notes": "eid identifies the event: must be kept (#2). Written for the test set, not taken from a real share."
     },
     {
       "source": "DiDi",
@@ -219,8 +222,8 @@
       "category": "Events & travel",
       "input": "https://www.eventbrite.co.uk/e/1?aff=x&sg=y",
       "expected": "https://www.eventbrite.co.uk/e/1",
-      "verified": "2026-10-30",
-      "notes": "Other country domains."
+      "verified": null,
+      "notes": "Other country domains. Written for the test set, not taken from a real share."
     },
     {
       "source": "Fever",

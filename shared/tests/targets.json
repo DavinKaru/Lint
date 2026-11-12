@@ -1,0 +1,849 @@
+{
+  "_about": "The 1.0 target list: the share sources Lint is measured against. 'sources' names the link-case sources (in link-cases.json) that count towards each target. breakRisk marks sources where some params make the link work, so every rule needs a real share checked first. Mirrors the cards on the Link support board.",
+  "version": 1,
+  "targets": [
+    {
+      "name": "Airbnb",
+      "category": "Events & travel",
+      "priority": "first",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Booking.com",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Eventbrite",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": [
+        "Eventbrite"
+      ]
+    },
+    {
+      "name": "Expedia",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Fever",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": [
+        "Fever"
+      ]
+    },
+    {
+      "name": "GetYourGuide / Klook",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Google Flights",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Humanitix (AU)",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Meetup",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Moshtix (AU)",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Qantas (AU)",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Skyscanner",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Ticketek (AU)",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Ticketmaster",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Tripadvisor",
+      "category": "Events & travel",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Apple Maps",
+      "category": "Maps & ride-share",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Bolt trip share",
+      "category": "Maps & ride-share",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "DiDi trip share",
+      "category": "Maps & ride-share",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": [
+        "DiDi"
+      ]
+    },
+    {
+      "name": "Google Calendar",
+      "category": "Maps & ride-share",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": [
+        "Google Calendar"
+      ]
+    },
+    {
+      "name": "Google Maps short links",
+      "category": "Maps & ride-share",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Google Maps"
+      ]
+    },
+    {
+      "name": "Lyft trip share",
+      "category": "Maps & ride-share",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Ola trip share",
+      "category": "Maps & ride-share",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Uber trip share",
+      "category": "Maps & ride-share",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Waze",
+      "category": "Maps & ride-share",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Yelp",
+      "category": "Maps & ride-share",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "7NEWS (AU)",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "9News (AU)",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "ABC News (AU)",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Apple News",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "BBC",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Beehiiv",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Bloomberg",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Flipboard",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Google News",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Mailchimp click links",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Medium",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "news.com.au (AU)",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "NYTimes",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "SBS (AU)",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "SMH / The Age (AU)",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Substack",
+      "category": "News & newsletters",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Substack"
+      ]
+    },
+    {
+      "name": "The Guardian",
+      "category": "News & newsletters",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Bing redirects",
+      "category": "Search & ads",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "DuckDuckGo",
+      "category": "Search & ads",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": [
+        "DuckDuckGo"
+      ]
+    },
+    {
+      "name": "Facebook & Instagram link wrappers",
+      "category": "Search & ads",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Facebook",
+        "Messenger"
+      ]
+    },
+    {
+      "name": "Google AMP links",
+      "category": "Search & ads",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": [
+        "Google AMP"
+      ]
+    },
+    {
+      "name": "Google search redirects",
+      "category": "Search & ads",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Gmail / Google Docs",
+        "Google Search"
+      ]
+    },
+    {
+      "name": "Google Shopping",
+      "category": "Search & ads",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": [
+        "Google Shopping"
+      ]
+    },
+    {
+      "name": "Outlook Safe Links",
+      "category": "Search & ads",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Outlook Safe Links"
+      ]
+    },
+    {
+      "name": "AliExpress",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Amazon (full links)",
+      "category": "Shopping",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Amazon"
+      ]
+    },
+    {
+      "name": "Big W (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Booktopia (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Bunnings (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Catch (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Coles (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Depop",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Domain (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "DoorDash",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "eBay",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Etsy",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Facebook Marketplace",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Gumtree (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "IKEA",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "JB Hi-Fi (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Kmart (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Menulog (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "realestate.com.au (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Shein",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Shopify stores",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Target",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Temu",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "The Iconic (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Uber Eats",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Vinted",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Walmart",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Woolworths (AU)",
+      "category": "Shopping",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Bluesky",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Discord",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Facebook (remaining)",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": [
+        "Facebook"
+      ]
+    },
+    {
+      "name": "Instagram",
+      "category": "Social",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Instagram"
+      ]
+    },
+    {
+      "name": "LinkedIn",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": [
+        "LinkedIn"
+      ]
+    },
+    {
+      "name": "Mastodon",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Pinterest",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Quora",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Reddit",
+      "category": "Social",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Reddit"
+      ]
+    },
+    {
+      "name": "Snapchat",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Telegram",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Threads",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": [
+        "Threads"
+      ]
+    },
+    {
+      "name": "TikTok",
+      "category": "Social",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "TikTok"
+      ]
+    },
+    {
+      "name": "Tumblr",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": [
+        "Tumblr"
+      ]
+    },
+    {
+      "name": "WhatsApp",
+      "category": "Social",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "X / Twitter",
+      "category": "Social",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "X / Twitter"
+      ]
+    },
+    {
+      "name": "Apple Music",
+      "category": "Video & music",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Apple Music",
+        "App Store"
+      ]
+    },
+    {
+      "name": "Apple Podcasts",
+      "category": "Video & music",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Deezer",
+      "category": "Video & music",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Netflix",
+      "category": "Video & music",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Shazam",
+      "category": "Video & music",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "SoundCloud",
+      "category": "Video & music",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Spotify",
+      "category": "Video & music",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "Spotify"
+      ]
+    },
+    {
+      "name": "Tidal",
+      "category": "Video & music",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Twitch",
+      "category": "Video & music",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Vimeo",
+      "category": "Video & music",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "YouTube",
+      "category": "Video & music",
+      "priority": "first",
+      "breakRisk": false,
+      "sources": [
+        "YouTube",
+        "YouTube Music"
+      ]
+    },
+    {
+      "name": "Canva",
+      "category": "Work & productivity",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Dropbox",
+      "category": "Work & productivity",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Figma",
+      "category": "Work & productivity",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "GitHub",
+      "category": "Work & productivity",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Google Docs / Drive",
+      "category": "Work & productivity",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Microsoft Teams",
+      "category": "Work & productivity",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    },
+    {
+      "name": "Notion",
+      "category": "Work & productivity",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Seek (AU)",
+      "category": "Work & productivity",
+      "priority": "later",
+      "breakRisk": false,
+      "sources": []
+    },
+    {
+      "name": "Zoom",
+      "category": "Work & productivity",
+      "priority": "later",
+      "breakRisk": true,
+      "sources": []
+    }
+  ]
+}
