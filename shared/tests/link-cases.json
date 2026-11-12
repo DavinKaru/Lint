@@ -266,6 +266,14 @@
       "notes": "A search for a URL isn't a redirect: only ei is stripped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://example.com/listing?cd=2&ei=abc123",
+      "expected": "https://example.com/listing?cd=2&ei=abc123",
+      "verified": null,
+      "notes": "cd and ei are only stripped on Google (#15). Written for the test set, not taken from a real share."
+    },
+    {
       "source": "Google AMP",
       "category": "Search & ads",
       "input": "https://www.google.com/amp/s/www.example.com/news/story.amp",
@@ -826,6 +834,14 @@
       "notes": "Passed through unchanged; GitHub's own params are under review in #15. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
+      "source": "GitHub",
+      "category": "Work & productivity",
+      "input": "https://api.github.com/repos/example/repo/contents/README.md?ref=feature-branch",
+      "expected": "https://api.github.com/repos/example/repo/contents/README.md?ref=feature-branch",
+      "verified": null,
+      "notes": "ref is the branch, tag or commit (GitHub's REST docs), so it is never stripped here (#15). Written for the test set, not taken from a real share."
+    },
+    {
       "source": "eBay",
       "category": "Shopping",
       "input": "https://www.ebay.com.au/itm/123456789012?var=987654321&_trkparms=amclksrc%3DITM&_trksid=p4429486.c101224&ssspo=AbCd&sssrc=2047675&ssuid=xyz&widget_ver=artemis",
@@ -1354,12 +1370,44 @@
       "notes": "An Associates link: tag, linkCode and linkId are the creator's affiliate link and stay (#28); crid and ref_ are tracking. Written for the test set, not taken from a real share."
     },
     {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/gp/product/B0ABCDEF12/?smid=A1EXAMPLESELLER&psc=1&qid=1730000000",
+      "expected": "https://www.amazon.com/gp/product/B0ABCDEF12/?smid=A1EXAMPLESELLER&psc=1",
+      "verified": null,
+      "notes": "smid picks the seller's offer (and its price), so it stays on Amazon (#15); qid is search tracking. Written for the test set, not taken from a real share."
+    },
+    {
       "source": "Google Maps short links",
       "category": "Maps & ride-share",
       "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&hl=en",
       "expected": "https://www.google.com/maps/place/Sydney+Opera+House/@-33.85,151.21,17z?entry=ttu",
       "verified": null,
       "notes": "Unwrapped from the consent page, then g_st stripped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "GitLab",
+      "category": "Work & productivity",
+      "input": "https://gitlab.com/api/v4/projects/12345/repository/files/README.md/raw?ref=main",
+      "expected": "https://gitlab.com/api/v4/projects/12345/repository/files/README.md/raw?ref=main",
+      "verified": null,
+      "notes": "ref is the branch (GitLab's API docs) and must stay (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "New York Times",
+      "category": "News & newsletters",
+      "input": "https://www.nytimes.com/2026/01/01/world/example-article.html?smid=nytcore-ios-share",
+      "expected": "https://www.nytimes.com/2026/01/01/world/example-article.html",
+      "verified": null,
+      "notes": "smid marks how the article was shared. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Parcel tracking",
+      "category": "Shopping",
+      "input": "https://track.example-carrier.com/track?trackingId=AB123456789AU",
+      "expected": "https://track.example-carrier.com/track?trackingId=AB123456789AU",
+      "verified": null,
+      "notes": "Some carriers' tracking pages and APIs take the parcel number as trackingId, so it's only stripped on LinkedIn (#15). Written for the test set, not taken from a real share."
     }
   ],
   "shortLinks": [

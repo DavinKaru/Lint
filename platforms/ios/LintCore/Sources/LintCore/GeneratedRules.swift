@@ -26,27 +26,21 @@ enum GeneratedRules {
         // HubSpot
         "_hsenc", "_hsmi", "__hsfp", "__hssc", "__hstc",
         // Generic referral
-        //   Generic names, under review in #15.
-        "ref", "ref_src",
+        //   ref_src is distinctive enough to strip everywhere. ref itself is only stripped on sites that use it for tracking: GitHub and GitLab links use ?ref= for the branch (#15).
+        "ref_src",
         // Pinterest
         "epik",
         // Google (Ads, Analytics, Search, Shopping)
-        //   cd and ei are generic names, under review in #15.
-        "aqs", "cd", "ei", "iflsig", "pcampaignid", "rlz", "srsltid", "sxsrf", "uact", "ved", "_ga", "_gl",
+        "aqs", "iflsig", "pcampaignid", "rlz", "srsltid", "sxsrf", "uact", "ved", "_ga", "_gl",
         // Meta / Facebook
         //   eid is Facebook-only, see siteParams.
         "comment_tracking", "eav", "mibextid", "__tn__",
         // Snapchat
         "ScCid",
         // Reddit
-        //   share_id is a generic name, under review in #15.
-        "correlation_id", "rdt", "ref_campaign", "ref_source", "share_id",
-        // LinkedIn
-        //   Generic names, under review in #15.
-        "refId", "trackingId", "trk",
+        "correlation_id", "rdt", "ref_campaign", "ref_source",
         // Amazon
-        //   qid, smid and srs are generic names, under review in #15.
-        "dchild", "qid", "refRID", "smid", "spIA", "srs",
+        "dchild", "refRID", "spIA",
         // Twitter / X
         "__twitter_impression",
         // Matomo / Piwik (legacy)
@@ -73,7 +67,7 @@ enum GeneratedRules {
         "spotify.com": ["si"],
         // Meta / Facebook (including Marketplace)
         //   eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook. referral_code, referral_story_type and tracking are added to shared Marketplace listings.
-        "facebook.com": ["eid", "referral_code", "referral_story_type", "tracking"],
+        "facebook.com": ["eid", "referral_code", "referral_story_type", "tracking", "ref"],
         // Eventbrite
         //   aff records how a link was shared (e.g. ebdsshandroid, ebdsshsms) and sg is a long per-share token, both added when you share. Eventbrite uses a domain per country, hence the wildcard.
         "eventbrite.*": ["aff", "sg"],
@@ -87,12 +81,12 @@ enum GeneratedRules {
         //   s says which share option was used (e.g. s=20, s=46); t is a per-share token identifying who shared it.
         "x.com": ["s", "t"],
         "twitter.com": ["s", "t"],
-        // Google Maps
-        //   Added to links resolved from maps.app.goo.gl: g_st is the share type and g_ep encodes the share context. entry= is left alone.
-        "google.*": ["g_st", "g_ep"],
+        // Google (Maps, Search)
+        //   Maps links resolved from maps.app.goo.gl carry g_st (the share type) and g_ep (the share context); entry= is left alone. cd and ei are search-result tracking, only stripped on Google because the names are generic (#15).
+        "google.*": ["g_st", "g_ep", "cd", "ei"],
         // Amazon (full links, every country domain)
         //   Search and recommendation context on product links (sprefix carries what you searched for). Variant selectors th and psc are kept. Affiliate link params (tag, linkCode, linkId, ascsubtag, creativeASIN, camp, creative) are kept, see affiliateParams. keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query.
-        "amazon.*": ["crid", "dib", "dib_tag", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "social_share", "_encoding", "ref_"],
+        "amazon.*": ["crid", "dib", "dib_tag", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "social_share", "_encoding", "ref_", "qid", "srs", "ref"],
         // Apple Music, Podcasts and App Store
         //   uo and ct are origin and campaign tracking (the share sheet adds ct=share). i= (the track or episode), mt= and app= are kept, and so is the at= affiliate token (see affiliateParams).
         "music.apple.com": ["uo", "ct"],
@@ -107,7 +101,7 @@ enum GeneratedRules {
         "pinterest.*": ["sfo", "mweb_unauth_id"],
         // LinkedIn
         //   rcm identifies the member who shared a post; lipi, midToken, midSig and trkEmail are page and email tracking. otpToken (email sign-in) is deliberately not listed.
-        "linkedin.com": ["rcm", "lipi", "midToken", "midSig", "trkEmail"],
+        "linkedin.com": ["rcm", "lipi", "midToken", "midSig", "trkEmail", "refId", "trackingId", "trk"],
         // Threads
         //   Per-share tracking tokens on post links.
         "threads.net": ["xmt", "slof"],
@@ -155,7 +149,7 @@ enum GeneratedRules {
         "aliexpress.*": ["spm", "scm", "scm_id", "scm-url", "pvid", "algo_pvid", "algo_exp_id", "terminal_id", "afSmartRedirect", "gatewayAdapt", "sourceType", "srcSns", "businessType", "social_params", "tt", "utparam", "gps-id", "curPageLogUid", "bizType", "mp", "_randl_shipto"],
         // Etsy
         //   Search and share tracking on listing links. variation0/variation1 pick the options and are kept.
-        "etsy.com": ["click_key", "click_sum", "ga_order", "ga_search_type", "ga_view_type", "ga_search_query", "organic_search_click", "plkey", "sts", "frs", "pro", "sr_prefetch", "pf_from", "logging_key", "content_source", "share_time"],
+        "etsy.com": ["click_key", "click_sum", "ga_order", "ga_search_type", "ga_view_type", "ga_search_query", "organic_search_click", "plkey", "sts", "frs", "pro", "sr_prefetch", "pf_from", "logging_key", "content_source", "share_time", "ref"],
         // Shein
         //   Share and page-source tracking. mallCode picks the warehouse and is kept.
         "shein.*": ["src_identifier", "src_module", "src_tab_page_id", "scici", "ici", "share_from", "url_from", "onelink"],
@@ -187,6 +181,24 @@ enum GeneratedRules {
         // Deezer
         //   App deep-link plumbing added to shared track links.
         "deezer.com": ["deferredFl", "host"],
+        // Reddit
+        //   share_id and ref on post links; share_id is only stripped here because the name is generic (#15).
+        "reddit.com": ["share_id", "ref"],
+        // New York Times
+        //   smid marks how an article was shared (smid=nytcore-ios-share). Not stripped on Amazon, where smid picks the seller's offer (#15).
+        "nytimes.com": ["smid"],
+        // Kickstarter
+        //   ref marks where a project link came from.
+        "kickstarter.com": ["ref"],
+        // Goodreads
+        //   ref marks which part of the page a book link came from.
+        "goodreads.com": ["ref"],
+        // Seek (AU)
+        //   ref marks where a job link was opened from (ref=search-standalone).
+        "seek.com.au": ["ref"],
+        // Snapchat
+        //   share_id identifies the share on profile links.
+        "snapchat.com": ["share_id"],
     ]
 
     /// Params only stripped on some pages of a site (see `UrlCleaner.pathMatches`).
