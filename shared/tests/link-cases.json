@@ -1258,6 +1258,14 @@
       "notes": "On a search link keywords is the query and must stay. Written for the test set, not taken from a real share."
     },
     {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.co.jp/-/en/Example-Product/dp/B0ABCDEF12/ref=sr_1_1?keywords=example&qid=1730000000",
+      "expected": "https://www.amazon.co.jp/-/en/Example-Product/dp/B0ABCDEF12/ref=sr_1_1",
+      "verified": null,
+      "notes": "The same product page in another language (/-/en/): keywords is stripped like on /dp/ pages, and qid is search tracking. Written for the test set, not taken from a real share."
+    },
+    {
       "source": "Google Maps short links",
       "category": "Maps & ride-share",
       "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&hl=en",

@@ -57,6 +57,13 @@ object ShortLinkResolver {
         return GeneratedRules.SHORT_LINK_PATHS.any { UrlCleaner.onPage(host, uri.rawPath, it.sites, it.paths) }
     }
 
+    /** True if [url] is a short link that identifies the person sharing it (see ShortLinkPath.identifiesYou). */
+    private fun identifiesYou(url: String): Boolean {
+        val uri = try { URI(url) } catch (e: Exception) { return false }
+        val host = uri.host?.lowercase() ?: return false
+        return GeneratedRules.SHORT_LINK_PATHS.any { it.identifiesYou && UrlCleaner.onPage(host, uri.rawPath, it.sites, it.paths) }
+    }
+
     /**
      * True if [url] is a sign-in or consent page (GeneratedRules.DEAD_END_PAGES): where a short link
      * lands when the provider wants a signed-in browser, rather than the content itself.
@@ -75,9 +82,11 @@ object ShortLinkResolver {
      * [startUrl] unchanged if a hop throws, or if the chain still hasn't terminated after
      * [maxHops] redirects (an unusually long or looping chain).
      *
-     * A redirect to a sign-in or consent page ([isDeadEnd]) ends the chain at the hop before it,
-     * so the shared link is never a sign-in page. If that page carries the real link in full (a
-     * consent page's continue=, see [UrlCleaner.unwrap]), the chain ends there instead.
+     * A redirect to a sign-in or consent page ([isDeadEnd]) ends the chain without requesting it.
+     * If that page carries the real link in full (a consent page's continue=, see
+     * [UrlCleaner.unwrap]) and it isn't another sign-in page, that's the result. Otherwise it's the
+     * hop before, unless that link identifies the person sharing it (a Mailchimp click link); then
+     * the sign-in page itself, which still leads to the content once signed in.
      */
     fun followRedirects(startUrl: String, fetcher: HopFetcher, maxHops: Int = MAX_HOPS): String {
         var currentUrl = startUrl
@@ -102,7 +111,11 @@ object ShortLinkResolver {
             }
             if (isDeadEnd(next)) {
                 val unwrapped = UrlCleaner.unwrap(next)
-                return if (unwrapped != next) unwrapped else currentUrl
+                return when {
+                    unwrapped != next && !isDeadEnd(unwrapped) -> unwrapped
+                    identifiesYou(currentUrl) -> next
+                    else -> currentUrl
+                }
             }
             currentUrl = next
         }

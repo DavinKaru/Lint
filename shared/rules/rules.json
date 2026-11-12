@@ -327,13 +327,15 @@
         "/dp/*/**",
         "/*/dp/*/**",
         "/gp/product/*/**",
-        "/gp/aw/d/*/**"
+        "/gp/aw/d/*/**",
+        "/-/*/dp/*/**",
+        "/-/*/*/dp/*/**"
       ],
       "params": [
         "keywords"
       ],
       "source": "Amazon product pages",
-      "notes": "keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query."
+      "notes": "keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query. /-/<lang>/ paths are the same pages in another language."
     },
     {
       "sites": [
@@ -1156,8 +1158,9 @@
       "paths": [
         "/track/click"
       ],
+      "identifiesYou": true,
       "provider": "Mailchimp",
-      "notes": "Newsletter click links on <account>.<dc>.list-manage.com. The e= param identifies the subscriber, so resolving replaces it with the destination. Resolving counts as a click by the person sharing."
+      "notes": "Newsletter click links on <account>.<dc>.list-manage.com. The e= param identifies the subscriber, so resolving replaces it with the destination. Resolving counts as a click by the person sharing. identifiesYou: if it redirects straight to a sign-in page, that page is shared rather than this link."
     }
   ],
   "deadEndPages": [

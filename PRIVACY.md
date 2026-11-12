@@ -54,10 +54,13 @@ hasn't been tested on a real device yet.
   flow.
 - If a redirect lands on a sign-in or consent page (Facebook's login page, Google's cookie
   consent, LinkedIn's sign-in wall, ... listed as `deadEndPages` in
-  [`shared/rules/rules.json`](shared/rules/rules.json)), Lint stops there without requesting it and
-  keeps the link from the step before. That's the page the provider was sending you to, and the
-  original short link if there was no step before. If the consent page carries the full link it
-  continues to, Lint uses that instead.
+  [`shared/rules/rules.json`](shared/rules/rules.json)), Lint stops there without requesting it:
+  - if the page carries the full link it continues to (a consent page's `continue=`, a Facebook
+    sign-in page's `next=`) and that isn't another sign-in page, Lint uses that link;
+  - otherwise it keeps the link from the step before, or the original short link if there was no
+    step before;
+  - except when that link identifies you (a Mailchimp click link carries your subscriber ID): then
+    Lint shares the sign-in page itself, which still leads to the content once signed in.
 
 Lint doesn't attempt to defeat bot detection (e.g. by mimicking a real browser's full network
 fingerprint) to force a blocked provider like Amazon to resolve — that would be fragile, an arms

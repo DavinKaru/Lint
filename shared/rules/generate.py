@@ -91,6 +91,8 @@ def validate(rules: dict) -> None:
                 if not SITE_KEY.match(site):
                     fail(f'{kind} "{label}": site "{site}" should be a lowercase domain')
             check_segment_paths(group["paths"], f'{kind} "{label}"')
+            if not isinstance(group.get("identifiesYou", False), bool) or ("identifiesYou" in group and section != "shortLinkPaths"):
+                fail(f'{kind} "{label}": identifiesYou should be true or false, and only on shortLinkPaths')
         check_listed_once(rules.get(section, []), lambda g: [(s, p) for s in g["sites"] for p in g["paths"]], f"{section} listed twice")
     for group in rules.get("pathWrappers", []):
         label = group["source"]
@@ -212,7 +214,8 @@ def kotlin(rules: dict) -> str:
     out.append("    val SHORT_LINK_PATHS: List<ShortLinkPath> = listOf(")
     for group in rules.get("shortLinkPaths", []):
         out += comment_lines(group, "        // ")
-        out.append(f"        ShortLinkPath(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])})),")
+        extra = ", identifiesYou = true" if group.get("identifiesYou") else ""
+        out.append(f"        ShortLinkPath(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])}){extra}),")
     out += ["    )", ""]
 
     out.append("    /** Redirect links that carry the real link in a query param; unwrapped offline. */")
@@ -255,8 +258,11 @@ def kotlin(rules: dict) -> str:
     out.append("/** A redirect on [sites] whose path after [prefix] is the real link, without its [scheme]. */")
     out.append("internal data class PathWrapper(val sites: List<String>, val prefix: String, val scheme: String)")
     out.append("")
-    out.append("/** Short links on [sites] whose path matches one of [paths] (see UrlCleaner.pathMatches). */")
-    out.append("internal data class ShortLinkPath(val sites: List<String>, val paths: List<String>)")
+    out.append("/**")
+    out.append(" * Short links on [sites] whose path matches one of [paths] (see UrlCleaner.pathMatches). If [identifiesYou],")
+    out.append(" * the link itself identifies the person sharing it, so it's never kept in place of a sign-in page.")
+    out.append(" */")
+    out.append("internal data class ShortLinkPath(val sites: List<String>, val paths: List<String>, val identifiesYou: Boolean = false)")
     out.append("")
     out.append("/** [params] stripped on [sites], but only where the path matches one of [paths] (see UrlCleaner.pathMatches). */")
     out.append("internal data class SitePathParams(val sites: List<String>, val paths: List<String>, val params: Set<String>)")
@@ -316,7 +322,8 @@ def swift(rules: dict) -> str:
     out.append("    static let shortLinkPaths: [ShortLinkPath] = [")
     for group in rules.get("shortLinkPaths", []):
         out += comment_lines(group, "        // ")
-        out.append(f"        ShortLinkPath(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}]),")
+        extra = ", identifiesYou: true" if group.get("identifiesYou") else ""
+        out.append(f"        ShortLinkPath(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}]{extra}),")
     out += ["    ]", ""]
 
     out.append("    /// Redirect links that carry the real link in a query param; unwrapped offline.")
@@ -354,10 +361,12 @@ def swift(rules: dict) -> str:
     out.append("    var targetSites: [String]? = nil")
     out.append("}")
     out.append("")
-    out.append("/// Short links on `sites` whose path matches one of `paths` (see `UrlCleaner.pathMatches`).")
+    out.append("/// Short links on `sites` whose path matches one of `paths` (see `UrlCleaner.pathMatches`). If `identifiesYou`,")
+    out.append("/// the link itself identifies the person sharing it, so it's never kept in place of a sign-in page.")
     out.append("struct ShortLinkPath: Sendable {")
     out.append("    let sites: [String]")
     out.append("    let paths: [String]")
+    out.append("    var identifiesYou = false")
     out.append("}")
     out.append("")
     out.append("/// `params` stripped on `sites`, but only where the path matches one of `paths` (see `UrlCleaner.pathMatches`).")

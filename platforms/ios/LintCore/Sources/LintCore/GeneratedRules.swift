@@ -192,8 +192,8 @@ enum GeneratedRules {
     /// Params only stripped on some pages of a site (see `UrlCleaner.pathMatches`).
     static let sitePathParams: [SitePathParams] = [
         // Amazon product pages
-        //   keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query.
-        SitePathParams(sites: ["amazon.*"], paths: ["/dp/*/**", "/*/dp/*/**", "/gp/product/*/**", "/gp/aw/d/*/**"], params: ["keywords"]),
+        //   keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query. /-/<lang>/ paths are the same pages in another language.
+        SitePathParams(sites: ["amazon.*"], paths: ["/dp/*/**", "/*/dp/*/**", "/gp/product/*/**", "/gp/aw/d/*/**", "/-/*/dp/*/**", "/-/*/*/dp/*/**"], params: ["keywords"]),
         // Pinterest pin pages
         //   Who shared the pin. Only stripped on /pin/<id>/ pages: on group-board and sign-up links they are the invite.
         SitePathParams(sites: ["pinterest.*"], paths: ["/pin/*/**"], params: ["invite_code", "sender"]),
@@ -246,8 +246,8 @@ enum GeneratedRules {
         //   Share links like facebook.com/share/p/<code>/ and /share/r/<code>/.
         ShortLinkPath(sites: ["facebook.com"], paths: ["/share/*", "/share/*/*"]),
         // Mailchimp
-        //   Newsletter click links on <account>.<dc>.list-manage.com. The e= param identifies the subscriber, so resolving replaces it with the destination. Resolving counts as a click by the person sharing.
-        ShortLinkPath(sites: ["list-manage.com"], paths: ["/track/click"]),
+        //   Newsletter click links on <account>.<dc>.list-manage.com. The e= param identifies the subscriber, so resolving replaces it with the destination. Resolving counts as a click by the person sharing. identifiesYou: if it redirects straight to a sign-in page, that page is shared rather than this link.
+        ShortLinkPath(sites: ["list-manage.com"], paths: ["/track/click"], identifiesYou: true),
     ]
 
     /// Redirect links that carry the real link in a query param; unwrapped offline.
@@ -336,10 +336,12 @@ struct RedirectWrapper: Sendable {
     var targetSites: [String]? = nil
 }
 
-/// Short links on `sites` whose path matches one of `paths` (see `UrlCleaner.pathMatches`).
+/// Short links on `sites` whose path matches one of `paths` (see `UrlCleaner.pathMatches`). If `identifiesYou`,
+/// the link itself identifies the person sharing it, so it's never kept in place of a sign-in page.
 struct ShortLinkPath: Sendable {
     let sites: [String]
     let paths: [String]
+    var identifiesYou = false
 }
 
 /// `params` stripped on `sites`, but only where the path matches one of `paths` (see `UrlCleaner.pathMatches`).

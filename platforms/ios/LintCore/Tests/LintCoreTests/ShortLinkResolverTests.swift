@@ -263,6 +263,30 @@ struct ShortLinkResolverTests {
         )
         #expect(result == "https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=abc")
     }
+
+    @Test func sharesTheSignInPageRatherThanAClickLinkThatIdentifiesYou() async {
+        let start = "https://example.us1.list-manage.com/track/click?u=abc&id=def&e=SUBSCRIBER"
+        let signIn = "https://www.facebook.com/login/?next=%2Fevents%2F1234567890"
+        let result = await ShortLinkResolver.followRedirects(
+            from: start,
+            fetcher: fetcher([start: HopResponse(statusCode: 302, location: signIn)])
+        )
+        #expect(result == signIn)
+    }
+
+    @Test func neverTakesASignInPageOutOfAConsentPage() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://youtu.be/dQw4w9WgXcQ",
+            fetcher: fetcher([
+                "https://youtu.be/dQw4w9WgXcQ": HopResponse(statusCode: 301, location: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ": HopResponse(
+                    statusCode: 302,
+                    location: "https://consent.youtube.com/m?continue=https%3A%2F%2Faccounts.google.com%2FServiceLogin%3Fcontinue%3Dx"
+                ),
+            ])
+        )
+        #expect(result == "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    }
 }
 
 private actor TimeoutRecorder {

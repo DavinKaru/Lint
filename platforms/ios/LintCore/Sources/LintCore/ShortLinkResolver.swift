@@ -54,6 +54,12 @@ public enum ShortLinkResolver {
         return GeneratedRules.shortLinkPaths.contains { UrlCleaner.onPage(host, components.percentEncodedPath, $0.sites, $0.paths) }
     }
 
+    /// True if `url` is a short link that identifies the person sharing it (see `ShortLinkPath.identifiesYou`).
+    private static func identifiesYou(_ url: String) -> Bool {
+        guard let components = URLComponents(string: url), let host = components.host?.lowercased() else { return false }
+        return GeneratedRules.shortLinkPaths.contains { $0.identifiesYou && UrlCleaner.onPage(host, components.percentEncodedPath, $0.sites, $0.paths) }
+    }
+
     /// True if `url` is a sign-in or consent page (`GeneratedRules.deadEndPages`): where a short link
     /// lands when the provider wants a signed-in browser, rather than the content itself.
     public static func isDeadEnd(_ url: String) -> Bool {
@@ -68,9 +74,11 @@ public enum ShortLinkResolver {
     /// `startUrl` unchanged if a hop throws, or if the chain still hasn't terminated after
     /// `maxHops` redirects (an unusually long or looping chain).
     ///
-    /// A redirect to a sign-in or consent page (`isDeadEnd`) ends the chain at the hop before it,
-    /// so the shared link is never a sign-in page. If that page carries the real link in full (a
-    /// consent page's continue=, see `UrlCleaner.unwrap`), the chain ends there instead.
+    /// A redirect to a sign-in or consent page (`isDeadEnd`) ends the chain without requesting it.
+    /// If that page carries the real link in full (a consent page's continue=, see
+    /// `UrlCleaner.unwrap`) and it isn't another sign-in page, that's the result. Otherwise it's the
+    /// hop before, unless that link identifies the person sharing it (a Mailchimp click link); then
+    /// the sign-in page itself, which still leads to the content once signed in.
     public static func followRedirects(
         from startUrl: String,
         fetcher: HopFetcher,
@@ -93,7 +101,8 @@ public enum ShortLinkResolver {
             else { return startUrl }
             if isDeadEnd(next) {
                 let unwrapped = UrlCleaner.unwrap(next)
-                return unwrapped != next ? unwrapped : currentUrl
+                if unwrapped != next && !isDeadEnd(unwrapped) { return unwrapped }
+                return identifiesYou(currentUrl) ? next : currentUrl
             }
             currentUrl = next
         }

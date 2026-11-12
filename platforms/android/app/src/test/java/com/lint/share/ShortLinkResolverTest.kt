@@ -208,4 +208,31 @@ class ShortLinkResolverTest {
             ShortLinkResolver.followRedirects("https://youtu.be/dQw4w9WgXcQ", fetcher),
         )
     }
+
+    @Test
+    fun `shares the sign-in page rather than a click link that identifies you`() {
+        val start = "https://example.us1.list-manage.com/track/click?u=abc&id=def&e=SUBSCRIBER"
+        val signIn = "https://www.facebook.com/login/?next=%2Fevents%2F1234567890"
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            if (url == start) HopResponse(302, signIn) else throw AssertionError("unexpected url: $url")
+        }
+
+        assertEquals(signIn, ShortLinkResolver.followRedirects(start, fetcher))
+    }
+
+    @Test
+    fun `never takes a sign-in page out of a consent page`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://youtu.be/dQw4w9WgXcQ" -> HopResponse(301, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ" -> HopResponse(
+                    302,
+                    "https://consent.youtube.com/m?continue=https%3A%2F%2Faccounts.google.com%2FServiceLogin%3Fcontinue%3Dx",
+                )
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals("https://www.youtube.com/watch?v=dQw4w9WgXcQ", ShortLinkResolver.followRedirects("https://youtu.be/dQw4w9WgXcQ", fetcher))
+    }
 }
