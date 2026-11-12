@@ -317,7 +317,23 @@
         "ref_"
       ],
       "source": "Amazon (full links, every country domain)",
-      "notes": "Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is kept: older search links (amazon.com/s?keywords=...) use it as the query."
+      "notes": "Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query."
+    },
+    {
+      "sites": [
+        "amazon.*"
+      ],
+      "paths": [
+        "/dp/*/**",
+        "/*/dp/*/**",
+        "/gp/product/*/**",
+        "/gp/aw/d/*/**"
+      ],
+      "params": [
+        "keywords"
+      ],
+      "source": "Amazon product pages",
+      "notes": "keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query."
     },
     {
       "sites": [
@@ -353,7 +369,21 @@
         "mweb_unauth_id"
       ],
       "source": "Pinterest",
-      "notes": "Added to pins opened from pin.it share links. invite_code and sender identify the sharer but are kept: Pinterest also uses them for group-board and sign-up invites."
+      "notes": "Added to pins opened from pin.it share links. invite_code and sender are only stripped on pin pages (below): Pinterest also uses them for group-board and sign-up invites."
+    },
+    {
+      "sites": [
+        "pinterest.*"
+      ],
+      "paths": [
+        "/pin/*/**"
+      ],
+      "params": [
+        "invite_code",
+        "sender"
+      ],
+      "source": "Pinterest pin pages",
+      "notes": "Who shared the pin. Only stripped on /pin/<id>/ pages: on group-board and sign-up links they are the invite."
     },
     {
       "sites": [
@@ -1128,6 +1158,96 @@
       ],
       "provider": "Mailchimp",
       "notes": "Newsletter click links on <account>.<dc>.list-manage.com. The e= param identifies the subscriber, so resolving replaces it with the destination. Resolving counts as a click by the person sharing."
+    }
+  ],
+  "deadEndPages": [
+    {
+      "sites": [
+        "consent.google.com",
+        "consent.youtube.com"
+      ],
+      "paths": [
+        "/**"
+      ],
+      "source": "Google and YouTube cookie consent"
+    },
+    {
+      "sites": [
+        "accounts.google.com"
+      ],
+      "paths": [
+        "/**"
+      ],
+      "source": "Google sign-in"
+    },
+    {
+      "sites": [
+        "facebook.com"
+      ],
+      "paths": [
+        "/login/**",
+        "/login.php"
+      ],
+      "source": "Facebook sign-in"
+    },
+    {
+      "sites": [
+        "instagram.com"
+      ],
+      "paths": [
+        "/accounts/login/**"
+      ],
+      "source": "Instagram sign-in"
+    },
+    {
+      "sites": [
+        "linkedin.com"
+      ],
+      "paths": [
+        "/authwall/**",
+        "/login/**",
+        "/uas/login/**"
+      ],
+      "source": "LinkedIn sign-in wall"
+    },
+    {
+      "sites": [
+        "x.com",
+        "twitter.com"
+      ],
+      "paths": [
+        "/login/**",
+        "/i/flow/login/**"
+      ],
+      "source": "X / Twitter sign-in"
+    },
+    {
+      "sites": [
+        "reddit.com"
+      ],
+      "paths": [
+        "/login/**",
+        "/account/login/**"
+      ],
+      "source": "Reddit sign-in"
+    },
+    {
+      "sites": [
+        "tiktok.com"
+      ],
+      "paths": [
+        "/login/**"
+      ],
+      "source": "TikTok sign-in"
+    },
+    {
+      "sites": [
+        "amazon.*"
+      ],
+      "paths": [
+        "/ap/signin/**"
+      ],
+      "source": "Amazon sign-in"
     }
   ]
 }

@@ -17,14 +17,35 @@ object UrlCleaner {
     // The rules themselves (tracking params, prefixes, site-specific params) live in
     // shared/rules/rules.json and are generated into GeneratedRules.kt.
 
-    private fun isTrackingParam(name: String, host: String?): Boolean {
+    private fun isTrackingParam(name: String, host: String?, path: String?): Boolean {
         if (GeneratedRules.TRACKING_PREFIXES.any { name.startsWith(it) } || name in GeneratedRules.TRACKING_PARAMS) {
             return true
         }
         val lowerHost = host?.lowercase() ?: return false
-        return GeneratedRules.SITE_PARAMS.any { (domain, params) ->
-            name in params && hostMatches(lowerHost, domain)
-        }
+        return GeneratedRules.SITE_PARAMS.any { (domain, params) -> name in params && hostMatches(lowerHost, domain) } ||
+            GeneratedRules.SITE_PATH_PARAMS.any { rule ->
+                name in rule.params && onPage(lowerHost, path, rule.sites, rule.paths)
+            }
+    }
+
+    /** True if [host] matches one of [sites] and [path] (raw, percent-encoded) one of [paths]. */
+    internal fun onPage(host: String, path: String?, sites: List<String>, paths: List<String>): Boolean {
+        if (sites.none { hostMatches(host, it) }) return false
+        val segments = (path ?: "").trim('/').split('/')
+        return paths.any { pathMatches(segments, it) }
+    }
+
+    /**
+     * True if a path's [segments] (split on "/", leading and trailing slashes trimmed) match
+     * [pattern]: "/"-separated segments, each a name to match exactly or "*" for any one non-empty
+     * segment, optionally ending in "**" for any rest of the path (including none).
+     */
+    internal fun pathMatches(segments: List<String>, pattern: String): Boolean {
+        val wanted = pattern.trim('/').split('/')
+        val anyRest = wanted.last() == "**"
+        val fixed = if (anyRest) wanted.dropLast(1) else wanted
+        if (if (anyRest) segments.size < fixed.size else segments.size != fixed.size) return false
+        return fixed.indices.all { i -> segments[i].isNotEmpty() && (fixed[i] == "*" || fixed[i] == segments[i]) }
     }
 
     /**
@@ -87,7 +108,7 @@ object UrlCleaner {
 
         val pairs = uri.rawQuery?.split("&") ?: return null
         for (wrapper in GeneratedRules.REDIRECT_WRAPPERS) {
-            if (wrapper.sites.none { hostMatches(host, it) } || wrapper.paths.none { pathMatches(path, it) }) continue
+            if (wrapper.sites.none { hostMatches(host, it) } || wrapper.paths.none { wrapperPathMatches(path, it) }) continue
             for (param in wrapper.params) {
                 val pair = pairs.firstOrNull { it.startsWith("$param=") } ?: continue
                 val value = pair.substringAfter("=")
@@ -100,7 +121,8 @@ object UrlCleaner {
         return null
     }
 
-    private fun pathMatches(path: String, pattern: String): Boolean =
+    /** Redirect wrapper paths match exactly, or as a prefix when they end in "*". */
+    private fun wrapperPathMatches(path: String, pattern: String): Boolean =
         if (pattern.endsWith("*")) path.startsWith(pattern.dropLast(1)) else path == pattern
 
     /** True if [url]'s host matches one of [sites] (same matching as site rules). */
@@ -210,7 +232,7 @@ object UrlCleaner {
             .filter { it.isNotEmpty() }
             .filter { pair ->
                 val name = pair.substringBefore("=")
-                !isTrackingParam(name, uri.host)
+                !isTrackingParam(name, uri.host, uri.rawPath)
             }
 
         val newQuery = keptPairs.joinToString("&")

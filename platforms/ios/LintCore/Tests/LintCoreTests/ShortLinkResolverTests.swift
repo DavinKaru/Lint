@@ -229,6 +229,40 @@ struct ShortLinkResolverTests {
         #expect(!recorded.isEmpty)
         #expect(recorded.allSatisfy { $0 <= .milliseconds(200) })
     }
+
+    @Test func stopsAtTheHopBeforeASignInPage() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://fb.watch/abc123",
+            fetcher: fetcher([
+                "https://fb.watch/abc123": HopResponse(statusCode: 302, location: "https://www.facebook.com/watch/?v=1234567890"),
+                "https://www.facebook.com/watch/?v=1234567890": HopResponse(statusCode: 302, location: "/login/?next=%2Fwatch%2F%3Fv%3D1234567890"),
+            ])
+        )
+        #expect(result == "https://www.facebook.com/watch/?v=1234567890")
+    }
+
+    @Test func keepsTheShortLinkWhenItRedirectsStraightToASignInPage() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://fb.watch/abc123",
+            fetcher: fetcher([
+                "https://fb.watch/abc123": HopResponse(statusCode: 302, location: "https://www.facebook.com/login.php?next=%2Fwatch%2F"),
+            ])
+        )
+        #expect(result == "https://fb.watch/abc123")
+    }
+
+    @Test func takesTheRealLinkFromAConsentPageThatCarriesItInFull() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://youtu.be/dQw4w9WgXcQ",
+            fetcher: fetcher([
+                "https://youtu.be/dQw4w9WgXcQ": HopResponse(
+                    statusCode: 302,
+                    location: "https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ%26si%3Dabc&gl=AU"
+                ),
+            ])
+        )
+        #expect(result == "https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=abc")
+    }
 }
 
 private actor TimeoutRecorder {

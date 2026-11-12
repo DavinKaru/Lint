@@ -11,14 +11,35 @@ public enum UrlCleaner {
     // The rules themselves (tracking params, prefixes, site-specific params) live in
     // shared/rules/rules.json and are generated into GeneratedRules.swift.
 
-    private static func isTrackingParam(_ name: String, host: String?) -> Bool {
+    private static func isTrackingParam(_ name: String, host: String?, path: String) -> Bool {
         if GeneratedRules.trackingPrefixes.contains(where: { name.hasPrefix($0) }) || GeneratedRules.trackingParams.contains(name) {
             return true
         }
         guard let lowerHost = host?.lowercased() else { return false }
-        return GeneratedRules.siteParams.contains { domain, params in
-            params.contains(name) && hostMatches(lowerHost, domain)
-        }
+        return GeneratedRules.siteParams.contains { domain, params in params.contains(name) && hostMatches(lowerHost, domain) } ||
+            GeneratedRules.sitePathParams.contains { rule in
+                rule.params.contains(name) && onPage(lowerHost, path, rule.sites, rule.paths)
+            }
+    }
+
+    /// True if `host` matches one of `sites` and `path` (raw, percent-encoded) one of `paths`.
+    static func onPage(_ host: String, _ path: String, _ sites: [String], _ paths: [String]) -> Bool {
+        guard sites.contains(where: { hostMatches(host, $0) }) else { return false }
+        let segments = path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            .split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+        return paths.contains { pathMatches(segments, $0) }
+    }
+
+    /// True if a path's `segments` (split on "/", leading and trailing slashes trimmed) match
+    /// `pattern`: "/"-separated segments, each a name to match exactly or "*" for any one non-empty
+    /// segment, optionally ending in "**" for any rest of the path (including none).
+    static func pathMatches(_ segments: [String], _ pattern: String) -> Bool {
+        var wanted = pattern.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            .split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+        let anyRest = wanted.last == "**"
+        if anyRest { wanted.removeLast() }
+        guard anyRest ? segments.count >= wanted.count : segments.count == wanted.count else { return false }
+        return wanted.indices.allSatisfy { i in !segments[i].isEmpty && (wanted[i] == "*" || wanted[i] == segments[i]) }
     }
 
     /// True if `host` is `domain` or one of its subdomains. A `domain` ending in ".*" (e.g.
@@ -86,7 +107,7 @@ public enum UrlCleaner {
         let pairs = query.split(separator: "&", omittingEmptySubsequences: true).map(String.init)
         for wrapper in GeneratedRules.redirectWrappers {
             guard wrapper.sites.contains(where: { hostMatches(host, $0) }),
-                  wrapper.paths.contains(where: { pathMatches(path, $0) })
+                  wrapper.paths.contains(where: { wrapperPathMatches(path, $0) })
             else { continue }
             for param in wrapper.params {
                 guard let pair = pairs.first(where: { $0.hasPrefix(param + "=") }) else { continue }
@@ -106,7 +127,8 @@ public enum UrlCleaner {
         return nil
     }
 
-    private static func pathMatches(_ path: String, _ pattern: String) -> Bool {
+    /// Redirect wrapper paths match exactly, or as a prefix when they end in "*".
+    private static func wrapperPathMatches(_ path: String, _ pattern: String) -> Bool {
         pattern.hasSuffix("*") ? path.hasPrefix(String(pattern.dropLast())) : path == pattern
     }
 
@@ -195,7 +217,7 @@ public enum UrlCleaner {
 
         let keptPairs = rawQuery.split(separator: "&", omittingEmptySubsequences: true).filter { pair in
             let name = pair.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: false).first ?? ""
-            return !isTrackingParam(String(name), host: components.host)
+            return !isTrackingParam(String(name), host: components.host, path: components.percentEncodedPath)
         }
 
         var result = String(base)

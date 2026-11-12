@@ -51,22 +51,14 @@ public enum ShortLinkResolver {
         guard let components = URLComponents(string: url), let rawHost = components.host else { return false }
         let host = rawHost.lowercased()
         if GeneratedRules.shortLinkHosts.contains(host) { return true }
-        let segments = trimmedSegments(components.percentEncodedPath)
-        return GeneratedRules.shortLinkPaths.contains { rule in
-            rule.sites.contains { UrlCleaner.hostMatches(host, $0) } &&
-                rule.paths.contains { pathMatchesSegments(segments, $0) }
-        }
+        return GeneratedRules.shortLinkPaths.contains { UrlCleaner.onPage(host, components.percentEncodedPath, $0.sites, $0.paths) }
     }
 
-    private static func trimmedSegments(_ path: String) -> [String] {
-        path.trimmingCharacters(in: CharacterSet(charactersIn: "/")).split(separator: "/", omittingEmptySubsequences: false).map(String.init)
-    }
-
-    /// True if `segments` match `pattern` segment for segment, where "*" is any one non-empty segment.
-    private static func pathMatchesSegments(_ segments: [String], _ pattern: String) -> Bool {
-        let wanted = trimmedSegments(pattern)
-        return wanted.count == segments.count &&
-            zip(wanted, segments).allSatisfy { w, s in !s.isEmpty && (w == "*" || w == s) }
+    /// True if `url` is a sign-in or consent page (`GeneratedRules.deadEndPages`): where a short link
+    /// lands when the provider wants a signed-in browser, rather than the content itself.
+    public static func isDeadEnd(_ url: String) -> Bool {
+        guard let components = URLComponents(string: url), let host = components.host?.lowercased() else { return false }
+        return GeneratedRules.deadEndPages.contains { UrlCleaner.onPage(host, components.percentEncodedPath, $0.sites, $0.paths) }
     }
 
     /// Pure redirect-following logic. Starting from `startUrl`, calls `fetcher` for each hop and
@@ -75,6 +67,10 @@ public enum ShortLinkResolver {
     /// whatever URL was reached so far (confirming it doesn't redirect further). Falls back to
     /// `startUrl` unchanged if a hop throws, or if the chain still hasn't terminated after
     /// `maxHops` redirects (an unusually long or looping chain).
+    ///
+    /// A redirect to a sign-in or consent page (`isDeadEnd`) ends the chain at the hop before it,
+    /// so the shared link is never a sign-in page. If that page carries the real link in full (a
+    /// consent page's continue=, see `UrlCleaner.unwrap`), the chain ends there instead.
     public static func followRedirects(
         from startUrl: String,
         fetcher: HopFetcher,
@@ -95,6 +91,10 @@ public enum ShortLinkResolver {
             guard let base = URL(string: currentUrl),
                   let next = URL(string: location, relativeTo: base)?.absoluteString
             else { return startUrl }
+            if isDeadEnd(next) {
+                let unwrapped = UrlCleaner.unwrap(next)
+                return unwrapped != next ? unwrapped : currentUrl
+            }
             currentUrl = next
         }
 

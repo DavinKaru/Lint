@@ -165,4 +165,47 @@ class ShortLinkResolverTest {
 
         assertEquals("https://www.tiktok.com/@user/video/1234567890?_r=1&_t=8abcde", result)
     }
+
+    @Test
+    fun `stops at the hop before a sign-in page`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://fb.watch/abc123" -> HopResponse(302, "https://www.facebook.com/watch/?v=1234567890")
+                "https://www.facebook.com/watch/?v=1234567890" -> HopResponse(302, "/login/?next=%2Fwatch%2F%3Fv%3D1234567890")
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals("https://www.facebook.com/watch/?v=1234567890", ShortLinkResolver.followRedirects("https://fb.watch/abc123", fetcher))
+    }
+
+    @Test
+    fun `keeps the short link when it redirects straight to a sign-in page`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://fb.watch/abc123" -> HopResponse(302, "https://www.facebook.com/login.php?next=%2Fwatch%2F")
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals("https://fb.watch/abc123", ShortLinkResolver.followRedirects("https://fb.watch/abc123", fetcher))
+    }
+
+    @Test
+    fun `takes the real link from a consent page that carries it in full`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://youtu.be/dQw4w9WgXcQ" -> HopResponse(
+                    302,
+                    "https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ%26si%3Dabc&gl=AU",
+                )
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals(
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=abc",
+            ShortLinkResolver.followRedirects("https://youtu.be/dQw4w9WgXcQ", fetcher),
+        )
+    }
 }

@@ -54,18 +54,17 @@ object ShortLinkResolver {
         } ?: return false
         val host = uri.host?.lowercase() ?: return false
         if (host in GeneratedRules.SHORT_LINK_HOSTS) return true
-        val segments = (uri.rawPath ?: "").trim('/').split('/')
-        return GeneratedRules.SHORT_LINK_PATHS.any { rule ->
-            rule.sites.any { UrlCleaner.hostMatches(host, it) } &&
-                rule.paths.any { pathMatchesSegments(segments, it) }
-        }
+        return GeneratedRules.SHORT_LINK_PATHS.any { UrlCleaner.onPage(host, uri.rawPath, it.sites, it.paths) }
     }
 
-    /** True if [segments] match [pattern] segment for segment, where "*" is any one non-empty segment. */
-    private fun pathMatchesSegments(segments: List<String>, pattern: String): Boolean {
-        val wanted = pattern.trim('/').split('/')
-        return wanted.size == segments.size &&
-            wanted.zip(segments).all { (w, s) -> s.isNotEmpty() && (w == "*" || w == s) }
+    /**
+     * True if [url] is a sign-in or consent page (GeneratedRules.DEAD_END_PAGES): where a short link
+     * lands when the provider wants a signed-in browser, rather than the content itself.
+     */
+    fun isDeadEnd(url: String): Boolean {
+        val uri = try { URI(url) } catch (e: Exception) { return false }
+        val host = uri.host?.lowercase() ?: return false
+        return GeneratedRules.DEAD_END_PAGES.any { UrlCleaner.onPage(host, uri.rawPath, it.sites, it.paths) }
     }
 
     /**
@@ -75,6 +74,10 @@ object ShortLinkResolver {
      * whatever URL was reached so far (confirming it doesn't redirect further). Falls back to
      * [startUrl] unchanged if a hop throws, or if the chain still hasn't terminated after
      * [maxHops] redirects (an unusually long or looping chain).
+     *
+     * A redirect to a sign-in or consent page ([isDeadEnd]) ends the chain at the hop before it,
+     * so the shared link is never a sign-in page. If that page carries the real link in full (a
+     * consent page's continue=, see [UrlCleaner.unwrap]), the chain ends there instead.
      */
     fun followRedirects(startUrl: String, fetcher: HopFetcher, maxHops: Int = MAX_HOPS): String {
         var currentUrl = startUrl
@@ -92,11 +95,16 @@ object ShortLinkResolver {
             if (response.responseCode !in 300..399) return currentUrl
             val location = response.locationHeader ?: return currentUrl
 
-            currentUrl = try {
+            val next = try {
                 URI(currentUrl).resolve(location).toString()
             } catch (e: Exception) {
                 return startUrl
             }
+            if (isDeadEnd(next)) {
+                val unwrapped = UrlCleaner.unwrap(next)
+                return if (unwrapped != next) unwrapped else currentUrl
+            }
+            currentUrl = next
         }
 
         return startUrl
