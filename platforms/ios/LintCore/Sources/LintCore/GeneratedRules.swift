@@ -187,15 +187,13 @@ enum GeneratedRules {
         // New York Times
         //   smid marks how an article was shared (smid=nytcore-ios-share). Not stripped on Amazon, where smid picks the seller's offer (#15).
         "nytimes.com": ["smid"],
-        // Kickstarter
-        //   ref marks where a project link came from.
-        "kickstarter.com": ["ref"],
         // Goodreads
-        //   ref marks which part of the page a book link came from.
-        "goodreads.com": ["ref"],
-        // Seek (AU)
+        //   ref marks which part of the page a book link came from; qid, from_search and from_srp mark a link opened from search results (qid identifies the search).
+        "goodreads.com": ["ref", "qid", "from_search", "from_srp"],
+        // Seek (AU, NZ)
         //   ref marks where a job link was opened from (ref=search-standalone).
         "seek.com.au": ["ref"],
+        "nz.seek.com": ["ref"],
         // Snapchat
         //   share_id identifies the share on profile links.
         "snapchat.com": ["share_id"],

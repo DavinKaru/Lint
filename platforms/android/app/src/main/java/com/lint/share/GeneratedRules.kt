@@ -191,15 +191,13 @@ internal object GeneratedRules {
         // New York Times
         //   smid marks how an article was shared (smid=nytcore-ios-share). Not stripped on Amazon, where smid picks the seller's offer (#15).
         "nytimes.com" to setOf("smid"),
-        // Kickstarter
-        //   ref marks where a project link came from.
-        "kickstarter.com" to setOf("ref"),
         // Goodreads
-        //   ref marks which part of the page a book link came from.
-        "goodreads.com" to setOf("ref"),
-        // Seek (AU)
+        //   ref marks which part of the page a book link came from; qid, from_search and from_srp mark a link opened from search results (qid identifies the search).
+        "goodreads.com" to setOf("ref", "qid", "from_search", "from_srp"),
+        // Seek (AU, NZ)
         //   ref marks where a job link was opened from (ref=search-standalone).
         "seek.com.au" to setOf("ref"),
+        "nz.seek.com" to setOf("ref"),
         // Snapchat
         //   share_id identifies the share on profile links.
         "snapchat.com" to setOf("share_id"),

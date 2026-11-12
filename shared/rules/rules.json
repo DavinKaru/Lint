@@ -755,32 +755,26 @@
     },
     {
       "sites": [
-        "kickstarter.com"
-      ],
-      "params": [
-        "ref"
-      ],
-      "source": "Kickstarter",
-      "notes": "ref marks where a project link came from."
-    },
-    {
-      "sites": [
         "goodreads.com"
       ],
       "params": [
-        "ref"
+        "ref",
+        "qid",
+        "from_search",
+        "from_srp"
       ],
       "source": "Goodreads",
-      "notes": "ref marks which part of the page a book link came from."
+      "notes": "ref marks which part of the page a book link came from; qid, from_search and from_srp mark a link opened from search results (qid identifies the search)."
     },
     {
       "sites": [
-        "seek.com.au"
+        "seek.com.au",
+        "nz.seek.com"
       ],
       "params": [
         "ref"
       ],
-      "source": "Seek (AU)",
+      "source": "Seek (AU, NZ)",
       "notes": "ref marks where a job link was opened from (ref=search-standalone)."
     },
     {
@@ -898,6 +892,24 @@
     }
   ],
   "neverStrip": [
+    {
+      "params": [
+        "ref"
+      ],
+      "notes": "GitHub's and GitLab's APIs use ?ref= for the branch (#15). Only stripped on sites known to use it for tracking (siteParams)."
+    },
+    {
+      "params": [
+        "smid"
+      ],
+      "notes": "On Amazon, smid picks the seller's offer and price (#15). Only stripped on nytimes.com."
+    },
+    {
+      "params": [
+        "trackingId"
+      ],
+      "notes": "Some carriers use trackingId for the parcel number (#15). Only stripped on LinkedIn."
+    },
     {
       "params": [
         "cid"
@@ -1285,6 +1297,16 @@
     }
   ],
   "affiliateParams": [
+    {
+      "sites": [
+        "kickstarter.com"
+      ],
+      "params": [
+        "ref"
+      ],
+      "source": "Kickstarter referral tags",
+      "notes": "Creators tag their share links with ref= and see pledges per tag; paid referral services like Kickbooster credit backers through the same tag (https://help.kickstarter.com/hc/en-us/articles/115005138933). Kickstarter's own ref=discovery tags can't be told apart, so all are kept."
+    },
     {
       "sites": [
         "amazon.*"

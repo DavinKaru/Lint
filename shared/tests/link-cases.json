@@ -1426,6 +1426,62 @@
       "notes": "smid marks how the article was shared. Written for the test set, not taken from a real share."
     },
     {
+      "source": "Goodreads",
+      "category": "Shopping",
+      "input": "https://www.goodreads.com/book/show/12345678-example-book?from_search=true&from_srp=true&qid=AbCdEf1234&rank=1&ref=nav_sb_ss_1_5",
+      "expected": "https://www.goodreads.com/book/show/12345678-example-book?rank=1",
+      "verified": null,
+      "notes": "A book opened from search: qid identifies the search, and it, from_search, from_srp and ref are stripped (#15). rank is left in. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Kickstarter",
+      "category": "Shopping",
+      "input": "https://www.kickstarter.com/projects/example/example-project?ref=abc123&utm_source=x",
+      "expected": "https://www.kickstarter.com/projects/example/example-project?ref=abc123",
+      "verified": null,
+      "notes": "ref is the creator's referral tag, which creators and paid referral services are credited by, so it's kept like an affiliate ID (#28). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Seek (AU)",
+      "category": "Work & productivity",
+      "input": "https://nz.seek.com/job/12345678?ref=search-standalone",
+      "expected": "https://nz.seek.com/job/12345678",
+      "verified": null,
+      "notes": "Seek New Zealand is served from nz.seek.com; ref is stripped there too. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Reddit",
+      "category": "Social",
+      "input": "https://www.reddit.com/r/example/comments/abc123/example_post/?ref=share&context=3",
+      "expected": "https://www.reddit.com/r/example/comments/abc123/example_post/?context=3",
+      "verified": null,
+      "notes": "ref is only stripped on sites that use it for tracking, like Reddit (#15); context= picks how much of the thread shows. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "LinkedIn",
+      "category": "Work & productivity",
+      "input": "https://www.linkedin.com/jobs/view/1234567890/?refId=AbCdEf%3D%3D&trackingId=GhIjKl%3D%3D&trk=public_jobs",
+      "expected": "https://www.linkedin.com/jobs/view/1234567890/",
+      "verified": null,
+      "notes": "refId, trackingId and trk are only stripped on LinkedIn (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://www.google.com/search?q=example&ei=AbCdEf&cd=1",
+      "expected": "https://www.google.com/search?q=example",
+      "verified": null,
+      "notes": "cd and ei are only stripped on google.* (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/-/es/gp/product/B0ABCDEF12?srs=1234567890&th=1",
+      "expected": "https://www.amazon.com/-/es/gp/product/B0ABCDEF12?th=1",
+      "verified": null,
+      "notes": "srs is stripped on product pages, including /-/<lang>/gp/product/ (#15). Written for the test set, not taken from a real share."
+    },
+    {
       "source": "Parcel tracking",
       "category": "Shopping",
       "input": "https://track.example-carrier.com/track?trackingId=AB123456789AU",
