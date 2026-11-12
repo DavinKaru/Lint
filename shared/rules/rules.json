@@ -349,13 +349,11 @@
         "pinterest.*"
       ],
       "params": [
-        "invite_code",
-        "sender",
         "sfo",
         "mweb_unauth_id"
       ],
       "source": "Pinterest",
-      "notes": "Added to pins opened from pin.it share links: invite_code and sender identify who shared it."
+      "notes": "Added to pins opened from pin.it share links. invite_code and sender identify the sharer but are kept: Pinterest also uses them for group-board and sign-up invites."
     },
     {
       "sites": [
@@ -385,27 +383,15 @@
     },
     {
       "sites": [
-        "tumblr.com"
-      ],
-      "params": [
-        "source"
-      ],
-      "source": "Tumblr",
-      "notes": "source=share marks how a post was shared."
-    },
-    {
-      "sites": [
         "quora.com"
       ],
       "params": [
         "ch",
         "oid",
-        "share",
-        "srid",
         "target_type"
       ],
       "source": "Quora",
-      "notes": "Share-sheet tracking on answer links."
+      "notes": "Share-sheet tracking on answer links. share and srid are kept: they let a logged-out recipient past the sign-in wall."
     },
     {
       "sites": [
@@ -1046,6 +1032,48 @@
       "base64Prefix": "a1",
       "source": "Bing search results",
       "notes": "Bing's result links carry the real link in u= as \"a1\" followed by unpadded base64url."
+    },
+    {
+      "sites": [
+        "consent.google.com",
+        "consent.youtube.com"
+      ],
+      "paths": [
+        "/ml",
+        "/m"
+      ],
+      "params": [
+        "continue"
+      ],
+      "source": "Google cookie consent",
+      "notes": "Resolving a maps.app.goo.gl or youtu.be link from a cookie-less device (e.g. in the EU) can land here; continue= is the real link."
+    },
+    {
+      "sites": [
+        "facebook.com"
+      ],
+      "paths": [
+        "/login/",
+        "/login.php"
+      ],
+      "params": [
+        "next"
+      ],
+      "source": "Facebook sign-in",
+      "notes": "Resolving a Facebook short link without being signed in can land here; next= is the real link."
+    },
+    {
+      "sites": [
+        "star.aliexpress.com"
+      ],
+      "paths": [
+        "/share/share.htm"
+      ],
+      "params": [
+        "redirectUrl"
+      ],
+      "source": "AliExpress share page",
+      "notes": "Where a.aliexpress.com share links land: a share page whose redirectUrl= is the product link."
     }
   ],
   "pathWrappers": [

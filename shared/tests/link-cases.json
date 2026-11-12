@@ -573,9 +573,9 @@
       "source": "Pinterest",
       "category": "Social",
       "input": "https://www.pinterest.com.au/pin/123456789012345678/?invite_code=abc123&sender=987654321&sfo=1",
-      "expected": "https://www.pinterest.com.au/pin/123456789012345678/",
+      "expected": "https://www.pinterest.com.au/pin/123456789012345678/?invite_code=abc123&sender=987654321",
       "verified": null,
-      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+      "notes": "invite_code and sender stay: they also carry board invites. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
       "source": "LinkedIn",
@@ -597,17 +597,17 @@
       "source": "Tumblr",
       "category": "Social",
       "input": "https://www.tumblr.com/someone/765432109876543210/a-post?source=share",
-      "expected": "https://www.tumblr.com/someone/765432109876543210/a-post",
+      "expected": "https://www.tumblr.com/someone/765432109876543210/a-post?source=share",
       "verified": null,
-      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+      "notes": "Passed through unchanged: source= also prefills Tumblr's share pages. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
       "source": "Quora",
       "category": "Social",
       "input": "https://www.quora.com/What-is-a-question/answer/Someone?ch=10&oid=12345&share=abcd1234&srid=3abc&target_type=answer",
-      "expected": "https://www.quora.com/What-is-a-question/answer/Someone",
+      "expected": "https://www.quora.com/What-is-a-question/answer/Someone?share=abcd1234&srid=3abc",
       "verified": null,
-      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+      "notes": "share and srid let a logged-out recipient read it, so they stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
       "source": "Snapchat",
@@ -1232,6 +1232,14 @@
       "expected": "https://www.amazon.com.au/s?keywords=usb+c+cable",
       "verified": null,
       "notes": "On a search link keywords is the query and must stay. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Google Maps short links",
+      "category": "Maps & ride-share",
+      "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&hl=en",
+      "expected": "https://www.google.com/maps/place/Sydney+Opera+House/@-33.85,151.21,17z?entry=ttu",
+      "verified": null,
+      "notes": "Unwrapped from the consent page, then g_st stripped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     }
   ],
   "shortLinks": [
@@ -1481,6 +1489,30 @@
       "expected": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1amF2YXNjcmlwdDphbGVydCgxKQ&ntb=1",
       "verified": null,
       "notes": "Only http(s) links are unwrapped."
+    },
+    {
+      "source": "Google Maps short links",
+      "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&m=0&pc=m&uxe=eomtm&cm=2&hl=en&src=1",
+      "expected": "https://www.google.com/maps/place/Sydney+Opera+House/@-33.85,151.21,17z?entry=ttu&g_st=ic",
+      "notes": "Where a resolved maps.app.goo.gl link can land on a cookie-less device. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook (remaining)",
+      "input": "https://www.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Fsomeone%2Fposts%2Fpfbid0AbCdEf",
+      "expected": "https://www.facebook.com/someone/posts/pfbid0AbCdEf",
+      "notes": "Where a resolved Facebook short link can land when not signed in. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook (remaining)",
+      "input": "https://www.facebook.com/login/?next=%2Fsomeone%2Fposts%2F1",
+      "expected": "https://www.facebook.com/login/?next=%2Fsomeone%2Fposts%2F1",
+      "notes": "A relative next= isn't a full link, so it's left alone."
+    },
+    {
+      "source": "AliExpress",
+      "input": "https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005001234567890.html%3FsourceType%3D1%26spm%3Dabc",
+      "expected": "https://www.aliexpress.com/item/1005001234567890.html?sourceType=1&spm=abc",
+      "notes": "Where a.aliexpress.com share links land; the inner link is cleaned afterwards. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     }
   ]
 }

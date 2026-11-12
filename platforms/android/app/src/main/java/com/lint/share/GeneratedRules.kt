@@ -107,8 +107,8 @@ internal object GeneratedRules {
         //   r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it.
         "substack.com" to setOf("r", "showWelcomeOnShare"),
         // Pinterest
-        //   Added to pins opened from pin.it share links: invite_code and sender identify who shared it.
-        "pinterest.*" to setOf("invite_code", "sender", "sfo", "mweb_unauth_id"),
+        //   Added to pins opened from pin.it share links. invite_code and sender identify the sharer but are kept: Pinterest also uses them for group-board and sign-up invites.
+        "pinterest.*" to setOf("sfo", "mweb_unauth_id"),
         // LinkedIn
         //   rcm identifies the member who shared a post; lipi, midToken, midSig and trkEmail are page and email tracking. otpToken (email sign-in) is deliberately not listed.
         "linkedin.com" to setOf("rcm", "lipi", "midToken", "midSig", "trkEmail"),
@@ -116,12 +116,9 @@ internal object GeneratedRules {
         //   Per-share tracking tokens on post links.
         "threads.net" to setOf("xmt", "slof"),
         "threads.com" to setOf("xmt", "slof"),
-        // Tumblr
-        //   source=share marks how a post was shared.
-        "tumblr.com" to setOf("source"),
         // Quora
-        //   Share-sheet tracking on answer links.
-        "quora.com" to setOf("ch", "oid", "share", "srid", "target_type"),
+        //   Share-sheet tracking on answer links. share and srid are kept: they let a logged-out recipient past the sign-in wall.
+        "quora.com" to setOf("ch", "oid", "target_type"),
         // SoundCloud
         //   si is the per-share token, as on Spotify and YouTube.
         "soundcloud.com" to setOf("si"),
@@ -281,6 +278,15 @@ internal object GeneratedRules {
         // Bing search results
         //   Bing's result links carry the real link in u= as "a1" followed by unpadded base64url.
         RedirectWrapper(listOf("bing.com"), listOf("/ck/a"), listOf("u"), base64Prefix = "a1"),
+        // Google cookie consent
+        //   Resolving a maps.app.goo.gl or youtu.be link from a cookie-less device (e.g. in the EU) can land here; continue= is the real link.
+        RedirectWrapper(listOf("consent.google.com", "consent.youtube.com"), listOf("/ml", "/m"), listOf("continue")),
+        // Facebook sign-in
+        //   Resolving a Facebook short link without being signed in can land here; next= is the real link.
+        RedirectWrapper(listOf("facebook.com"), listOf("/login/", "/login.php"), listOf("next")),
+        // AliExpress share page
+        //   Where a.aliexpress.com share links land: a share page whose redirectUrl= is the product link.
+        RedirectWrapper(listOf("star.aliexpress.com"), listOf("/share/share.htm"), listOf("redirectUrl")),
     )
 
     /** Redirect links that carry the real link in their path; unwrapped offline. */
