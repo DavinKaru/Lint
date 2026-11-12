@@ -86,7 +86,7 @@ enum GeneratedRules {
         "google.*": ["g_st", "g_ep", "cd", "ei"],
         // Amazon (full links, every country domain)
         //   Search and recommendation context on product links (sprefix carries what you searched for). Variant selectors th and psc are kept. Affiliate link params (tag, linkCode, linkId, ascsubtag, creativeASIN, camp, creative) are kept, see affiliateParams. keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query.
-        "amazon.*": ["crid", "dib", "dib_tag", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "social_share", "_encoding", "ref_", "qid", "srs", "ref"],
+        "amazon.*": ["crid", "dib", "dib_tag", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "social_share", "_encoding", "ref_", "qid", "ref"],
         // Apple Music, Podcasts and App Store
         //   uo and ct are origin and campaign tracking (the share sheet adds ct=share). i= (the track or episode), mt= and app= are kept, and so is the at= affiliate token (see affiliateParams).
         "music.apple.com": ["uo", "ct"],
@@ -204,8 +204,8 @@ enum GeneratedRules {
     /// Params only stripped on some pages of a site (see `UrlCleaner.pathMatches`).
     static let sitePathParams: [SitePathParams] = [
         // Amazon product pages
-        //   keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query. /-/<lang>/ paths are the same pages in another language.
-        SitePathParams(sites: ["amazon.*"], paths: ["/dp/*/**", "/*/dp/*/**", "/gp/product/*/**", "/gp/aw/d/*/**", "/-/*/dp/*/**", "/-/*/*/dp/*/**", "/-/*/gp/product/*/**", "/-/*/gp/aw/d/*/**"], params: ["keywords"]),
+        //   keywords on a product link is what you searched for to find it, and srs the store page it was opened from. Only stripped on product pages: on search links (/s?keywords=...) keywords is the query, and srs can pick the store being browsed (#15). /-/<lang>/ paths are the same pages in another language.
+        SitePathParams(sites: ["amazon.*"], paths: ["/dp/*/**", "/*/dp/*/**", "/gp/product/*/**", "/gp/aw/d/*/**", "/-/*/dp/*/**", "/-/*/*/dp/*/**", "/-/*/gp/product/*/**", "/-/*/gp/aw/d/*/**"], params: ["keywords", "srs"]),
         // Pinterest pin pages
         //   Who shared the pin. Only stripped on /pin/<id>/ pages: on group-board and sign-up links they are the invite.
         SitePathParams(sites: ["pinterest.*"], paths: ["/pin/*/**"], params: ["invite_code", "sender"]),

@@ -1378,6 +1378,22 @@
       "notes": "smid picks the seller's offer (and its price), so it stays on Amazon (#15); qid is search tracking. Written for the test set, not taken from a real share."
     },
     {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/s?srs=17276797011&rh=n%3A1234&qid=1730000000",
+      "expected": "https://www.amazon.com/s?srs=17276797011&rh=n%3A1234",
+      "verified": null,
+      "notes": "On a search page srs can pick the store being browsed, so it's only stripped on product pages (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/dp/B0ABCDEF12?srs=17276797011&psc=1",
+      "expected": "https://www.amazon.com/dp/B0ABCDEF12?psc=1",
+      "verified": null,
+      "notes": "On a product page srs is the store page it was opened from. Written for the test set, not taken from a real share."
+    },
+    {
       "source": "Google Maps short links",
       "category": "Maps & ride-share",
       "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&hl=en",
