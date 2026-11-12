@@ -792,6 +792,414 @@
       "expected": "https://github.com/DavinKaru/Lint/pull/27?notification_referrer_id=NT_abc",
       "verified": null,
       "notes": "Passed through unchanged; GitHub's own params are under review in #15. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "eBay",
+      "category": "Shopping",
+      "input": "https://www.ebay.com.au/itm/123456789012?var=987654321&_trkparms=amclksrc%3DITM&_trksid=p4429486.c101224&ssspo=AbCd&sssrc=2047675&ssuid=xyz&widget_ver=artemis",
+      "expected": "https://www.ebay.com.au/itm/123456789012?var=987654321",
+      "verified": null,
+      "notes": "var= picks the variation and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "AliExpress",
+      "category": "Shopping",
+      "input": "https://www.aliexpress.com/item/1005001234567890.html?spm=a2g0o.productlist.main.1.abc&algo_pvid=abc-123&aff_platform=link-c-tool&sk=_dAbCdE&gatewayAdapt=glo2aus&pdp_npi=4%40dis%21AUD%2110.00",
+      "expected": "https://www.aliexpress.com/item/1005001234567890.html?pdp_npi=4%40dis%21AUD%2110.00",
+      "verified": null,
+      "notes": "pdp_npi can carry the price shown and is kept. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Etsy",
+      "category": "Shopping",
+      "input": "https://www.etsy.com/au/listing/1234567890/a-handmade-thing?click_key=abc123&click_sum=def456&ga_search_query=thing&ref=search_grid-1&sts=1&variation0=111222333",
+      "expected": "https://www.etsy.com/au/listing/1234567890/a-handmade-thing?variation0=111222333",
+      "verified": null,
+      "notes": "variation0 picks the option and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Shein",
+      "category": "Shopping",
+      "input": "https://au.shein.com/Some-Dress-p-12345678.html?mallCode=1&src_identifier=on%3DIMAGE&src_module=Women&src_tab_page_id=page_home123&scici=navbar_WomenHomePage~~tab01",
+      "expected": "https://au.shein.com/Some-Dress-p-12345678.html?mallCode=1",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Temu",
+      "category": "Shopping",
+      "input": "https://www.temu.com/au/some-item-g-601099512345678.html?_x_sessn_id=abc123&refer_page_name=home&refer_page_id=10005_1700000000000_abc&refer_page_sn=10005&share_uin=AbCdEfGh&_x_ns_sku_id=17592186044416",
+      "expected": "https://www.temu.com/au/some-item-g-601099512345678.html?_x_ns_sku_id=17592186044416",
+      "verified": null,
+      "notes": "_x_ns_sku_id picks the variant and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Walmart",
+      "category": "Shopping",
+      "input": "https://www.walmart.com/ip/Some-Product/123456789?classType=VARIANT&athbdg=L1600&athcpid=123456789&athpgid=AthenaItempage&athznid=si",
+      "expected": "https://www.walmart.com/ip/Some-Product/123456789?classType=VARIANT",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Target",
+      "category": "Shopping",
+      "input": "https://www.target.com/p/some-product/-/A-12345678?preselect=87654321&utm_source=share&utm_medium=ios",
+      "expected": "https://www.target.com/p/some-product/-/A-12345678?preselect=87654321",
+      "verified": null,
+      "notes": "preselect picks the variant and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "IKEA",
+      "category": "Shopping",
+      "input": "https://www.ikea.com/au/en/p/billy-bookcase-white-00263850/?utm_source=app&utm_medium=share",
+      "expected": "https://www.ikea.com/au/en/p/billy-bookcase-white-00263850/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Depop",
+      "category": "Shopping",
+      "input": "https://www.depop.com/products/someone-vintage-jacket/?utm_source=depop&utm_medium=share",
+      "expected": "https://www.depop.com/products/someone-vintage-jacket/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Vinted",
+      "category": "Shopping",
+      "input": "https://www.vinted.com.au/items/1234567890-some-jacket?referrer=catalog&homepage_session_id=abc-123",
+      "expected": "https://www.vinted.com.au/items/1234567890-some-jacket",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "DoorDash",
+      "category": "Shopping",
+      "input": "https://www.doordash.com/store/some-restaurant-sydney-123456/?utm_source=mx_share&utm_medium=app",
+      "expected": "https://www.doordash.com/store/some-restaurant-sydney-123456/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Uber Eats",
+      "category": "Shopping",
+      "input": "https://www.ubereats.com/au/store/some-restaurant/AbCdEfGhIjKlMnOp?diningMode=DELIVERY&utm_source=share",
+      "expected": "https://www.ubereats.com/au/store/some-restaurant/AbCdEfGhIjKlMnOp?diningMode=DELIVERY",
+      "verified": null,
+      "notes": "diningMode is kept. The pl= param, which can encode the delivery location, is left for a real-share check. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook Marketplace",
+      "category": "Shopping",
+      "input": "https://www.facebook.com/marketplace/item/1234567890123456/?ref=share_attachment&referral_code=marketplace_top_picks&referral_story_type=top_picks&tracking=browse_serp%3Aabc&mibextid=AbCdEf",
+      "expected": "https://www.facebook.com/marketplace/item/1234567890123456/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Woolworths (AU)",
+      "category": "Shopping",
+      "input": "https://www.woolworths.com.au/shop/productdetails/123456/some-product?utm_source=app&utm_medium=share",
+      "expected": "https://www.woolworths.com.au/shop/productdetails/123456/some-product",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Coles (AU)",
+      "category": "Shopping",
+      "input": "https://www.coles.com.au/product/some-product-1234567?utm_source=app&utm_medium=share",
+      "expected": "https://www.coles.com.au/product/some-product-1234567",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Kmart (AU)",
+      "category": "Shopping",
+      "input": "https://www.kmart.com.au/product/some-product-43210000/?utm_source=share",
+      "expected": "https://www.kmart.com.au/product/some-product-43210000/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Big W (AU)",
+      "category": "Shopping",
+      "input": "https://www.bigw.com.au/product/some-product/p/123456?utm_source=share&utm_medium=app",
+      "expected": "https://www.bigw.com.au/product/some-product/p/123456",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bunnings (AU)",
+      "category": "Shopping",
+      "input": "https://www.bunnings.com.au/some-drill_p0123456?utm_source=share",
+      "expected": "https://www.bunnings.com.au/some-drill_p0123456",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "JB Hi-Fi (AU)",
+      "category": "Shopping",
+      "input": "https://www.jbhifi.com.au/products/some-headphones?utm_source=share&gclid=AbCd",
+      "expected": "https://www.jbhifi.com.au/products/some-headphones",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Catch (AU)",
+      "category": "Shopping",
+      "input": "https://www.catch.com.au/product/some-product-1234567/?offer_id=7654321&utm_source=share",
+      "expected": "https://www.catch.com.au/product/some-product-1234567/?offer_id=7654321",
+      "verified": null,
+      "notes": "offer_id picks the seller offer and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "The Iconic (AU)",
+      "category": "Shopping",
+      "input": "https://www.theiconic.com.au/some-sneakers-1234567.html?utm_source=share",
+      "expected": "https://www.theiconic.com.au/some-sneakers-1234567.html",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Booktopia (AU)",
+      "category": "Shopping",
+      "input": "https://www.booktopia.com.au/some-book-someone/book/9781234567890.html?utm_source=share",
+      "expected": "https://www.booktopia.com.au/some-book-someone/book/9781234567890.html",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Gumtree (AU)",
+      "category": "Shopping",
+      "input": "https://www.gumtree.com.au/s-ad/sydney/bikes/some-bike/1312345678?utm_source=share",
+      "expected": "https://www.gumtree.com.au/s-ad/sydney/bikes/some-bike/1312345678",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Domain (AU)",
+      "category": "Shopping",
+      "input": "https://www.domain.com.au/12-some-street-suburb-nsw-2000-2012345678?utm_source=share",
+      "expected": "https://www.domain.com.au/12-some-street-suburb-nsw-2000-2012345678",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "realestate.com.au (AU)",
+      "category": "Shopping",
+      "input": "https://www.realestate.com.au/property-house-nsw-suburb-141234567?sourcePage=rea:p4ep:property-details&sourceElement=share",
+      "expected": "https://www.realestate.com.au/property-house-nsw-suburb-141234567?sourcePage=rea:p4ep:property-details&sourceElement=share",
+      "verified": null,
+      "notes": "Passed through unchanged: sourcePage and sourceElement are under review rather than guessed at. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Menulog (AU)",
+      "category": "Shopping",
+      "input": "https://www.menulog.com.au/restaurants-some-place-sydney/menu?utm_source=share",
+      "expected": "https://www.menulog.com.au/restaurants-some-place-sydney/menu",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "BBC",
+      "category": "News & newsletters",
+      "input": "https://www.bbc.com/news/articles/c0abcdefgh1o?at_medium=RSS&at_campaign=rss&at_link_id=abc&at_link_origin=BBC_News",
+      "expected": "https://www.bbc.com/news/articles/c0abcdefgh1o",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "The Guardian",
+      "category": "News & newsletters",
+      "input": "https://www.theguardian.com/australia-news/2026/nov/12/some-story?CMP=share_btn_url",
+      "expected": "https://www.theguardian.com/australia-news/2026/nov/12/some-story",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "NYTimes",
+      "category": "News & newsletters",
+      "input": "https://www.nytimes.com/2026/11/12/world/some-story.html?unlocked_article_code=1.AbC.DeFg.HiJkLmNo&smid=url-share",
+      "expected": "https://www.nytimes.com/2026/11/12/world/some-story.html?unlocked_article_code=1.AbC.DeFg.HiJkLmNo",
+      "verified": null,
+      "notes": "unlocked_article_code is the gift that lets a non-subscriber read it: must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bloomberg",
+      "category": "News & newsletters",
+      "input": "https://www.bloomberg.com/news/articles/2026-11-12/some-story?sref=AbCdEfGh",
+      "expected": "https://www.bloomberg.com/news/articles/2026-11-12/some-story?sref=AbCdEfGh",
+      "verified": null,
+      "notes": "sref is the gift token: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Medium",
+      "category": "News & newsletters",
+      "input": "https://medium.com/@someone/some-post-0123456789ab?sk=0123456789abcdef0123456789abcdef",
+      "expected": "https://medium.com/@someone/some-post-0123456789ab?sk=0123456789abcdef0123456789abcdef",
+      "verified": null,
+      "notes": "sk is the friend link that skips the paywall: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "ABC News (AU)",
+      "category": "News & newsletters",
+      "input": "https://www.abc.net.au/news/2026-11-12/some-story/104512345?utm_campaign=abc_news_web&utm_content=link&utm_medium=content_shared&utm_source=abc_news_web",
+      "expected": "https://www.abc.net.au/news/2026-11-12/some-story/104512345",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "SBS (AU)",
+      "category": "News & newsletters",
+      "input": "https://www.sbs.com.au/news/article/some-story/abc123?utm_source=share",
+      "expected": "https://www.sbs.com.au/news/article/some-story/abc123",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "news.com.au (AU)",
+      "category": "News & newsletters",
+      "input": "https://www.news.com.au/national/some-story/news-story/0123456789abcdef0123456789abcdef?utm_source=share",
+      "expected": "https://www.news.com.au/national/some-story/news-story/0123456789abcdef0123456789abcdef",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "9News (AU)",
+      "category": "News & newsletters",
+      "input": "https://www.9news.com.au/national/some-story/0a1b2c3d-1234?utm_source=share",
+      "expected": "https://www.9news.com.au/national/some-story/0a1b2c3d-1234",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "7NEWS (AU)",
+      "category": "News & newsletters",
+      "input": "https://7news.com.au/news/some-story-c-12345678?utm_source=share",
+      "expected": "https://7news.com.au/news/some-story-c-12345678",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google News",
+      "category": "News & newsletters",
+      "input": "https://news.google.com/stories/CAAqNggKIjBDQklTSGpvSmMzUnZjbmt0TXpZd1NoRUtEd2pVLUpfakJ4R29RM0VqQmprcUFDZ0FQAQ?hl=en-AU&gl=AU&ceid=AU%3Aen",
+      "expected": "https://news.google.com/stories/CAAqNggKIjBDQklTSGpvSmMzUnZjbmt0TXpZd1NoRUtEd2pVLUpfakJ4R29RM0VqQmprcUFDZ0FQAQ?hl=en-AU&gl=AU&ceid=AU%3Aen",
+      "verified": null,
+      "notes": "hl, gl and ceid pick the edition: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Apple News",
+      "category": "News & newsletters",
+      "input": "https://apple.news/AbCdEfGhIjKlMnOpQrStUv",
+      "expected": "https://apple.news/AbCdEfGhIjKlMnOpQrStUv",
+      "verified": null,
+      "notes": "Passed through unchanged; apple.news resolves in the browser, not by HTTP redirect. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Beehiiv",
+      "category": "News & newsletters",
+      "input": "https://newsletter.example.com/p/some-issue?_bhlid=0123456789abcdef0123456789abcdef01234567&utm_source=newsletter.example.com",
+      "expected": "https://newsletter.example.com/p/some-issue",
+      "verified": null,
+      "notes": "Beehiiv newsletters run on their own domains, so _bhlid is stripped everywhere. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Meetup",
+      "category": "Events & travel",
+      "input": "https://www.meetup.com/some-group/events/301234567/?recId=abc-123&recSource=ml-popular-events&searchId=def-456&eventOrigin=find_page%24all",
+      "expected": "https://www.meetup.com/some-group/events/301234567/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Ticketmaster",
+      "category": "Events & travel",
+      "input": "https://www.ticketmaster.com.au/some-artist-tickets/artist/123456?utm_source=share&utm_medium=app",
+      "expected": "https://www.ticketmaster.com.au/some-artist-tickets/artist/123456",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Ticketek (AU)",
+      "category": "Events & travel",
+      "input": "https://premier.ticketek.com.au/shows/show.aspx?sh=SOMESHOW26&utm_source=share",
+      "expected": "https://premier.ticketek.com.au/shows/show.aspx?sh=SOMESHOW26",
+      "verified": null,
+      "notes": "sh= picks the show and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Moshtix (AU)",
+      "category": "Events & travel",
+      "input": "https://www.moshtix.com.au/v2/event/some-gig/123456?utm_source=share",
+      "expected": "https://www.moshtix.com.au/v2/event/some-gig/123456",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Humanitix (AU)",
+      "category": "Events & travel",
+      "input": "https://events.humanitix.com/some-event?utm_source=share",
+      "expected": "https://events.humanitix.com/some-event",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Tripadvisor",
+      "category": "Events & travel",
+      "input": "https://www.tripadvisor.com.au/Restaurant_Review-g255060-d1234567-Reviews-Some_Place-Sydney_New_South_Wales.html?m=19905",
+      "expected": "https://www.tripadvisor.com.au/Restaurant_Review-g255060-d1234567-Reviews-Some_Place-Sydney_New_South_Wales.html?m=19905",
+      "verified": null,
+      "notes": "Passed through unchanged: m= is under review rather than guessed at. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "GetYourGuide / Klook",
+      "category": "Events & travel",
+      "input": "https://www.klook.com/en-AU/activity/12345-some-tour-sydney/?spm=Home.SearchSuggest_LIST&clickId=abc123",
+      "expected": "https://www.klook.com/en-AU/activity/12345-some-tour-sydney/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Apple Maps",
+      "category": "Maps & ride-share",
+      "input": "https://maps.apple.com/?address=1%20Some%20St,%20Sydney%20NSW%202000&ll=-33.86,151.21&q=Some%20Place",
+      "expected": "https://maps.apple.com/?address=1%20Some%20St,%20Sydney%20NSW%202000&ll=-33.86,151.21&q=Some%20Place",
+      "verified": null,
+      "notes": "Every param places the pin: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Waze",
+      "category": "Maps & ride-share",
+      "input": "https://waze.com/ul?ll=-33.8688,151.2093&navigate=yes&utm_source=waze_app&utm_campaign=default",
+      "expected": "https://waze.com/ul?ll=-33.8688,151.2093&navigate=yes",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Yelp",
+      "category": "Maps & ride-share",
+      "input": "https://www.yelp.com.au/biz/some-cafe-sydney?uid=AbCdEfGhIjKlMnOpQrStUv&utm_campaign=www_business_share_popup&utm_medium=copy_link&utm_source=(direct)",
+      "expected": "https://www.yelp.com.au/biz/some-cafe-sydney",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Deezer",
+      "category": "Video & music",
+      "input": "https://www.deezer.com/en/track/123456789?host=0&deferredFl=1&utm_source=deezer&utm_content=track-123456789&utm_medium=mobile",
+      "expected": "https://www.deezer.com/en/track/123456789",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Seek (AU)",
+      "category": "Work & productivity",
+      "input": "https://www.seek.com.au/job/80123456?type=standout&ref=search-standalone",
+      "expected": "https://www.seek.com.au/job/80123456?type=standout",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     }
   ],
   "shortLinks": [
@@ -946,6 +1354,26 @@
     {
       "source": "SoundCloud",
       "url": "https://on.soundcloud.com/AbCdEf",
+      "known": true
+    },
+    {
+      "source": "eBay",
+      "url": "https://ebay.us/AbCdEf",
+      "known": true
+    },
+    {
+      "source": "AliExpress",
+      "url": "https://a.aliexpress.com/_mAbCdEf",
+      "known": true
+    },
+    {
+      "source": "Flipboard",
+      "url": "https://flip.it/AbCdEf",
+      "known": true
+    },
+    {
+      "source": "Deezer",
+      "url": "https://link.deezer.com/s/AbCdEfGh",
       "known": true
     }
   ],

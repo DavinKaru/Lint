@@ -31,6 +31,10 @@ hasn't been tested on a real device yet.
 | `lnkd.in` | LinkedIn | Not yet confirmed | LinkedIn's short links. Not yet tested on a real device. |
 | `fb.me` | Facebook | Not yet confirmed | Older Facebook short links. Not yet tested on a real device. |
 | `on.soundcloud.com` | SoundCloud | Not yet confirmed | Resolves to a track link carrying the `si` share token, then stripped. Not yet tested on a real device. |
+| `ebay.us` | eBay | Not yet confirmed | eBay's share short links. Not yet tested on a real device. |
+| `a.aliexpress.com` | AliExpress | Not yet confirmed | AliExpress app share links. Not yet tested on a real device. |
+| `flip.it` | Flipboard | Not yet confirmed | Flipboard's short links. Not yet tested on a real device. |
+| `link.deezer.com` | Deezer | Not yet confirmed | Deezer's share links. Not yet tested on a real device. |
 
 ### How resolution works
 

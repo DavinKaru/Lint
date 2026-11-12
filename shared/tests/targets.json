@@ -46,7 +46,9 @@
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "GetYourGuide / Klook"
+      ]
     },
     {
       "name": "Google Flights",
@@ -60,21 +62,27 @@
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Humanitix (AU)"
+      ]
     },
     {
       "name": "Meetup",
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Meetup"
+      ]
     },
     {
       "name": "Moshtix (AU)",
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Moshtix (AU)"
+      ]
     },
     {
       "name": "Qantas (AU)",
@@ -95,28 +103,36 @@
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Ticketek (AU)"
+      ]
     },
     {
       "name": "Ticketmaster",
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Ticketmaster"
+      ]
     },
     {
       "name": "Tripadvisor",
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Tripadvisor"
+      ]
     },
     {
       "name": "Apple Maps",
       "category": "Maps & ride-share",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Apple Maps"
+      ]
     },
     {
       "name": "Bolt trip share",
@@ -178,77 +194,99 @@
       "category": "Maps & ride-share",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Waze"
+      ]
     },
     {
       "name": "Yelp",
       "category": "Maps & ride-share",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Yelp"
+      ]
     },
     {
       "name": "7NEWS (AU)",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "7NEWS (AU)"
+      ]
     },
     {
       "name": "9News (AU)",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "9News (AU)"
+      ]
     },
     {
       "name": "ABC News (AU)",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "ABC News (AU)"
+      ]
     },
     {
       "name": "Apple News",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Apple News"
+      ]
     },
     {
       "name": "BBC",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "BBC"
+      ]
     },
     {
       "name": "Beehiiv",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Beehiiv"
+      ]
     },
     {
       "name": "Bloomberg",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Bloomberg"
+      ]
     },
     {
       "name": "Flipboard",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Flipboard"
+      ]
     },
     {
       "name": "Google News",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Google News"
+      ]
     },
     {
       "name": "Mailchimp click links",
@@ -262,28 +300,36 @@
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Medium"
+      ]
     },
     {
       "name": "news.com.au (AU)",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "news.com.au (AU)"
+      ]
     },
     {
       "name": "NYTimes",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "NYTimes"
+      ]
     },
     {
       "name": "SBS (AU)",
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "SBS (AU)"
+      ]
     },
     {
       "name": "SMH / The Age (AU)",
@@ -306,7 +352,9 @@
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "The Guardian"
+      ]
     },
     {
       "name": "Bing redirects",
@@ -376,7 +424,9 @@
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "AliExpress"
+      ]
     },
     {
       "name": "Amazon (full links)",
@@ -392,126 +442,162 @@
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Big W (AU)"
+      ]
     },
     {
       "name": "Booktopia (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Booktopia (AU)"
+      ]
     },
     {
       "name": "Bunnings (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Bunnings (AU)"
+      ]
     },
     {
       "name": "Catch (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Catch (AU)"
+      ]
     },
     {
       "name": "Coles (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Coles (AU)"
+      ]
     },
     {
       "name": "Depop",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Depop"
+      ]
     },
     {
       "name": "Domain (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Domain (AU)"
+      ]
     },
     {
       "name": "DoorDash",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "DoorDash"
+      ]
     },
     {
       "name": "eBay",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "eBay"
+      ]
     },
     {
       "name": "Etsy",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Etsy"
+      ]
     },
     {
       "name": "Facebook Marketplace",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Facebook Marketplace"
+      ]
     },
     {
       "name": "Gumtree (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Gumtree (AU)"
+      ]
     },
     {
       "name": "IKEA",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "IKEA"
+      ]
     },
     {
       "name": "JB Hi-Fi (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "JB Hi-Fi (AU)"
+      ]
     },
     {
       "name": "Kmart (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Kmart (AU)"
+      ]
     },
     {
       "name": "Menulog (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Menulog (AU)"
+      ]
     },
     {
       "name": "realestate.com.au (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "realestate.com.au (AU)"
+      ]
     },
     {
       "name": "Shein",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Shein"
+      ]
     },
     {
       "name": "Shopify stores",
@@ -525,49 +611,63 @@
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Target"
+      ]
     },
     {
       "name": "Temu",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Temu"
+      ]
     },
     {
       "name": "The Iconic (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "The Iconic (AU)"
+      ]
     },
     {
       "name": "Uber Eats",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Uber Eats"
+      ]
     },
     {
       "name": "Vinted",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Vinted"
+      ]
     },
     {
       "name": "Walmart",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Walmart"
+      ]
     },
     {
       "name": "Woolworths (AU)",
       "category": "Shopping",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Woolworths (AU)"
+      ]
     },
     {
       "name": "Bluesky",
@@ -737,7 +837,9 @@
       "category": "Video & music",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Deezer"
+      ]
     },
     {
       "name": "Netflix",
@@ -880,7 +982,9 @@
       "category": "Work & productivity",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Seek (AU)"
+      ]
     },
     {
       "name": "Zoom",

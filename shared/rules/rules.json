@@ -173,6 +173,20 @@
       ],
       "source": "Matomo / Piwik (legacy)",
       "notes": "Exact names only: a blanket pk_* or piwik_* prefix would hit ordinary params like ?pk_id=42."
+    },
+    {
+      "params": [
+        "xtor"
+      ],
+      "source": "AT Internet / Piano Analytics",
+      "notes": "Campaign tag on many European news sites. Distinctive enough to strip everywhere."
+    },
+    {
+      "params": [
+        "_bhlid"
+      ],
+      "source": "Beehiiv",
+      "notes": "Per-subscriber click ID on links in Beehiiv newsletters, which are often on custom domains, so it's stripped everywhere."
     }
   ],
   "siteParams": [
@@ -204,10 +218,13 @@
         "facebook.com"
       ],
       "params": [
-        "eid"
+        "eid",
+        "referral_code",
+        "referral_story_type",
+        "tracking"
       ],
-      "source": "Meta / Facebook",
-      "notes": "eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook."
+      "source": "Meta / Facebook (including Marketplace)",
+      "notes": "eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook. referral_code, referral_story_type and tracking are added to shared Marketplace listings."
     },
     {
       "sites": [
@@ -496,6 +513,242 @@
       ],
       "source": "Canva",
       "notes": "utlId is a per-share link ID (alongside utm_*). The view token in the path is kept."
+    },
+    {
+      "sites": [
+        "ebay.*"
+      ],
+      "params": [
+        "_trkparms",
+        "_trksid",
+        "_from",
+        "hash",
+        "mkcid",
+        "mkevt",
+        "mkrid",
+        "campid",
+        "toolid",
+        "customid",
+        "ssspo",
+        "sssrc",
+        "ssuid",
+        "widget_ver",
+        "amdata"
+      ],
+      "source": "eBay",
+      "notes": "Search, share-sheet (sss*) and partner-network (mk*, campid) tracking. var= picks the variation and epid= the product, so both are kept."
+    },
+    {
+      "sites": [
+        "aliexpress.*"
+      ],
+      "params": [
+        "spm",
+        "scm",
+        "scm_id",
+        "scm-url",
+        "pvid",
+        "algo_pvid",
+        "algo_exp_id",
+        "aff_platform",
+        "aff_trace_key",
+        "aff_fcid",
+        "aff_fsk",
+        "sk",
+        "terminal_id",
+        "afSmartRedirect",
+        "gatewayAdapt",
+        "sourceType",
+        "srcSns",
+        "businessType",
+        "social_params",
+        "tt",
+        "utparam",
+        "gps-id",
+        "curPageLogUid",
+        "bizType",
+        "mp",
+        "_randl_shipto"
+      ],
+      "source": "AliExpress",
+      "notes": "Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price."
+    },
+    {
+      "sites": [
+        "etsy.com"
+      ],
+      "params": [
+        "click_key",
+        "click_sum",
+        "ga_order",
+        "ga_search_type",
+        "ga_view_type",
+        "ga_search_query",
+        "organic_search_click",
+        "plkey",
+        "sts",
+        "frs",
+        "pro",
+        "sr_prefetch",
+        "pf_from",
+        "logging_key",
+        "content_source",
+        "share_time"
+      ],
+      "source": "Etsy",
+      "notes": "Search and share tracking on listing links. variation0/variation1 pick the options and are kept."
+    },
+    {
+      "sites": [
+        "shein.*"
+      ],
+      "params": [
+        "src_identifier",
+        "src_module",
+        "src_tab_page_id",
+        "scici",
+        "ici",
+        "share_from",
+        "url_from",
+        "onelink"
+      ],
+      "source": "Shein",
+      "notes": "Share and page-source tracking. mallCode picks the warehouse and is kept."
+    },
+    {
+      "sites": [
+        "temu.com"
+      ],
+      "params": [
+        "refer_page_name",
+        "refer_page_id",
+        "refer_page_sn",
+        "_x_sessn_id",
+        "share_uin",
+        "_x_vst_scene",
+        "_x_ads_channel",
+        "_x_ads_sub_channel",
+        "_x_ads_account",
+        "_x_ads_set",
+        "_x_ads_id",
+        "_x_ads_creative_id"
+      ],
+      "source": "Temu",
+      "notes": "Session, sharer (share_uin) and ad tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept."
+    },
+    {
+      "sites": [
+        "walmart.com"
+      ],
+      "params": [
+        "athbdg",
+        "athcpid",
+        "athpgid",
+        "athznid",
+        "athieid",
+        "athstid",
+        "athguid",
+        "athwpid",
+        "athena",
+        "athancid",
+        "sourceid",
+        "veh",
+        "wmlspartner"
+      ],
+      "source": "Walmart",
+      "notes": "ath* are recommendation-carousel tracking. classType and selected are kept."
+    },
+    {
+      "sites": [
+        "vinted.*"
+      ],
+      "params": [
+        "referrer",
+        "homepage_session_id"
+      ],
+      "source": "Vinted",
+      "notes": "Where the item was opened from. referrer is generic, so it's only stripped here."
+    },
+    {
+      "sites": [
+        "bbc.co.uk",
+        "bbc.com"
+      ],
+      "params": [
+        "at_medium",
+        "at_campaign",
+        "at_campaign_type",
+        "at_link_id",
+        "at_link_origin",
+        "at_link_type",
+        "at_format",
+        "at_ptr_name",
+        "at_ptr_type",
+        "at_bbc_team",
+        "at_custom1",
+        "at_custom2",
+        "at_custom3",
+        "at_custom4"
+      ],
+      "source": "BBC",
+      "notes": "AT Internet tags on shared articles. A blanket at_* prefix would be too broad for other sites."
+    },
+    {
+      "sites": [
+        "theguardian.com"
+      ],
+      "params": [
+        "CMP",
+        "INTCMP"
+      ],
+      "source": "The Guardian",
+      "notes": "CMP=share_btn_link and friends record which share button was used."
+    },
+    {
+      "sites": [
+        "meetup.com"
+      ],
+      "params": [
+        "recId",
+        "recSource",
+        "searchId",
+        "eventOrigin",
+        "_xtd"
+      ],
+      "source": "Meetup",
+      "notes": "Recommendation and search tracking on event links."
+    },
+    {
+      "sites": [
+        "klook.com"
+      ],
+      "params": [
+        "spm",
+        "clickId"
+      ],
+      "source": "Klook",
+      "notes": "Page tracking. aid (affiliate) is kept for now, see the affiliate-ID decision."
+    },
+    {
+      "sites": [
+        "yelp.*"
+      ],
+      "params": [
+        "uid"
+      ],
+      "source": "Yelp",
+      "notes": "uid identifies the Yelp member who shared the link."
+    },
+    {
+      "sites": [
+        "deezer.com"
+      ],
+      "params": [
+        "deferredFl",
+        "host"
+      ],
+      "source": "Deezer",
+      "notes": "App deep-link plumbing added to shared track links."
     }
   ],
   "shortLinkHosts": [
@@ -575,6 +828,30 @@
         "on.soundcloud.com"
       ],
       "provider": "SoundCloud"
+    },
+    {
+      "hosts": [
+        "ebay.us"
+      ],
+      "provider": "eBay"
+    },
+    {
+      "hosts": [
+        "a.aliexpress.com"
+      ],
+      "provider": "AliExpress"
+    },
+    {
+      "hosts": [
+        "flip.it"
+      ],
+      "provider": "Flipboard"
+    },
+    {
+      "hosts": [
+        "link.deezer.com"
+      ],
+      "provider": "Deezer"
     }
   ],
   "neverStrip": [

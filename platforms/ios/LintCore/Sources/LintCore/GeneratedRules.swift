@@ -52,6 +52,12 @@ enum GeneratedRules {
         // Matomo / Piwik (legacy)
         //   Exact names only: a blanket pk_* or piwik_* prefix would hit ordinary params like ?pk_id=42.
         "pk_campaign", "pk_kwd", "pk_keyword", "pk_medium", "pk_source", "pk_content", "pk_cid", "piwik_campaign", "piwik_kwd",
+        // AT Internet / Piano Analytics
+        //   Campaign tag on many European news sites. Distinctive enough to strip everywhere.
+        "xtor",
+        // Beehiiv
+        //   Per-subscriber click ID on links in Beehiiv newsletters, which are often on custom domains, so it's stripped everywhere.
+        "_bhlid",
     ]
 
     /// Params only stripped on specific sites, because their names are generic enough to mean
@@ -65,9 +71,9 @@ enum GeneratedRules {
         // Spotify
         //   si is the per-share token identifying who shared it.
         "spotify.com": ["si"],
-        // Meta / Facebook
-        //   eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook.
-        "facebook.com": ["eid"],
+        // Meta / Facebook (including Marketplace)
+        //   eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook. referral_code, referral_story_type and tracking are added to shared Marketplace listings.
+        "facebook.com": ["eid", "referral_code", "referral_story_type", "tracking"],
         // Eventbrite
         //   aff records how a link was shared (e.g. ebdsshandroid, ebdsshsms); sg is a long per-share token. Eventbrite uses a domain per country, hence the wildcard.
         "eventbrite.*": ["aff", "sg"],
@@ -144,6 +150,46 @@ enum GeneratedRules {
         // Canva
         //   utlId is a per-share link ID (alongside utm_*). The view token in the path is kept.
         "canva.com": ["utlId"],
+        // eBay
+        //   Search, share-sheet (sss*) and partner-network (mk*, campid) tracking. var= picks the variation and epid= the product, so both are kept.
+        "ebay.*": ["_trkparms", "_trksid", "_from", "hash", "mkcid", "mkevt", "mkrid", "campid", "toolid", "customid", "ssspo", "sssrc", "ssuid", "widget_ver", "amdata"],
+        // AliExpress
+        //   Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price.
+        "aliexpress.*": ["spm", "scm", "scm_id", "scm-url", "pvid", "algo_pvid", "algo_exp_id", "aff_platform", "aff_trace_key", "aff_fcid", "aff_fsk", "sk", "terminal_id", "afSmartRedirect", "gatewayAdapt", "sourceType", "srcSns", "businessType", "social_params", "tt", "utparam", "gps-id", "curPageLogUid", "bizType", "mp", "_randl_shipto"],
+        // Etsy
+        //   Search and share tracking on listing links. variation0/variation1 pick the options and are kept.
+        "etsy.com": ["click_key", "click_sum", "ga_order", "ga_search_type", "ga_view_type", "ga_search_query", "organic_search_click", "plkey", "sts", "frs", "pro", "sr_prefetch", "pf_from", "logging_key", "content_source", "share_time"],
+        // Shein
+        //   Share and page-source tracking. mallCode picks the warehouse and is kept.
+        "shein.*": ["src_identifier", "src_module", "src_tab_page_id", "scici", "ici", "share_from", "url_from", "onelink"],
+        // Temu
+        //   Session, sharer (share_uin) and ad tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept.
+        "temu.com": ["refer_page_name", "refer_page_id", "refer_page_sn", "_x_sessn_id", "share_uin", "_x_vst_scene", "_x_ads_channel", "_x_ads_sub_channel", "_x_ads_account", "_x_ads_set", "_x_ads_id", "_x_ads_creative_id"],
+        // Walmart
+        //   ath* are recommendation-carousel tracking. classType and selected are kept.
+        "walmart.com": ["athbdg", "athcpid", "athpgid", "athznid", "athieid", "athstid", "athguid", "athwpid", "athena", "athancid", "sourceid", "veh", "wmlspartner"],
+        // Vinted
+        //   Where the item was opened from. referrer is generic, so it's only stripped here.
+        "vinted.*": ["referrer", "homepage_session_id"],
+        // BBC
+        //   AT Internet tags on shared articles. A blanket at_* prefix would be too broad for other sites.
+        "bbc.co.uk": ["at_medium", "at_campaign", "at_campaign_type", "at_link_id", "at_link_origin", "at_link_type", "at_format", "at_ptr_name", "at_ptr_type", "at_bbc_team", "at_custom1", "at_custom2", "at_custom3", "at_custom4"],
+        "bbc.com": ["at_medium", "at_campaign", "at_campaign_type", "at_link_id", "at_link_origin", "at_link_type", "at_format", "at_ptr_name", "at_ptr_type", "at_bbc_team", "at_custom1", "at_custom2", "at_custom3", "at_custom4"],
+        // The Guardian
+        //   CMP=share_btn_link and friends record which share button was used.
+        "theguardian.com": ["CMP", "INTCMP"],
+        // Meetup
+        //   Recommendation and search tracking on event links.
+        "meetup.com": ["recId", "recSource", "searchId", "eventOrigin", "_xtd"],
+        // Klook
+        //   Page tracking. aid (affiliate) is kept for now, see the affiliate-ID decision.
+        "klook.com": ["spm", "clickId"],
+        // Yelp
+        //   uid identifies the Yelp member who shared the link.
+        "yelp.*": ["uid"],
+        // Deezer
+        //   App deep-link plumbing added to shared track links.
+        "deezer.com": ["deferredFl", "host"],
     ]
 
     /// Hosts whose links are resolved (redirects followed) before cleaning.
@@ -174,6 +220,14 @@ enum GeneratedRules {
         "fb.me",
         // SoundCloud
         "on.soundcloud.com",
+        // eBay
+        "ebay.us",
+        // AliExpress
+        "a.aliexpress.com",
+        // Flipboard
+        "flip.it",
+        // Deezer
+        "link.deezer.com",
     ]
 
     /// Short links that live on a path of a normal site; each "*" matches one path segment.
