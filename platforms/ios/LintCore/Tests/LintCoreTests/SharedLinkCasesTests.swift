@@ -21,8 +21,16 @@ struct SharedLinkCasesTests {
         var testDescription: String { "\(source): \(url)" }
     }
 
+    struct UnwrapCase: Decodable, Sendable, CustomTestStringConvertible {
+        let source: String
+        let input: String
+        let expected: String
+        var testDescription: String { "\(source): \(input.prefix(80))" }
+    }
+
     struct Cases: Decodable, Sendable {
         let clean: [CleanCase]
+        let unwrap: [UnwrapCase]
         let shortLinks: [ShortLinkCase]
     }
 
@@ -53,8 +61,14 @@ struct SharedLinkCasesTests {
         #expect(UrlCleaner.cleanFirstUrl(in: testCase.input) == testCase.expected)
     }
 
+    @Test(arguments: cases.unwrap)
+    func unwrapsSharedCase(_ testCase: UnwrapCase) {
+        #expect(UrlCleaner.unwrap(testCase.input) == testCase.expected)
+    }
+
     @Test(arguments: cases.shortLinks)
     func matchesSharedShortLinkCase(_ testCase: ShortLinkCase) {
-        #expect(ShortLinkResolver.isKnownShortLink(testCase.url) == testCase.known)
+        // Unwrapped first, as the share flow does, so a short link inside a redirect link counts.
+        #expect(ShortLinkResolver.isKnownShortLink(UrlCleaner.unwrap(testCase.url)) == testCase.known)
     }
 }

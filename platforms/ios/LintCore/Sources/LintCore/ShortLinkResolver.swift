@@ -22,8 +22,8 @@ private let logger = Logger(subsystem: "com.lint.share", category: "Lint")
 /// defeats the point of this being a fully on-device tool.
 public enum ShortLinkResolver {
 
-    // Which hosts count as short links lives in shared/rules/rules.json, generated into
-    // GeneratedRules.shortLinkHosts.
+    // Which hosts and paths count as short links lives in shared/rules/rules.json, generated into
+    // GeneratedRules.shortLinkHosts and shortLinkPaths.
 
     public static let maxHops = 5
     private static let requestTimeout: Duration = .milliseconds(1500)
@@ -44,10 +44,29 @@ public enum ShortLinkResolver {
     public typealias HopFetcher = @Sendable (String) async throws -> HopResponse
 
     /// Returns true if `url`'s host is exactly one of the known short-link domains
-    /// (case-insensitive, exact match — not a substring match).
+    /// (case-insensitive, exact match — not a substring match), or its host and whole path match
+    /// one of the short-link path rules (e.g. reddit.com/r/<sub>/s/<code>). Pass it the link after
+    /// `UrlCleaner.unwrap`, as the share flow does.
     public static func isKnownShortLink(_ url: String) -> Bool {
-        guard let host = URLComponents(string: url)?.host else { return false }
-        return GeneratedRules.shortLinkHosts.contains(host.lowercased())
+        guard let components = URLComponents(string: url), let rawHost = components.host else { return false }
+        let host = rawHost.lowercased()
+        if GeneratedRules.shortLinkHosts.contains(host) { return true }
+        let segments = trimmedSegments(components.percentEncodedPath)
+        return GeneratedRules.shortLinkPaths.contains { rule in
+            rule.sites.contains { UrlCleaner.hostMatches(host, $0) } &&
+                rule.paths.contains { pathMatchesSegments(segments, $0) }
+        }
+    }
+
+    private static func trimmedSegments(_ path: String) -> [String] {
+        path.trimmingCharacters(in: CharacterSet(charactersIn: "/")).split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+    }
+
+    /// True if `segments` match `pattern` segment for segment, where "*" is any one non-empty segment.
+    private static func pathMatchesSegments(_ segments: [String], _ pattern: String) -> Bool {
+        let wanted = trimmedSegments(pattern)
+        return wanted.count == segments.count &&
+            zip(wanted, segments).allSatisfy { w, s in !s.isEmpty && (w == "*" || w == s) }
     }
 
     /// Pure redirect-following logic. Starting from `startUrl`, calls `fetcher` for each hop and

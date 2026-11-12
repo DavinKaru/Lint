@@ -24,8 +24,8 @@ private const val TAG = "Lint"
  */
 object ShortLinkResolver {
 
-    // Which hosts count as short links lives in shared/rules/rules.json, generated into
-    // GeneratedRules.SHORT_LINK_HOSTS.
+    // Which hosts and paths count as short links lives in shared/rules/rules.json, generated into
+    // GeneratedRules.SHORT_LINK_HOSTS and SHORT_LINK_PATHS.
 
     const val MAX_HOPS = 5
     private const val CONNECT_TIMEOUT_MS = 1500
@@ -42,15 +42,30 @@ object ShortLinkResolver {
 
     /**
      * Returns true if [url]'s host is exactly one of the known short-link domains
-     * (case-insensitive, exact match — not a substring match).
+     * (case-insensitive, exact match — not a substring match), or its host and whole path match
+     * one of the short-link path rules (e.g. reddit.com/r/<sub>/s/<code>). Pass it the link after
+     * [UrlCleaner.unwrap], as the share flow does.
      */
     fun isKnownShortLink(url: String): Boolean {
-        val host = try {
-            URI(url).host
+        val uri = try {
+            URI(url)
         } catch (e: Exception) {
             null
         } ?: return false
-        return host.lowercase() in GeneratedRules.SHORT_LINK_HOSTS
+        val host = uri.host?.lowercase() ?: return false
+        if (host in GeneratedRules.SHORT_LINK_HOSTS) return true
+        val segments = (uri.rawPath ?: "").trim('/').split('/')
+        return GeneratedRules.SHORT_LINK_PATHS.any { rule ->
+            rule.sites.any { UrlCleaner.hostMatches(host, it) } &&
+                rule.paths.any { pathMatchesSegments(segments, it) }
+        }
+    }
+
+    /** True if [segments] match [pattern] segment for segment, where "*" is any one non-empty segment. */
+    private fun pathMatchesSegments(segments: List<String>, pattern: String): Boolean {
+        val wanted = pattern.trim('/').split('/')
+        return wanted.size == segments.size &&
+            wanted.zip(segments).all { (w, s) -> s.isNotEmpty() && (w == "*" || w == s) }
     }
 
     /**

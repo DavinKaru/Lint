@@ -1,6 +1,7 @@
 import Foundation
 
-/// Strips known tracking query parameters from URLs found in shared text.
+/// Strips known tracking query parameters from URLs found in shared text, after unwrapping any
+/// known redirect link (e.g. google.com/url?q=...) to the real link inside it.
 ///
 /// Swift port of Android's `UrlCleaner.kt`. The rules both share live in shared/rules/rules.json.
 public enum UrlCleaner {
@@ -25,7 +26,7 @@ public enum UrlCleaner {
     /// country code, or "com."/"co." plus one (so eventbrite.com, eventbrite.ca, eventbrite.com.au,
     /// eventbrite.co.uk), plus subdomains of those. Lookalikes like noteventbrite.com or
     /// eventbrite.evil.com don't match.
-    private static func hostMatches(_ host: String, _ domain: String) -> Bool {
+    static func hostMatches(_ host: String, _ domain: String) -> Bool {
         guard domain.hasSuffix(".*") else { return host == domain || host.hasSuffix(".\(domain)") }
         let name = NSRegularExpression.escapedPattern(for: String(domain.dropLast(2)))
         let pattern = #"^(.+\.)?"# + name + #"\.(com|[a-z]{2}|(com|co)\.[a-z]{2})$"#
@@ -54,13 +55,131 @@ public enum UrlCleaner {
         return text.replacingCharacters(in: match.range, with: cleaned)
     }
 
-    /// Removes tracking query parameters from a single URL string, preserving any
-    /// non-tracking query parameters and the fragment. Returns nil if the URL can't be parsed.
+    /// Unwraps known redirect links (Gmail's google.com/url?q=..., l.facebook.com/l.php?u=...,
+    /// Outlook Safe Links, ...) to the real link they point at, entirely offline. Wrappers inside
+    /// wrappers are unwrapped too. Anything that isn't a known wrapper with a valid http(s) link
+    /// inside is returned unchanged.
+    public static func unwrap(_ url: String) -> String {
+        var current = url
+        for _ in 0..<maxUnwrapDepth {
+            guard let next = unwrapOnce(current) else { return current }
+            current = next
+        }
+        return current
+    }
+
+    private static let maxUnwrapDepth = 5
+
+    private static func unwrapOnce(_ url: String) -> String? {
+        guard let components = URLComponents(string: url), let host = components.host?.lowercased(), !host.isEmpty else { return nil }
+        let path = components.percentEncodedPath.isEmpty ? "/" : components.percentEncodedPath
+
+        for wrapper in GeneratedRules.pathWrappers {
+            guard wrapper.sites.contains(where: { hostMatches(host, $0) }), path.hasPrefix(wrapper.prefix) else { continue }
+            var rest = String(path.dropFirst(wrapper.prefix.count))
+            if let query = components.percentEncodedQuery { rest += "?" + query }
+            if let fragment = components.percentEncodedFragment { rest += "#" + fragment }
+            return validTarget(wrapper.scheme + "://" + rest)
+        }
+
+        guard let query = components.percentEncodedQuery else { return nil }
+        let pairs = query.split(separator: "&", omittingEmptySubsequences: true).map(String.init)
+        for wrapper in GeneratedRules.redirectWrappers {
+            guard wrapper.sites.contains(where: { hostMatches(host, $0) }),
+                  wrapper.paths.contains(where: { pathMatches(path, $0) })
+            else { continue }
+            for param in wrapper.params {
+                guard let pair = pairs.first(where: { $0.hasPrefix(param + "=") }) else { continue }
+                let value = String(pair.dropFirst(param.count + 1))
+                // A base64 wrapper never falls back to percent-decoding.
+                let decoded: String?
+                if let prefix = wrapper.base64Prefix {
+                    decoded = base64UrlDecode(value, prefix: prefix)
+                } else {
+                    decoded = percentDecode(value)
+                }
+                guard let target = decoded, let valid = validTarget(target) else { continue }
+                if let sites = wrapper.targetSites, !onSite(valid, sites) { continue }
+                return valid
+            }
+        }
+        return nil
+    }
+
+    private static func pathMatches(_ path: String, _ pattern: String) -> Bool {
+        pattern.hasSuffix("*") ? path.hasPrefix(String(pattern.dropLast())) : path == pattern
+    }
+
+    /// True if `url`'s host matches one of `sites` (same matching as site rules).
+    private static func onSite(_ url: String, _ sites: [String]) -> Bool {
+        guard let host = URLComponents(string: url)?.host?.lowercased() else { return false }
+        return sites.contains { hostMatches(host, $0) }
+    }
+
+    /// `target` if it's an http(s) link that parses with a host, otherwise nil. Whitespace, control
+    /// and invisible format characters (e.g. U+202E) are refused.
+    private static func validTarget(_ target: String) -> String? {
+        let lower = target.lowercased()
+        guard lower.hasPrefix("http://") || lower.hasPrefix("https://") else { return nil }
+        guard !target.unicodeScalars.contains(where: { CharacterSet.whitespacesAndNewlines.contains($0) || CharacterSet.controlCharacters.contains($0) })
+        else { return nil }
+        guard let host = URLComponents(string: target)?.host, !host.isEmpty else { return nil }
+        return target
+    }
+
+    /// Decodes `value` if it's `prefix` followed by unpadded base64url (Bing's u=a1aHR0c... form), or
+    /// nil if it isn't or the bytes aren't valid UTF-8. Never falls back to percent-decoding: a
+    /// wrapper that uses base64 always does.
+    private static func base64UrlDecode(_ value: String, prefix: String) -> String? {
+        guard value.hasPrefix(prefix) else { return nil }
+        var body = String(value.dropFirst(prefix.count))
+        while body.hasSuffix("=") { body.removeLast() }
+        guard body.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }),
+              body.count % 4 != 1
+        else { return nil }
+        var standard = body.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        standard += String(repeating: "=", count: (4 - standard.count % 4) % 4)
+        guard let data = Data(base64Encoded: standard) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    /// Strict percent-decoding ("+" stays "+"): nil if malformed or not valid UTF-8.
+    private static func percentDecode(_ value: String) -> String? {
+        let utf8 = Array(value.utf8)
+        var bytes: [UInt8] = []
+        bytes.reserveCapacity(utf8.count)
+        var i = 0
+        while i < utf8.count {
+            if utf8[i] == UInt8(ascii: "%") {
+                guard i + 2 < utf8.count, let hi = hexValue(utf8[i + 1]), let lo = hexValue(utf8[i + 2]) else { return nil }
+                bytes.append(hi << 4 | lo)
+                i += 3
+            } else {
+                bytes.append(utf8[i])
+                i += 1
+            }
+        }
+        return String(bytes: bytes, encoding: .utf8)
+    }
+
+    private static func hexValue(_ byte: UInt8) -> UInt8? {
+        switch byte {
+        case UInt8(ascii: "0")...UInt8(ascii: "9"): byte - UInt8(ascii: "0")
+        case UInt8(ascii: "a")...UInt8(ascii: "f"): byte - UInt8(ascii: "a") + 10
+        case UInt8(ascii: "A")...UInt8(ascii: "F"): byte - UInt8(ascii: "A") + 10
+        default: nil
+        }
+    }
+
+    /// Unwraps `url` if it's a known redirect link (see `unwrap`), then removes tracking query
+    /// parameters, preserving any non-tracking query parameters and the fragment. Returns nil if
+    /// the URL can't be parsed.
     ///
     /// Works on the raw string rather than rebuilding from parsed components, so everything
     /// other than the removed params (percent-encoding, param order, the fragment) is kept
     /// byte-for-byte.
-    public static func cleanUrl(_ url: String) -> String? {
+    public static func cleanUrl(_ original: String) -> String? {
+        let url = unwrap(original)
         guard let components = URLComponents(string: url) else { return nil }
 
         var beforeFragment = Substring(url)

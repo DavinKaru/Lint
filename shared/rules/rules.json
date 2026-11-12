@@ -173,6 +173,20 @@
       ],
       "source": "Matomo / Piwik (legacy)",
       "notes": "Exact names only: a blanket pk_* or piwik_* prefix would hit ordinary params like ?pk_id=42."
+    },
+    {
+      "params": [
+        "xtor"
+      ],
+      "source": "AT Internet / Piano Analytics",
+      "notes": "Campaign tag on many European news sites. Distinctive enough to strip everywhere."
+    },
+    {
+      "params": [
+        "_bhlid"
+      ],
+      "source": "Beehiiv",
+      "notes": "Per-subscriber click ID on links in Beehiiv newsletters, which are often on custom domains, so it's stripped everywhere."
     }
   ],
   "siteParams": [
@@ -183,10 +197,11 @@
       ],
       "params": [
         "feature",
-        "si"
+        "si",
+        "pp"
       ],
       "source": "YouTube",
-      "notes": "feature marks a video reached via a youtu.be short link; si is the per-share token identifying who shared it."
+      "notes": "feature marks a video reached via a youtu.be short link; si is the per-share token identifying who shared it. pp encodes the search that led to the video."
     },
     {
       "sites": [
@@ -203,10 +218,13 @@
         "facebook.com"
       ],
       "params": [
-        "eid"
+        "eid",
+        "referral_code",
+        "referral_story_type",
+        "tracking"
       ],
-      "source": "Meta / Facebook",
-      "notes": "eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook."
+      "source": "Meta / Facebook (including Marketplace)",
+      "notes": "eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook. referral_code, referral_story_type and tracking are added to shared Marketplace listings."
     },
     {
       "sites": [
@@ -246,6 +264,476 @@
       ],
       "source": "TikTok",
       "notes": "Appended once a vm.tiktok.com/vt.tiktok.com share link resolves, identifying the sharer's device/session and how the link was copied."
+    },
+    {
+      "sites": [
+        "x.com",
+        "twitter.com"
+      ],
+      "params": [
+        "s",
+        "t"
+      ],
+      "source": "X / Twitter",
+      "notes": "s says which share option was used (e.g. s=20, s=46); t is a per-share token identifying who shared it."
+    },
+    {
+      "sites": [
+        "google.*"
+      ],
+      "params": [
+        "g_st",
+        "g_ep"
+      ],
+      "source": "Google Maps",
+      "notes": "Added to links resolved from maps.app.goo.gl: g_st is the share type and g_ep encodes the share context. entry= is left alone."
+    },
+    {
+      "sites": [
+        "amazon.*"
+      ],
+      "params": [
+        "crid",
+        "dib",
+        "dib_tag",
+        "sprefix",
+        "sr",
+        "pd_rd_w",
+        "pd_rd_r",
+        "pd_rd_wg",
+        "pd_rd_i",
+        "pf_rd_p",
+        "pf_rd_r",
+        "pf_rd_s",
+        "pf_rd_t",
+        "pf_rd_i",
+        "pf_rd_m",
+        "content-id",
+        "linkCode",
+        "linkId",
+        "creativeASIN",
+        "social_share",
+        "_encoding",
+        "ref_"
+      ],
+      "source": "Amazon (full links, every country domain)",
+      "notes": "Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is kept: older search links (amazon.com/s?keywords=...) use it as the query."
+    },
+    {
+      "sites": [
+        "music.apple.com",
+        "podcasts.apple.com",
+        "apps.apple.com",
+        "itunes.apple.com"
+      ],
+      "params": [
+        "uo",
+        "ct"
+      ],
+      "source": "Apple Music, Podcasts and App Store",
+      "notes": "uo and ct are campaign/origin tracking. i= (the track or episode), mt= and app= are kept; the at= affiliate token is kept too."
+    },
+    {
+      "sites": [
+        "substack.com"
+      ],
+      "params": [
+        "r",
+        "showWelcomeOnShare"
+      ],
+      "source": "Substack",
+      "notes": "r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it."
+    },
+    {
+      "sites": [
+        "pinterest.*"
+      ],
+      "params": [
+        "sfo",
+        "mweb_unauth_id"
+      ],
+      "source": "Pinterest",
+      "notes": "Added to pins opened from pin.it share links. invite_code and sender identify the sharer but are kept: Pinterest also uses them for group-board and sign-up invites."
+    },
+    {
+      "sites": [
+        "linkedin.com"
+      ],
+      "params": [
+        "rcm",
+        "lipi",
+        "midToken",
+        "midSig",
+        "trkEmail"
+      ],
+      "source": "LinkedIn",
+      "notes": "rcm identifies the member who shared a post; lipi, midToken, midSig and trkEmail are page and email tracking. otpToken (email sign-in) is deliberately not listed."
+    },
+    {
+      "sites": [
+        "threads.net",
+        "threads.com"
+      ],
+      "params": [
+        "xmt",
+        "slof"
+      ],
+      "source": "Threads",
+      "notes": "Per-share tracking tokens on post links."
+    },
+    {
+      "sites": [
+        "quora.com"
+      ],
+      "params": [
+        "ch",
+        "oid",
+        "target_type"
+      ],
+      "source": "Quora",
+      "notes": "Share-sheet tracking on answer links. share and srid are kept: they let a logged-out recipient past the sign-in wall."
+    },
+    {
+      "sites": [
+        "soundcloud.com"
+      ],
+      "params": [
+        "si"
+      ],
+      "source": "SoundCloud",
+      "notes": "si is the per-share token, as on Spotify and YouTube."
+    },
+    {
+      "sites": [
+        "twitch.tv"
+      ],
+      "params": [
+        "tt_medium",
+        "tt_content",
+        "tt_campaign"
+      ],
+      "source": "Twitch",
+      "notes": "Share tracking on clip and channel links."
+    },
+    {
+      "sites": [
+        "vimeo.com"
+      ],
+      "params": [
+        "share"
+      ],
+      "source": "Vimeo",
+      "notes": "share=copy marks how the link was copied. Private-video hashes (in the path or h=) are kept."
+    },
+    {
+      "sites": [
+        "netflix.com"
+      ],
+      "params": [
+        "s",
+        "trkid",
+        "trg"
+      ],
+      "source": "Netflix",
+      "notes": "Share source and tracking IDs on title links. clip= is kept."
+    },
+    {
+      "sites": [
+        "tidal.com"
+      ],
+      "params": [
+        "u"
+      ],
+      "source": "Tidal",
+      "notes": "The bare ?u Tidal's share sheet appends."
+    },
+    {
+      "sites": [
+        "shazam.com"
+      ],
+      "params": [
+        "referrer"
+      ],
+      "source": "Shazam",
+      "notes": "referrer=share on song links."
+    },
+    {
+      "sites": [
+        "docs.google.com",
+        "drive.google.com"
+      ],
+      "params": [
+        "usp"
+      ],
+      "source": "Google Docs and Drive",
+      "notes": "usp=sharing / drive_link / share_link only records which button made the link. resourcekey and everything else is kept."
+    },
+    {
+      "sites": [
+        "notion.so",
+        "notion.site"
+      ],
+      "params": [
+        "pvs"
+      ],
+      "source": "Notion",
+      "notes": "pvs is the page-view source."
+    },
+    {
+      "sites": [
+        "figma.com"
+      ],
+      "params": [
+        "t"
+      ],
+      "source": "Figma",
+      "notes": "t is a per-share tracking token. node-id and everything else is kept."
+    },
+    {
+      "sites": [
+        "canva.com"
+      ],
+      "params": [
+        "utlId"
+      ],
+      "source": "Canva",
+      "notes": "utlId is a per-share link ID (alongside utm_*). The view token in the path is kept."
+    },
+    {
+      "sites": [
+        "ebay.*"
+      ],
+      "params": [
+        "_trkparms",
+        "_trksid",
+        "_from",
+        "hash",
+        "mkcid",
+        "mkevt",
+        "mkrid",
+        "campid",
+        "toolid",
+        "customid",
+        "ssspo",
+        "sssrc",
+        "ssuid",
+        "widget_ver",
+        "amdata"
+      ],
+      "source": "eBay",
+      "notes": "Search, share-sheet (sss*) and partner-network (mk*, campid) tracking. var= picks the variation and epid= the product, so both are kept."
+    },
+    {
+      "sites": [
+        "aliexpress.*"
+      ],
+      "params": [
+        "spm",
+        "scm",
+        "scm_id",
+        "scm-url",
+        "pvid",
+        "algo_pvid",
+        "algo_exp_id",
+        "aff_platform",
+        "aff_trace_key",
+        "aff_fcid",
+        "aff_fsk",
+        "sk",
+        "terminal_id",
+        "afSmartRedirect",
+        "gatewayAdapt",
+        "sourceType",
+        "srcSns",
+        "businessType",
+        "social_params",
+        "tt",
+        "utparam",
+        "gps-id",
+        "curPageLogUid",
+        "bizType",
+        "mp",
+        "_randl_shipto"
+      ],
+      "source": "AliExpress",
+      "notes": "Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price."
+    },
+    {
+      "sites": [
+        "etsy.com"
+      ],
+      "params": [
+        "click_key",
+        "click_sum",
+        "ga_order",
+        "ga_search_type",
+        "ga_view_type",
+        "ga_search_query",
+        "organic_search_click",
+        "plkey",
+        "sts",
+        "frs",
+        "pro",
+        "sr_prefetch",
+        "pf_from",
+        "logging_key",
+        "content_source",
+        "share_time"
+      ],
+      "source": "Etsy",
+      "notes": "Search and share tracking on listing links. variation0/variation1 pick the options and are kept."
+    },
+    {
+      "sites": [
+        "shein.*"
+      ],
+      "params": [
+        "src_identifier",
+        "src_module",
+        "src_tab_page_id",
+        "scici",
+        "ici",
+        "share_from",
+        "url_from",
+        "onelink"
+      ],
+      "source": "Shein",
+      "notes": "Share and page-source tracking. mallCode picks the warehouse and is kept."
+    },
+    {
+      "sites": [
+        "temu.com"
+      ],
+      "params": [
+        "refer_page_name",
+        "refer_page_id",
+        "refer_page_sn",
+        "_x_sessn_id",
+        "share_uin",
+        "_x_vst_scene",
+        "_x_ads_channel",
+        "_x_ads_sub_channel",
+        "_x_ads_account",
+        "_x_ads_set",
+        "_x_ads_id",
+        "_x_ads_creative_id"
+      ],
+      "source": "Temu",
+      "notes": "Session, sharer (share_uin) and ad tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept."
+    },
+    {
+      "sites": [
+        "walmart.com"
+      ],
+      "params": [
+        "athbdg",
+        "athcpid",
+        "athpgid",
+        "athznid",
+        "athieid",
+        "athstid",
+        "athguid",
+        "athwpid",
+        "athena",
+        "athancid",
+        "sourceid",
+        "veh",
+        "wmlspartner"
+      ],
+      "source": "Walmart",
+      "notes": "ath* are recommendation-carousel tracking. classType and selected are kept."
+    },
+    {
+      "sites": [
+        "vinted.*"
+      ],
+      "params": [
+        "referrer",
+        "homepage_session_id"
+      ],
+      "source": "Vinted",
+      "notes": "Where the item was opened from. referrer is generic, so it's only stripped here."
+    },
+    {
+      "sites": [
+        "bbc.co.uk",
+        "bbc.com"
+      ],
+      "params": [
+        "at_medium",
+        "at_campaign",
+        "at_campaign_type",
+        "at_link_id",
+        "at_link_origin",
+        "at_link_type",
+        "at_format",
+        "at_ptr_name",
+        "at_ptr_type",
+        "at_bbc_team",
+        "at_custom1",
+        "at_custom2",
+        "at_custom3",
+        "at_custom4"
+      ],
+      "source": "BBC",
+      "notes": "AT Internet tags on shared articles. A blanket at_* prefix would be too broad for other sites."
+    },
+    {
+      "sites": [
+        "theguardian.com"
+      ],
+      "params": [
+        "CMP",
+        "INTCMP"
+      ],
+      "source": "The Guardian",
+      "notes": "CMP=share_btn_link and friends record which share button was used."
+    },
+    {
+      "sites": [
+        "meetup.com"
+      ],
+      "params": [
+        "recId",
+        "recSource",
+        "searchId",
+        "eventOrigin",
+        "_xtd"
+      ],
+      "source": "Meetup",
+      "notes": "Recommendation and search tracking on event links."
+    },
+    {
+      "sites": [
+        "klook.com"
+      ],
+      "params": [
+        "spm",
+        "clickId"
+      ],
+      "source": "Klook",
+      "notes": "Page tracking. aid (affiliate) is kept for now, see #28."
+    },
+    {
+      "sites": [
+        "yelp.*"
+      ],
+      "params": [
+        "uid"
+      ],
+      "source": "Yelp",
+      "notes": "uid identifies the Yelp member who shared the link."
+    },
+    {
+      "sites": [
+        "deezer.com"
+      ],
+      "params": [
+        "deferredFl",
+        "host"
+      ],
+      "source": "Deezer",
+      "notes": "App deep-link plumbing added to shared track links."
     }
   ],
   "shortLinkHosts": [
@@ -288,6 +776,67 @@
         "vt.tiktok.com"
       ],
       "provider": "TikTok"
+    },
+    {
+      "hosts": [
+        "maps.app.goo.gl"
+      ],
+      "provider": "Google Maps",
+      "notes": "Google Maps share links."
+    },
+    {
+      "hosts": [
+        "redd.it"
+      ],
+      "provider": "Reddit"
+    },
+    {
+      "hosts": [
+        "pin.it"
+      ],
+      "provider": "Pinterest"
+    },
+    {
+      "hosts": [
+        "lnkd.in"
+      ],
+      "provider": "LinkedIn"
+    },
+    {
+      "hosts": [
+        "fb.me"
+      ],
+      "provider": "Facebook"
+    },
+    {
+      "hosts": [
+        "on.soundcloud.com"
+      ],
+      "provider": "SoundCloud"
+    },
+    {
+      "hosts": [
+        "ebay.us"
+      ],
+      "provider": "eBay"
+    },
+    {
+      "hosts": [
+        "a.aliexpress.com"
+      ],
+      "provider": "AliExpress"
+    },
+    {
+      "hosts": [
+        "flip.it"
+      ],
+      "provider": "Flipboard"
+    },
+    {
+      "hosts": [
+        "link.deezer.com"
+      ],
+      "provider": "Deezer"
     }
   ],
   "neverStrip": [
@@ -302,6 +851,283 @@
         "eid"
       ],
       "notes": "Google Calendar uses ?eid= to identify an event (#2). Only stripped on Facebook (siteParams)."
+    }
+  ],
+  "redirectWrappers": [
+    {
+      "sites": [
+        "google.*"
+      ],
+      "paths": [
+        "/url"
+      ],
+      "params": [
+        "q",
+        "url"
+      ],
+      "source": "Google redirects (Gmail, Docs, Search)",
+      "notes": "Gmail and Google Docs wrap every link as google.com/url?q=<link>; search results use ?url=."
+    },
+    {
+      "sites": [
+        "safelinks.protection.outlook.com"
+      ],
+      "paths": [
+        "/*"
+      ],
+      "params": [
+        "url"
+      ],
+      "source": "Outlook Safe Links",
+      "notes": "Regional hosts like nam12.safelinks.protection.outlook.com, sometimes with an /ap/... path."
+    },
+    {
+      "sites": [
+        "l.facebook.com",
+        "lm.facebook.com",
+        "l.messenger.com"
+      ],
+      "paths": [
+        "/l.php"
+      ],
+      "params": [
+        "u"
+      ],
+      "source": "Facebook and Messenger link redirects"
+    },
+    {
+      "sites": [
+        "l.instagram.com"
+      ],
+      "paths": [
+        "/"
+      ],
+      "params": [
+        "u"
+      ],
+      "source": "Instagram link redirects"
+    },
+    {
+      "sites": [
+        "l.threads.net",
+        "l.threads.com"
+      ],
+      "paths": [
+        "/"
+      ],
+      "params": [
+        "u"
+      ],
+      "source": "Threads link redirects"
+    },
+    {
+      "sites": [
+        "youtube.com"
+      ],
+      "paths": [
+        "/redirect"
+      ],
+      "params": [
+        "q"
+      ],
+      "source": "YouTube description and comment links"
+    },
+    {
+      "sites": [
+        "linkedin.com"
+      ],
+      "paths": [
+        "/redir/redirect",
+        "/safety/go"
+      ],
+      "params": [
+        "url"
+      ],
+      "source": "LinkedIn link redirects"
+    },
+    {
+      "sites": [
+        "out.reddit.com"
+      ],
+      "paths": [
+        "/*"
+      ],
+      "params": [
+        "url"
+      ],
+      "source": "Reddit outbound links",
+      "notes": "Path is the post ID, e.g. /t3_abc123."
+    },
+    {
+      "sites": [
+        "duckduckgo.com"
+      ],
+      "paths": [
+        "/l/"
+      ],
+      "params": [
+        "uddg"
+      ],
+      "source": "DuckDuckGo result redirects"
+    },
+    {
+      "sites": [
+        "slack-redir.net"
+      ],
+      "paths": [
+        "/link"
+      ],
+      "params": [
+        "url"
+      ],
+      "source": "Slack link redirects"
+    },
+    {
+      "sites": [
+        "steamcommunity.com"
+      ],
+      "paths": [
+        "/linkfilter/"
+      ],
+      "params": [
+        "u",
+        "url"
+      ],
+      "source": "Steam link filter"
+    },
+    {
+      "sites": [
+        "vk.com"
+      ],
+      "paths": [
+        "/away.php"
+      ],
+      "params": [
+        "to"
+      ],
+      "source": "VK outbound links"
+    },
+    {
+      "sites": [
+        "t.umblr.com"
+      ],
+      "paths": [
+        "/redirect"
+      ],
+      "params": [
+        "z"
+      ],
+      "source": "Tumblr link redirects"
+    },
+    {
+      "sites": [
+        "bing.com"
+      ],
+      "paths": [
+        "/ck/a"
+      ],
+      "params": [
+        "u"
+      ],
+      "base64Prefix": "a1",
+      "source": "Bing search results",
+      "notes": "Bing's result links carry the real link in u= as \"a1\" followed by unpadded base64url."
+    },
+    {
+      "sites": [
+        "consent.google.com",
+        "consent.youtube.com"
+      ],
+      "paths": [
+        "/ml",
+        "/m"
+      ],
+      "params": [
+        "continue"
+      ],
+      "source": "Google cookie consent",
+      "notes": "Resolving a maps.app.goo.gl or youtu.be link from a cookie-less device (e.g. in the EU) can land here; continue= is the real link. Google only continues to its own sites, so other targets are left alone.",
+      "targetSites": [
+        "google.*",
+        "youtube.com"
+      ]
+    },
+    {
+      "sites": [
+        "facebook.com"
+      ],
+      "paths": [
+        "/login/",
+        "/login.php"
+      ],
+      "params": [
+        "next"
+      ],
+      "source": "Facebook sign-in",
+      "notes": "Resolving a Facebook short link without being signed in can land here; next= is the real link. Facebook only continues to its own pages, so other targets are left alone.",
+      "targetSites": [
+        "facebook.com"
+      ]
+    },
+    {
+      "sites": [
+        "star.aliexpress.com"
+      ],
+      "paths": [
+        "/share/share.htm"
+      ],
+      "params": [
+        "redirectUrl"
+      ],
+      "source": "AliExpress share page",
+      "notes": "Where a.aliexpress.com share links land: a share page whose redirectUrl= is the product link.",
+      "targetSites": [
+        "aliexpress.*"
+      ]
+    }
+  ],
+  "pathWrappers": [
+    {
+      "sites": [
+        "google.*"
+      ],
+      "prefix": "/amp/s/",
+      "scheme": "https",
+      "source": "Google AMP viewer",
+      "notes": "google.com/amp/s/<host>/<path> shows another site's AMP page; the original is https://<host>/<path>."
+    }
+  ],
+  "shortLinkPaths": [
+    {
+      "sites": [
+        "reddit.com"
+      ],
+      "paths": [
+        "/r/*/s/*"
+      ],
+      "provider": "Reddit",
+      "notes": "App share links like reddit.com/r/<sub>/s/<code>; the full post link carries share_id and utm_*."
+    },
+    {
+      "sites": [
+        "facebook.com"
+      ],
+      "paths": [
+        "/share/*",
+        "/share/*/*"
+      ],
+      "provider": "Facebook",
+      "notes": "Share links like facebook.com/share/p/<code>/ and /share/r/<code>/."
+    },
+    {
+      "sites": [
+        "list-manage.com"
+      ],
+      "paths": [
+        "/track/click"
+      ],
+      "provider": "Mailchimp",
+      "notes": "Newsletter click links on <account>.<dc>.list-manage.com. The e= param identifies the subscriber, so resolving replaces it with the destination. Resolving counts as a click by the person sharing."
     }
   ]
 }

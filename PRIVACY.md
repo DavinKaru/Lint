@@ -7,12 +7,12 @@ all. There is one deliberate, narrow exception.
 
 Some tracking parameters only appear after a short link redirects to its full destination — the
 short link itself carries none. To clean those, Lint needs to know the destination first. When a
-shared link's host is exactly one of the domains below, `ShortLinkResolver` follows the redirect
+shared link's host is exactly one of the domains below (or, for the few listed share paths, its host and path match exactly), `ShortLinkResolver` follows the redirect
 before cleaning.
 
 This table is the single source of truth for which domains Lint resolves — nothing else in this
 repo (docs or otherwise) should re-list them. It must stay in sync with
-`shortLinkHosts` in [`shared/rules/rules.json`](shared/rules/rules.json), which both apps'
+`shortLinkHosts` and `shortLinkPaths` in [`shared/rules/rules.json`](shared/rules/rules.json), which both apps'
 code is generated from and is the actual enforcement point. The Status column reflects Android device testing; iOS
 hasn't been tested on a real device yet.
 
@@ -24,6 +24,18 @@ hasn't been tested on a real device yet.
 | `fb.watch` | Facebook | Not yet confirmed | Added later for Facebook Watch video shares; not yet tested on a real device. |
 | `spoti.fi` | Spotify | Not yet confirmed | Resolves to an `open.spotify.com` link carrying a `si` tracking token; not yet tested on a real device. |
 | `vm.tiktok.com`, `vt.tiktok.com` | TikTok | Not yet confirmed | Resolves to a `tiktok.com/@user/video/…` link carrying several share-tracking params (`is_from_webapp`, `sender_device`, `share_app_id`, etc. — see `UrlCleaner.kt`); not yet tested on a real device. |
+| `maps.app.goo.gl` | Google Maps | Not yet confirmed | Google Maps share links. Resolves to a `google.com/maps/…` link carrying `g_st`/`g_ep` share params, which are then stripped. Not yet tested on a real device. |
+| `redd.it`, and `reddit.com/r/<sub>/s/<code>` share paths | Reddit | Not yet confirmed | The Reddit app shares `/s/` links on reddit.com itself; only that exact path shape is resolved, never other reddit.com links. Resolves to the full post link carrying `share_id` and `utm_*`. Reddit may block non-browser requests, in which case the link is shared unchanged. Not yet tested on a real device. |
+| `facebook.com/share/…` share paths | Facebook | Not yet confirmed | Facebook's newer share links (`/share/p/<code>/`, `/share/r/<code>/`, `/share/<code>/`); only those path shapes are resolved. Not yet tested on a real device. |
+| `pin.it` | Pinterest | Not yet confirmed | Resolves to a pin link carrying `invite_code`/`sender`, which identify the sharer and are then stripped. Not yet tested on a real device. |
+| `lnkd.in` | LinkedIn | Not yet confirmed | LinkedIn's short links. Not yet tested on a real device. |
+| `fb.me` | Facebook | Not yet confirmed | Older Facebook short links. Not yet tested on a real device. |
+| `on.soundcloud.com` | SoundCloud | Not yet confirmed | Resolves to a track link carrying the `si` share token, then stripped. Not yet tested on a real device. |
+| `ebay.us` | eBay | Not yet confirmed | eBay's share short links. Not yet tested on a real device. |
+| `a.aliexpress.com` | AliExpress | Not yet confirmed | AliExpress app share links. Not yet tested on a real device. |
+| `flip.it` | Flipboard | Not yet confirmed | Flipboard's short links. Not yet tested on a real device. |
+| `link.deezer.com` | Deezer | Not yet confirmed | Deezer's share links. Not yet tested on a real device. |
+| `<account>.<dc>.list-manage.com/track/click` | Mailchimp | Not yet confirmed | Newsletter click links. Their `e=` param identifies you as the subscriber, so the link is resolved to its destination instead of being shared as is. Resolving it counts as a click by you in the sender's stats, much like opening it would. Only the `/track/click` path is resolved. Not yet tested on a real device. |
 
 ### How resolution works
 

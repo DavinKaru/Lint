@@ -15,7 +15,8 @@ assert every case, so a rule change that breaks a case fails on both. It's also 
 
 Each case records its `source` (the app or site), `category` (the same categories as the
 [Link support board](https://github.com/users/DavinKaru/projects/1)), `verified` (the date it was
-last checked against a real share) and optional `notes`.
+last checked against a real share from the app, or `null` for cases written from documentation
+or by hand) and optional `notes`.
 
 ## Adding a case
 
@@ -31,4 +32,8 @@ last checked against a real share) and optional `notes`.
 python3 shared/tests/coverage.py
 ```
 
-prints how many cases each category and source has, so gaps are easy to spot.
+prints progress towards 1.0: how many sources on the target list (`targets.json`, mirroring the
+[Link support board](https://github.com/users/DavinKaru/projects/1)) have cases, and how many of
+those are verified against a real share. `--missing` lists the targets with no cases yet.
+
+When adding a source, add its case `source` name to the matching target's `sources` in `targets.json`.

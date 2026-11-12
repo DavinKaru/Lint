@@ -121,7 +121,7 @@ struct UrlCleanerTests {
     @Test func stripsEventbriteShareParamsFromAnEventSharedAsText() {
         let input = "South Asian Queerspace October Meet Up\n\nDate: 17 oct • 13:00\n\n" +
             "https://www.eventbrite.com.au/e/south-asian-queerspace-october-meet-up-tickets-2002707650494" +
-            "?aff=ebdsshsms&utm_share_source=listing_android&sg=3de21ae99fe972aeffdddd25fd1744bc49bc3ce1f698a860d0c15acf48c78b311617f2f8a2a569aae6be479a1146e57d98d07f3a60a63faa195df17671643f110c8d45e59dcdb050059ea6378eec"
+            "?aff=ebdsshsms&utm_share_source=listing_android&sg=0000000000000000000000000000000000000000"
         let expected = "South Asian Queerspace October Meet Up\n\nDate: 17 oct • 13:00\n\n" +
             "https://www.eventbrite.com.au/e/south-asian-queerspace-october-meet-up-tickets-2002707650494"
         #expect(UrlCleaner.cleanFirstUrl(in: input) == expected)
@@ -143,7 +143,7 @@ struct UrlCleanerTests {
     }
 
     @Test func stripsFeverShareParams() {
-        let input = "https://feverup.com/m/471615?cp_smn_source=secretmelbourne&cp_smn_content=guided-dome-promenade-tour-royal-exhibition-building&cp_smn_term=profile_card_buy_button&suid=abe77647-acea-49d4-b5d6-023aa1b71674"
+        let input = "https://feverup.com/m/471615?cp_smn_source=secretmelbourne&cp_smn_content=guided-dome-promenade-tour-royal-exhibition-building&cp_smn_term=profile_card_buy_button&suid=00000000-0000-0000-0000-000000000000"
         #expect(UrlCleaner.cleanUrl(input) == "https://feverup.com/m/471615")
     }
 

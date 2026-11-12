@@ -1,5 +1,5 @@
 {
-  "_about": "Real shared links and what Lint must turn them into, checked by both the Android and iOS tests. Add a case for every source Lint supports or deliberately skips. Replace personal values (names, plates, per-share tokens) with placeholders before adding them. See shared/tests/README.md.",
+  "_about": "Real shared links (and well-documented share formats, marked verified: null until checked from a phone) and what Lint must turn them into, checked by both the Android and iOS tests. Add a case for every source Lint supports or deliberately skips. Replace personal values (names, plates, per-share tokens) with placeholders before adding them. See shared/tests/README.md.",
   "version": 1,
   "clean": [
     {
@@ -7,119 +7,120 @@
       "category": "All sites",
       "input": "https://example.com/article?utm_source=twitter&utm_medium=social&fbclid=abc123",
       "expected": "https://example.com/article",
-      "verified": "2026-10-30"
+      "verified": null,
+      "notes": "Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/search?q=kotlin&utm_source=twitter",
       "expected": "https://example.com/search?q=kotlin",
-      "verified": "2026-10-30",
-      "notes": "Unknown params are kept."
+      "verified": null,
+      "notes": "Unknown params are kept. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/article?utm_source=twitter#section-2",
       "expected": "https://example.com/article#section-2",
-      "verified": "2026-10-30",
-      "notes": "Fragment is kept."
+      "verified": null,
+      "notes": "Fragment is kept. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "Check this out: https://example.com/page?gclid=xyz&keep=1 thanks!",
       "expected": "Check this out: https://example.com/page?keep=1 thanks!",
-      "verified": "2026-10-30",
-      "notes": "Only the link inside shared text is changed."
+      "verified": null,
+      "notes": "Only the link inside shared text is changed. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/article?mtm_campaign=launch&mtm_source=newsletter&keep=1",
       "expected": "https://example.com/article?keep=1",
-      "verified": "2026-10-30",
-      "notes": "Matomo mtm_ prefix."
+      "verified": null,
+      "notes": "Matomo mtm_ prefix. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/a%20b?z=1&q=caf%C3%A9&utm_source=x&a=%2F#frag%20ment",
       "expected": "https://example.com/a%20b?z=1&q=caf%C3%A9&a=%2F#frag%20ment",
-      "verified": "2026-10-30",
-      "notes": "Percent-encoding and param order are kept byte-for-byte."
+      "verified": null,
+      "notes": "Percent-encoding and param order are kept byte-for-byte. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "🎉👨‍👩‍👧 https://x.com/?fbclid=1&a=b 🎉",
       "expected": "🎉👨‍👩‍👧 https://x.com/?a=b 🎉",
-      "verified": "2026-10-30",
-      "notes": "Emoji around the link."
+      "verified": null,
+      "notes": "Emoji around the link. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "a https://x.com/?fbclid=1 b https://y.com/?fbclid=2",
       "expected": "a https://x.com/ b https://y.com/?fbclid=2",
-      "verified": "2026-10-30",
-      "notes": "Only the first link is cleaned (matches Android's single-URL share)."
+      "verified": null,
+      "notes": "Only the first link is cleaned (matches Android's single-URL share). Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "just some text, no link here",
       "expected": "just some text, no link here",
-      "verified": "2026-10-30",
-      "notes": "No link: passed through unchanged."
+      "verified": null,
+      "notes": "No link: passed through unchanged. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/page?feature=beta&si=1&_t=2&_r=3&web_id=4",
       "expected": "https://example.com/page?feature=beta&si=1&_t=2&_r=3&web_id=4",
-      "verified": "2026-10-30",
-      "notes": "Site-specific names (YouTube/Spotify/TikTok) are kept on other sites."
+      "verified": null,
+      "notes": "Site-specific names (YouTube/Spotify/TikTok) are kept on other sites. Written for the test set, not taken from a real share."
     },
     {
       "source": "Generic",
       "category": "All sites",
       "input": "https://example.com/page?aff=partner1&sg=group2&suid=42",
       "expected": "https://example.com/page?aff=partner1&sg=group2&suid=42",
-      "verified": "2026-10-30",
-      "notes": "Eventbrite/Fever names are kept on other sites."
+      "verified": null,
+      "notes": "Eventbrite/Fever names are kept on other sites. Written for the test set, not taken from a real share."
     },
     {
       "source": "Lookalike",
       "category": "All sites",
       "input": "https://nottiktok.com/page?_t=abc&_r=1",
       "expected": "https://nottiktok.com/page?_t=abc&_r=1",
-      "verified": "2026-10-30",
-      "notes": "Lookalike domain doesn't get TikTok's rules."
+      "verified": null,
+      "notes": "Lookalike domain doesn't get TikTok's rules. Written for the test set, not taken from a real share."
     },
     {
       "source": "Lookalike",
       "category": "All sites",
       "input": "https://noteventbrite.com/e/1?aff=x&sg=y",
       "expected": "https://noteventbrite.com/e/1?aff=x&sg=y",
-      "verified": "2026-10-30",
-      "notes": "Lookalike domain doesn't get Eventbrite's rules."
+      "verified": null,
+      "notes": "Lookalike domain doesn't get Eventbrite's rules. Written for the test set, not taken from a real share."
     },
     {
       "source": "Lookalike",
       "category": "All sites",
       "input": "https://eventbrite.evil.com/e/1?aff=x&sg=y",
       "expected": "https://eventbrite.evil.com/e/1?aff=x&sg=y",
-      "verified": "2026-10-30",
-      "notes": "Eventbrite's name as a subdomain of another site doesn't count."
+      "verified": null,
+      "notes": "Eventbrite's name as a subdomain of another site doesn't count. Written for the test set, not taken from a real share."
     },
     {
       "source": "Secret Media Network",
       "category": "All sites",
       "input": "https://example.com/tickets?id=7&cp_smn_source=secretlondon&cp_smn_medium=newsletter",
       "expected": "https://example.com/tickets?id=7",
-      "verified": "2026-10-30",
-      "notes": "cp_smn_ prefix is stripped on every site."
+      "verified": null,
+      "notes": "cp_smn_ prefix is stripped on every site. Written for the test set, not taken from a real share."
     },
     {
       "source": "Google Shopping",
@@ -141,54 +142,56 @@
       "category": "Video & music",
       "input": "https://youtu.be/jD-3zMQmjTY?si=AbCdEf123",
       "expected": "https://youtu.be/jD-3zMQmjTY",
-      "verified": "2026-10-30",
-      "notes": "Unresolved youtu.be link still loses si."
+      "verified": null,
+      "notes": "Unresolved youtu.be link still loses si. Written for the test set, not taken from a real share."
     },
     {
       "source": "YouTube Music",
       "category": "Video & music",
       "input": "https://music.youtube.com/watch?v=abc&si=xyz&feature=share",
       "expected": "https://music.youtube.com/watch?v=abc",
-      "verified": "2026-10-30"
+      "verified": null,
+      "notes": "Written for the test set, not taken from a real share."
     },
     {
       "source": "Spotify",
       "category": "Video & music",
       "input": "https://open.spotify.com/track/1a2b3c?si=xyz789",
       "expected": "https://open.spotify.com/track/1a2b3c",
-      "verified": "2026-10-30"
+      "verified": null,
+      "notes": "Written for the test set, not taken from a real share."
     },
     {
       "source": "TikTok",
       "category": "Social",
       "input": "https://www.tiktok.com/@user/video/1234567890?is_from_webapp=1&sender_device=pc&web_id=42&share_app_id=1233&share_link_id=abc&share_item_id=def&u_code=ghi&_r=1&_t=8abcde",
       "expected": "https://www.tiktok.com/@user/video/1234567890",
-      "verified": "2026-10-30",
-      "notes": "Where vm/vt.tiktok.com resolve to."
+      "verified": null,
+      "notes": "Where vm/vt.tiktok.com resolve to. Written for the test set, not taken from a real share."
     },
     {
       "source": "Facebook",
       "category": "Social",
       "input": "https://www.facebook.com/events/123?eid=ARBxyz&ref=share",
       "expected": "https://www.facebook.com/events/123",
-      "verified": "2026-10-30",
-      "notes": "eid is only stripped on Facebook."
+      "verified": null,
+      "notes": "eid is only stripped on Facebook. Written for the test set, not taken from a real share."
     },
     {
       "source": "Google Maps",
       "category": "Maps & ride-share",
       "input": "https://maps.google.com/?cid=1234567890&utm_source=share",
       "expected": "https://maps.google.com/?cid=1234567890",
-      "verified": "2026-10-30",
-      "notes": "cid identifies the place: must be kept (#2)."
+      "verified": null,
+      "notes": "cid identifies the place: must be kept (#2). Written for the test set, not taken from a real share."
     },
     {
       "source": "Google Calendar",
       "category": "Maps & ride-share",
       "input": "https://calendar.google.com/calendar/event?eid=abc123&utm_medium=email",
       "expected": "https://calendar.google.com/calendar/event?eid=abc123",
-      "verified": "2026-10-30",
-      "notes": "eid identifies the event: must be kept (#2)."
+      "verified": null,
+      "notes": "eid identifies the event: must be kept (#2). Written for the test set, not taken from a real share."
     },
     {
       "source": "DiDi",
@@ -219,8 +222,8 @@
       "category": "Events & travel",
       "input": "https://www.eventbrite.co.uk/e/1?aff=x&sg=y",
       "expected": "https://www.eventbrite.co.uk/e/1",
-      "verified": "2026-10-30",
-      "notes": "Other country domains."
+      "verified": null,
+      "notes": "Other country domains. Written for the test set, not taken from a real share."
     },
     {
       "source": "Fever",
@@ -229,6 +232,1014 @@
       "expected": "https://feverup.com/m/471615",
       "verified": "2026-10-30",
       "notes": "Shared via Secret Melbourne. suid value is a placeholder."
+    },
+    {
+      "source": "Gmail / Google Docs",
+      "category": "Search & ads",
+      "input": "https://www.google.com/url?q=https://example.com/article?utm_source%3Dnewsletter%26id%3D42&source=gmail&ust=1700000000000000&usg=AOvVaw0abcDEF",
+      "expected": "https://example.com/article?id=42",
+      "verified": null,
+      "notes": "Gmail-wrapped link: the inner link's own query is percent-encoded inside q. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://www.google.com.au/url?sa=t&rct=j&q=&esrc=s&source=web&url=https%3A%2F%2Fwww.abc.net.au%2Fnews%2Fstory&ved=2ahUKE&usg=AOvVaw1",
+      "expected": "https://www.abc.net.au/news/story",
+      "verified": null,
+      "notes": "Empty q, real link in url; Australian Google domain. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://www.google.com/url?q=not-a-link&sa=D",
+      "expected": "https://www.google.com/url?q=not-a-link&sa=D",
+      "verified": null,
+      "notes": "No http(s) link inside: left as it is. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://www.google.com/search?q=https%3A%2F%2Fexample.com&ei=abc",
+      "expected": "https://www.google.com/search?q=https%3A%2F%2Fexample.com",
+      "verified": null,
+      "notes": "A search for a URL isn't a redirect: only ei is stripped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google AMP",
+      "category": "Search & ads",
+      "input": "https://www.google.com/amp/s/www.example.com/news/story.amp",
+      "expected": "https://www.example.com/news/story.amp",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Outlook Safe Links",
+      "category": "Search & ads",
+      "input": "https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fexample.com%2Fdocs%3Fpage%3D2%26utm_medium%3Demail&data=05%7C01%7Cuser%40example.com%7Cabc&sdata=xyz%3D&reserved=0",
+      "expected": "https://example.com/docs?page=2",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Outlook Safe Links",
+      "category": "Search & ads",
+      "input": "https://eur01.safelinks.protection.outlook.com/ap/w-59584e83/?url=https%3A%2F%2Fexample.com%2F&data=05%7C02&reserved=0",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Newer /ap/... path form. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook",
+      "category": "Social",
+      "input": "https://l.facebook.com/l.php?u=https%3A%2F%2Fexample.com%2Farticle%3Fid%3D7%26fbclid%3DIwAR0abc&h=AT0xyz&s=1",
+      "expected": "https://example.com/article?id=7",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook",
+      "category": "Social",
+      "input": "https://l.facebook.com.evil.com/l.php?u=https%3A%2F%2Fexample.com%2F",
+      "expected": "https://l.facebook.com.evil.com/l.php?u=https%3A%2F%2Fexample.com%2F",
+      "verified": null,
+      "notes": "Lookalike host: not unwrapped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook",
+      "category": "Social",
+      "input": "https://l.facebook.com/l.php?u=javascript%3Aalert(1)&h=AT0",
+      "expected": "https://l.facebook.com/l.php?u=javascript%3Aalert(1)&h=AT0",
+      "verified": null,
+      "notes": "Only http(s) targets are unwrapped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook",
+      "category": "Social",
+      "input": "https://l.facebook.com/l.php?u=https%3A%2F%2Fexample.com%2F%ZZbad&h=AT0",
+      "expected": "https://l.facebook.com/l.php?u=https%3A%2F%2Fexample.com%2F%ZZbad&h=AT0",
+      "verified": null,
+      "notes": "Malformed percent-encoding: left as it is rather than guessed. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Instagram",
+      "category": "Social",
+      "input": "https://l.instagram.com/?u=https%3A%2F%2Fexample.com%2Fshop%3Futm_source%3Dig_bio&e=AT0abc",
+      "expected": "https://example.com/shop",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Threads",
+      "category": "Social",
+      "input": "https://l.threads.net/?u=https%3A%2F%2Fexample.com%2Fpost&e=AT0",
+      "expected": "https://example.com/post",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Messenger",
+      "category": "Social",
+      "input": "https://l.messenger.com/l.php?u=https%3A%2F%2Fexample.com%2F&h=AT0",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "YouTube",
+      "category": "Video & music",
+      "input": "https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqbXyz&q=https%3A%2F%2Fexample.com%2Fmerch%3Futm_campaign%3Dyt&v=dQw4w9WgXcQ",
+      "expected": "https://example.com/merch",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "LinkedIn",
+      "category": "Social",
+      "input": "https://www.linkedin.com/redir/redirect?url=https%3A%2F%2Fexample.com%2Fpost&urlhash=abc&trk=public_post-text",
+      "expected": "https://example.com/post",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "LinkedIn",
+      "category": "Social",
+      "input": "https://www.linkedin.com/safety/go?url=https%3A%2F%2Fexample.com%2Fjob&trk=flagship-messaging-web",
+      "expected": "https://example.com/job",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Reddit",
+      "category": "Social",
+      "input": "https://out.reddit.com/t3_abc123?url=https%3A%2F%2Fexample.com%2Fstory&token=AQAAabc&app_name=web2x",
+      "expected": "https://example.com/story",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "DuckDuckGo",
+      "category": "Search & ads",
+      "input": "https://duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.com%2F&rut=abc123",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Slack",
+      "category": "Work & productivity",
+      "input": "https://slack-redir.net/link?url=https%3A%2F%2Fexample.com%2Fdoc",
+      "expected": "https://example.com/doc",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Steam",
+      "category": "Social",
+      "input": "https://steamcommunity.com/linkfilter/?u=https%3A%2F%2Fexample.com%2F",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "VK",
+      "category": "Social",
+      "input": "https://vk.com/away.php?to=https%3A%2F%2Fexample.com%2F&cc_key=",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Tumblr",
+      "category": "Social",
+      "input": "https://t.umblr.com/redirect?z=https%3A%2F%2Fexample.com%2F&t=abc",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Nested wrappers",
+      "category": "All sites",
+      "input": "https://www.google.com/url?q=https://l.facebook.com/l.php?u%3Dhttps%253A%252F%252Fexample.com%252F%253Ffbclid%253Dx%26h%3DAT0&sa=D",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "A Facebook redirect inside a Gmail link: both are unwrapped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Gmail / Google Docs",
+      "category": "Search & ads",
+      "input": "Read this: https://www.google.com/url?q=https://example.com/a?utm_source%3Dx&sa=D thanks",
+      "expected": "Read this: https://example.com/a thanks",
+      "verified": null,
+      "notes": "Wrapped link inside shared text. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "X / Twitter",
+      "category": "Social",
+      "input": "https://x.com/someone/status/1790000000000000000?s=46&t=AbCdEfGhIjKlMn",
+      "expected": "https://x.com/someone/status/1790000000000000000",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "X / Twitter",
+      "category": "Social",
+      "input": "https://twitter.com/someone/status/1790000000000000000?s=20",
+      "expected": "https://twitter.com/someone/status/1790000000000000000",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "X / Twitter",
+      "category": "Social",
+      "input": "https://example.com/page?s=20&t=abc",
+      "expected": "https://example.com/page?s=20&t=abc",
+      "verified": null,
+      "notes": "s and t are only stripped on X/Twitter. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Instagram",
+      "category": "Social",
+      "input": "https://www.instagram.com/p/C0abcDEFghi/?igsh=MTZ4bWl6bXo0&img_index=2",
+      "expected": "https://www.instagram.com/p/C0abcDEFghi/?img_index=2",
+      "verified": null,
+      "notes": "img_index picks the carousel photo and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Instagram",
+      "category": "Social",
+      "input": "https://www.instagram.com/reel/C0abcDEFghi/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==",
+      "expected": "https://www.instagram.com/reel/C0abcDEFghi/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Reddit",
+      "category": "Social",
+      "input": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/?share_id=AbC123xyz&utm_content=2&utm_medium=android_app&utm_name=androidcss&utm_source=share&utm_term=1",
+      "expected": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/",
+      "verified": null,
+      "notes": "Where an app /s/ share link resolves to. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Reddit",
+      "category": "Social",
+      "input": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/abc123x/?context=3&share_id=x",
+      "expected": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/abc123x/?context=3",
+      "verified": null,
+      "notes": "context picks how much of a comment thread to show and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "YouTube",
+      "category": "Video & music",
+      "input": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUKcmljayBhc3RsZXk%3D&t=42s",
+      "expected": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s",
+      "verified": null,
+      "notes": "pp encodes the search query; t (timestamp) must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "YouTube",
+      "category": "Video & music",
+      "input": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL123&index=3&si=abc",
+      "expected": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL123&index=3",
+      "verified": null,
+      "notes": "Playlist position must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3?crid=2ABCDEF&dib=eyJ2IjoiMSJ9&dib_tag=se&keywords=noise+cancelling+headphones&qid=1730000000&sprefix=noise%2Caps%2C250&sr=8-3",
+      "expected": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3?keywords=noise+cancelling+headphones",
+      "verified": null,
+      "notes": "Search context including the search terms. The /ref=... path segment is left for now. Format from public documentation and observed behaviour, not yet checked against a real share from the phone. keywords is kept for now (it's the query on search links); stripping it only on /dp/ links needs path-scoped rules (#29)."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/dp/B0ABCDEF12?th=1&psc=1&pd_rd_w=abc&pf_rd_p=def&pd_rd_r=ghi&content-id=amzn1.sym.x&tag=someone-20",
+      "expected": "https://www.amazon.com/dp/B0ABCDEF12?th=1&psc=1&tag=someone-20",
+      "verified": null,
+      "notes": "th and psc pick the product variant and must stay; the tag affiliate ID is kept pending a decision. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.co.uk/s?k=kettle&crid=1XYZ&sprefix=kett%2Caps%2C300&ref=nb_sb_ss_ts-doa-p_1_4&rh=n%3A123",
+      "expected": "https://www.amazon.co.uk/s?k=kettle&rh=n%3A123",
+      "verified": null,
+      "notes": "Search page: k (the search) and rh (filters) must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://example.com/item?keywords=red&sr=1",
+      "expected": "https://example.com/item?keywords=red&sr=1",
+      "verified": null,
+      "notes": "Amazon's names are only stripped on Amazon. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Maps",
+      "category": "Maps & ride-share",
+      "input": "https://www.google.com/maps/place/Royal+Exhibition+Building/@-37.8047,144.9717,17z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D&g_st=ic",
+      "expected": "https://www.google.com/maps/place/Royal+Exhibition+Building/@-37.8047,144.9717,17z/data=!3m1!4b1?entry=ttu",
+      "verified": null,
+      "notes": "Where maps.app.goo.gl resolves to. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Apple Music",
+      "category": "Video & music",
+      "input": "https://music.apple.com/au/album/some-album/1234567890?i=1234567891&uo=4&ct=share",
+      "expected": "https://music.apple.com/au/album/some-album/1234567890?i=1234567891",
+      "verified": null,
+      "notes": "i= is the track and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "App Store",
+      "category": "Video & music",
+      "input": "https://apps.apple.com/au/app/some-app/id123456789?mt=8&ct=share_sheet&uo=4",
+      "expected": "https://apps.apple.com/au/app/some-app/id123456789?mt=8",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Substack",
+      "category": "News & newsletters",
+      "input": "https://someone.substack.com/p/a-post-title?utm_campaign=post&utm_medium=web&r=2abcde&triedRedirect=true&showWelcomeOnShare=true",
+      "expected": "https://someone.substack.com/p/a-post-title?triedRedirect=true",
+      "verified": null,
+      "notes": "r is the sharer's referral ID; triedRedirect is left alone. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Pinterest",
+      "category": "Social",
+      "input": "https://www.pinterest.com.au/pin/123456789012345678/?invite_code=abc123&sender=987654321&sfo=1",
+      "expected": "https://www.pinterest.com.au/pin/123456789012345678/?invite_code=abc123&sender=987654321",
+      "verified": null,
+      "notes": "invite_code and sender stay: they also carry board invites. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "LinkedIn",
+      "category": "Social",
+      "input": "https://www.linkedin.com/posts/someone_some-post-activity-7250000000000000000-AbCd?utm_source=share&utm_medium=member_android&rcm=ACoAAA1bCdE",
+      "expected": "https://www.linkedin.com/posts/someone_some-post-activity-7250000000000000000-AbCd",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Threads",
+      "category": "Social",
+      "input": "https://www.threads.net/@someone/post/C9AbCdEfGhI?xmt=AQGzAbCdEf&slof=1",
+      "expected": "https://www.threads.net/@someone/post/C9AbCdEfGhI",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Tumblr",
+      "category": "Social",
+      "input": "https://www.tumblr.com/someone/765432109876543210/a-post?source=share",
+      "expected": "https://www.tumblr.com/someone/765432109876543210/a-post?source=share",
+      "verified": null,
+      "notes": "Passed through unchanged: source= also prefills Tumblr's share pages. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Quora",
+      "category": "Social",
+      "input": "https://www.quora.com/What-is-a-question/answer/Someone?ch=10&oid=12345&share=abcd1234&srid=3abc&target_type=answer",
+      "expected": "https://www.quora.com/What-is-a-question/answer/Someone?share=abcd1234&srid=3abc",
+      "verified": null,
+      "notes": "share and srid let a logged-out recipient read it, so they stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Snapchat",
+      "category": "Social",
+      "input": "https://www.snapchat.com/add/someone?share_id=AbCdEf123&locale=en-AU",
+      "expected": "https://www.snapchat.com/add/someone?locale=en-AU",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bluesky",
+      "category": "Social",
+      "input": "https://bsky.app/profile/someone.bsky.social/post/3kabcdefghi2x",
+      "expected": "https://bsky.app/profile/someone.bsky.social/post/3kabcdefghi2x",
+      "verified": null,
+      "notes": "Bluesky share links carry no tracking: passed through unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Mastodon",
+      "category": "Social",
+      "input": "https://aus.social/@someone/113456789012345678",
+      "expected": "https://aus.social/@someone/113456789012345678",
+      "verified": null,
+      "notes": "Mastodon post links carry no tracking: passed through unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Telegram",
+      "category": "Social",
+      "input": "https://t.me/somechannel/1234",
+      "expected": "https://t.me/somechannel/1234",
+      "verified": null,
+      "notes": "Passed through unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "WhatsApp",
+      "category": "Social",
+      "input": "https://whatsapp.com/channel/0029VaAbCdEfGhIjKlMn1234",
+      "expected": "https://whatsapp.com/channel/0029VaAbCdEfGhIjKlMn1234",
+      "verified": null,
+      "notes": "Passed through unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Discord",
+      "category": "Social",
+      "input": "https://discord.gg/AbCdEf12",
+      "expected": "https://discord.gg/AbCdEf12",
+      "verified": null,
+      "notes": "The invite code is the link: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "SoundCloud",
+      "category": "Video & music",
+      "input": "https://soundcloud.com/someartist/some-track?si=0123abcd4567ef89&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
+      "expected": "https://soundcloud.com/someartist/some-track",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Twitch",
+      "category": "Video & music",
+      "input": "https://clips.twitch.tv/SomeClipName-AbCdEf?tt_medium=clips_api&tt_content=url",
+      "expected": "https://clips.twitch.tv/SomeClipName-AbCdEf",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Vimeo",
+      "category": "Video & music",
+      "input": "https://vimeo.com/123456789/abcdef1234?share=copy",
+      "expected": "https://vimeo.com/123456789/abcdef1234",
+      "verified": null,
+      "notes": "The private-video hash in the path must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Vimeo",
+      "category": "Video & music",
+      "input": "https://player.vimeo.com/video/123456789?h=abcdef1234",
+      "expected": "https://player.vimeo.com/video/123456789?h=abcdef1234",
+      "verified": null,
+      "notes": "h= is the private-video hash: must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Netflix",
+      "category": "Video & music",
+      "input": "https://www.netflix.com/title/80100172?s=a&trkid=13747225&trg=cp&clip=81499054",
+      "expected": "https://www.netflix.com/title/80100172?clip=81499054",
+      "verified": null,
+      "notes": "clip= picks the clip and is kept. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Tidal",
+      "category": "Video & music",
+      "input": "https://tidal.com/browse/track/123456789?u",
+      "expected": "https://tidal.com/browse/track/123456789",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Shazam",
+      "category": "Video & music",
+      "input": "https://www.shazam.com/track/123456789/some-song?referrer=share",
+      "expected": "https://www.shazam.com/track/123456789/some-song",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Apple Podcasts",
+      "category": "Video & music",
+      "input": "https://podcasts.apple.com/au/podcast/some-show/id1234567890?i=1000654321098&uo=4",
+      "expected": "https://podcasts.apple.com/au/podcast/some-show/id1234567890?i=1000654321098",
+      "verified": null,
+      "notes": "i= is the episode and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Docs / Drive",
+      "category": "Work & productivity",
+      "input": "https://docs.google.com/document/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/edit?usp=sharing",
+      "expected": "https://docs.google.com/document/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/edit",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Docs / Drive",
+      "category": "Work & productivity",
+      "input": "https://drive.google.com/file/d/1AbCdEf/view?usp=drive_link&resourcekey=0-AbCdEf",
+      "expected": "https://drive.google.com/file/d/1AbCdEf/view?resourcekey=0-AbCdEf",
+      "verified": null,
+      "notes": "resourcekey is needed to open older shared files and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Notion",
+      "category": "Work & productivity",
+      "input": "https://www.notion.so/someone/Some-Page-0123456789abcdef0123456789abcdef?pvs=4",
+      "expected": "https://www.notion.so/someone/Some-Page-0123456789abcdef0123456789abcdef",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Figma",
+      "category": "Work & productivity",
+      "input": "https://www.figma.com/design/AbCdEfGh123/Some-File?node-id=12-34&t=AbCdEfGhIjKl-0",
+      "expected": "https://www.figma.com/design/AbCdEfGh123/Some-File?node-id=12-34",
+      "verified": null,
+      "notes": "node-id picks the frame and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Canva",
+      "category": "Work & productivity",
+      "input": "https://www.canva.com/design/DAGAbCdEf/AbCdEfGhIjKl/view?utm_content=DAGAbCdEf&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h0123abcd",
+      "expected": "https://www.canva.com/design/DAGAbCdEf/AbCdEfGhIjKl/view",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Dropbox",
+      "category": "Work & productivity",
+      "input": "https://www.dropbox.com/scl/fi/abc123/file.pdf?rlkey=xyz789&dl=0",
+      "expected": "https://www.dropbox.com/scl/fi/abc123/file.pdf?rlkey=xyz789&dl=0",
+      "verified": null,
+      "notes": "rlkey and dl are needed: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Zoom",
+      "category": "Work & productivity",
+      "input": "https://us02web.zoom.us/j/81234567890?pwd=AbCdEfGhIjKlMnOp.1",
+      "expected": "https://us02web.zoom.us/j/81234567890?pwd=AbCdEfGhIjKlMnOp.1",
+      "verified": null,
+      "notes": "pwd is the meeting password: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Microsoft Teams",
+      "category": "Work & productivity",
+      "input": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_AbCd%40thread.v2/0?context=%7b%22Tid%22%3a%22abc%22%7d",
+      "expected": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_AbCd%40thread.v2/0?context=%7b%22Tid%22%3a%22abc%22%7d",
+      "verified": null,
+      "notes": "Every param is needed: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "GitHub",
+      "category": "Work & productivity",
+      "input": "https://github.com/DavinKaru/Lint/pull/27?notification_referrer_id=NT_abc",
+      "expected": "https://github.com/DavinKaru/Lint/pull/27?notification_referrer_id=NT_abc",
+      "verified": null,
+      "notes": "Passed through unchanged; GitHub's own params are under review in #15. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "eBay",
+      "category": "Shopping",
+      "input": "https://www.ebay.com.au/itm/123456789012?var=987654321&_trkparms=amclksrc%3DITM&_trksid=p4429486.c101224&ssspo=AbCd&sssrc=2047675&ssuid=xyz&widget_ver=artemis",
+      "expected": "https://www.ebay.com.au/itm/123456789012?var=987654321",
+      "verified": null,
+      "notes": "var= picks the variation and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "AliExpress",
+      "category": "Shopping",
+      "input": "https://www.aliexpress.com/item/1005001234567890.html?spm=a2g0o.productlist.main.1.abc&algo_pvid=abc-123&aff_platform=link-c-tool&sk=_dAbCdE&gatewayAdapt=glo2aus&pdp_npi=4%40dis%21AUD%2110.00",
+      "expected": "https://www.aliexpress.com/item/1005001234567890.html?pdp_npi=4%40dis%21AUD%2110.00",
+      "verified": null,
+      "notes": "pdp_npi can carry the price shown and is kept. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Etsy",
+      "category": "Shopping",
+      "input": "https://www.etsy.com/au/listing/1234567890/a-handmade-thing?click_key=abc123&click_sum=def456&ga_search_query=thing&ref=search_grid-1&sts=1&variation0=111222333",
+      "expected": "https://www.etsy.com/au/listing/1234567890/a-handmade-thing?variation0=111222333",
+      "verified": null,
+      "notes": "variation0 picks the option and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Shein",
+      "category": "Shopping",
+      "input": "https://au.shein.com/Some-Dress-p-12345678.html?mallCode=1&src_identifier=on%3DIMAGE&src_module=Women&src_tab_page_id=page_home123&scici=navbar_WomenHomePage~~tab01",
+      "expected": "https://au.shein.com/Some-Dress-p-12345678.html?mallCode=1",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Temu",
+      "category": "Shopping",
+      "input": "https://www.temu.com/au/some-item-g-601099512345678.html?_x_sessn_id=abc123&refer_page_name=home&refer_page_id=10005_1700000000000_abc&refer_page_sn=10005&share_uin=AbCdEfGh&_x_ns_sku_id=17592186044416",
+      "expected": "https://www.temu.com/au/some-item-g-601099512345678.html?_x_ns_sku_id=17592186044416",
+      "verified": null,
+      "notes": "_x_ns_sku_id picks the variant and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Walmart",
+      "category": "Shopping",
+      "input": "https://www.walmart.com/ip/Some-Product/123456789?classType=VARIANT&athbdg=L1600&athcpid=123456789&athpgid=AthenaItempage&athznid=si",
+      "expected": "https://www.walmart.com/ip/Some-Product/123456789?classType=VARIANT",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Target",
+      "category": "Shopping",
+      "input": "https://www.target.com/p/some-product/-/A-12345678?preselect=87654321&utm_source=share&utm_medium=ios",
+      "expected": "https://www.target.com/p/some-product/-/A-12345678?preselect=87654321",
+      "verified": null,
+      "notes": "preselect picks the variant and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "IKEA",
+      "category": "Shopping",
+      "input": "https://www.ikea.com/au/en/p/billy-bookcase-white-00263850/?utm_source=app&utm_medium=share",
+      "expected": "https://www.ikea.com/au/en/p/billy-bookcase-white-00263850/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Depop",
+      "category": "Shopping",
+      "input": "https://www.depop.com/products/someone-vintage-jacket/?utm_source=depop&utm_medium=share",
+      "expected": "https://www.depop.com/products/someone-vintage-jacket/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Vinted",
+      "category": "Shopping",
+      "input": "https://www.vinted.com.au/items/1234567890-some-jacket?referrer=catalog&homepage_session_id=abc-123",
+      "expected": "https://www.vinted.com.au/items/1234567890-some-jacket",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "DoorDash",
+      "category": "Shopping",
+      "input": "https://www.doordash.com/store/some-restaurant-sydney-123456/?utm_source=mx_share&utm_medium=app",
+      "expected": "https://www.doordash.com/store/some-restaurant-sydney-123456/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Uber Eats",
+      "category": "Shopping",
+      "input": "https://www.ubereats.com/au/store/some-restaurant/AbCdEfGhIjKlMnOp?diningMode=DELIVERY&utm_source=share",
+      "expected": "https://www.ubereats.com/au/store/some-restaurant/AbCdEfGhIjKlMnOp?diningMode=DELIVERY",
+      "verified": null,
+      "notes": "diningMode is kept. The pl= param, which can encode the delivery location, is left for a real-share check. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook Marketplace",
+      "category": "Shopping",
+      "input": "https://www.facebook.com/marketplace/item/1234567890123456/?ref=share_attachment&referral_code=marketplace_top_picks&referral_story_type=top_picks&tracking=browse_serp%3Aabc&mibextid=AbCdEf",
+      "expected": "https://www.facebook.com/marketplace/item/1234567890123456/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Woolworths (AU)",
+      "category": "Shopping",
+      "input": "https://www.woolworths.com.au/shop/productdetails/123456/some-product?utm_source=app&utm_medium=share",
+      "expected": "https://www.woolworths.com.au/shop/productdetails/123456/some-product",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Coles (AU)",
+      "category": "Shopping",
+      "input": "https://www.coles.com.au/product/some-product-1234567?utm_source=app&utm_medium=share",
+      "expected": "https://www.coles.com.au/product/some-product-1234567",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Kmart (AU)",
+      "category": "Shopping",
+      "input": "https://www.kmart.com.au/product/some-product-43210000/?utm_source=share",
+      "expected": "https://www.kmart.com.au/product/some-product-43210000/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Big W (AU)",
+      "category": "Shopping",
+      "input": "https://www.bigw.com.au/product/some-product/p/123456?utm_source=share&utm_medium=app",
+      "expected": "https://www.bigw.com.au/product/some-product/p/123456",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bunnings (AU)",
+      "category": "Shopping",
+      "input": "https://www.bunnings.com.au/some-drill_p0123456?utm_source=share",
+      "expected": "https://www.bunnings.com.au/some-drill_p0123456",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "JB Hi-Fi (AU)",
+      "category": "Shopping",
+      "input": "https://www.jbhifi.com.au/products/some-headphones?utm_source=share&gclid=AbCd",
+      "expected": "https://www.jbhifi.com.au/products/some-headphones",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Catch (AU)",
+      "category": "Shopping",
+      "input": "https://www.catch.com.au/product/some-product-1234567/?offer_id=7654321&utm_source=share",
+      "expected": "https://www.catch.com.au/product/some-product-1234567/?offer_id=7654321",
+      "verified": null,
+      "notes": "offer_id picks the seller offer and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "The Iconic (AU)",
+      "category": "Shopping",
+      "input": "https://www.theiconic.com.au/some-sneakers-1234567.html?utm_source=share",
+      "expected": "https://www.theiconic.com.au/some-sneakers-1234567.html",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Booktopia (AU)",
+      "category": "Shopping",
+      "input": "https://www.booktopia.com.au/some-book-someone/book/9781234567890.html?utm_source=share",
+      "expected": "https://www.booktopia.com.au/some-book-someone/book/9781234567890.html",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Gumtree (AU)",
+      "category": "Shopping",
+      "input": "https://www.gumtree.com.au/s-ad/sydney/bikes/some-bike/1312345678?utm_source=share",
+      "expected": "https://www.gumtree.com.au/s-ad/sydney/bikes/some-bike/1312345678",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Domain (AU)",
+      "category": "Shopping",
+      "input": "https://www.domain.com.au/12-some-street-suburb-nsw-2000-2012345678?utm_source=share",
+      "expected": "https://www.domain.com.au/12-some-street-suburb-nsw-2000-2012345678",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "realestate.com.au (AU)",
+      "category": "Shopping",
+      "input": "https://www.realestate.com.au/property-house-nsw-suburb-141234567?sourcePage=rea:p4ep:property-details&sourceElement=share",
+      "expected": "https://www.realestate.com.au/property-house-nsw-suburb-141234567?sourcePage=rea:p4ep:property-details&sourceElement=share",
+      "verified": null,
+      "notes": "Passed through unchanged: sourcePage and sourceElement are under review rather than guessed at. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Menulog (AU)",
+      "category": "Shopping",
+      "input": "https://www.menulog.com.au/restaurants-some-place-sydney/menu?utm_source=share",
+      "expected": "https://www.menulog.com.au/restaurants-some-place-sydney/menu",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "BBC",
+      "category": "News & newsletters",
+      "input": "https://www.bbc.com/news/articles/c0abcdefgh1o?at_medium=RSS&at_campaign=rss&at_link_id=abc&at_link_origin=BBC_News",
+      "expected": "https://www.bbc.com/news/articles/c0abcdefgh1o",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "The Guardian",
+      "category": "News & newsletters",
+      "input": "https://www.theguardian.com/australia-news/2026/nov/12/some-story?CMP=share_btn_url",
+      "expected": "https://www.theguardian.com/australia-news/2026/nov/12/some-story",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "NYTimes",
+      "category": "News & newsletters",
+      "input": "https://www.nytimes.com/2026/11/12/world/some-story.html?unlocked_article_code=1.AbC.DeFg.HiJkLmNo&smid=url-share",
+      "expected": "https://www.nytimes.com/2026/11/12/world/some-story.html?unlocked_article_code=1.AbC.DeFg.HiJkLmNo",
+      "verified": null,
+      "notes": "unlocked_article_code is the gift that lets a non-subscriber read it: must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bloomberg",
+      "category": "News & newsletters",
+      "input": "https://www.bloomberg.com/news/articles/2026-11-12/some-story?sref=AbCdEfGh",
+      "expected": "https://www.bloomberg.com/news/articles/2026-11-12/some-story?sref=AbCdEfGh",
+      "verified": null,
+      "notes": "sref is the gift token: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Medium",
+      "category": "News & newsletters",
+      "input": "https://medium.com/@someone/some-post-0123456789ab?sk=0123456789abcdef0123456789abcdef",
+      "expected": "https://medium.com/@someone/some-post-0123456789ab?sk=0123456789abcdef0123456789abcdef",
+      "verified": null,
+      "notes": "sk is the friend link that skips the paywall: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "ABC News (AU)",
+      "category": "News & newsletters",
+      "input": "https://www.abc.net.au/news/2026-11-12/some-story/104512345?utm_campaign=abc_news_web&utm_content=link&utm_medium=content_shared&utm_source=abc_news_web",
+      "expected": "https://www.abc.net.au/news/2026-11-12/some-story/104512345",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "SBS (AU)",
+      "category": "News & newsletters",
+      "input": "https://www.sbs.com.au/news/article/some-story/abc123?utm_source=share",
+      "expected": "https://www.sbs.com.au/news/article/some-story/abc123",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "news.com.au (AU)",
+      "category": "News & newsletters",
+      "input": "https://www.news.com.au/national/some-story/news-story/0123456789abcdef0123456789abcdef?utm_source=share",
+      "expected": "https://www.news.com.au/national/some-story/news-story/0123456789abcdef0123456789abcdef",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "9News (AU)",
+      "category": "News & newsletters",
+      "input": "https://www.9news.com.au/national/some-story/0a1b2c3d-1234?utm_source=share",
+      "expected": "https://www.9news.com.au/national/some-story/0a1b2c3d-1234",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "7NEWS (AU)",
+      "category": "News & newsletters",
+      "input": "https://7news.com.au/news/some-story-c-12345678?utm_source=share",
+      "expected": "https://7news.com.au/news/some-story-c-12345678",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google News",
+      "category": "News & newsletters",
+      "input": "https://news.google.com/stories/CAAqNggKIjBDQklTSGpvSmMzUnZjbmt0TXpZd1NoRUtEd2pVLUpfakJ4R29RM0VqQmprcUFDZ0FQAQ?hl=en-AU&gl=AU&ceid=AU%3Aen",
+      "expected": "https://news.google.com/stories/CAAqNggKIjBDQklTSGpvSmMzUnZjbmt0TXpZd1NoRUtEd2pVLUpfakJ4R29RM0VqQmprcUFDZ0FQAQ?hl=en-AU&gl=AU&ceid=AU%3Aen",
+      "verified": null,
+      "notes": "hl, gl and ceid pick the edition: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Apple News",
+      "category": "News & newsletters",
+      "input": "https://apple.news/AbCdEfGhIjKlMnOpQrStUv",
+      "expected": "https://apple.news/AbCdEfGhIjKlMnOpQrStUv",
+      "verified": null,
+      "notes": "Passed through unchanged; apple.news resolves in the browser, not by HTTP redirect. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Beehiiv",
+      "category": "News & newsletters",
+      "input": "https://newsletter.example.com/p/some-issue?_bhlid=0123456789abcdef0123456789abcdef01234567&utm_source=newsletter.example.com",
+      "expected": "https://newsletter.example.com/p/some-issue",
+      "verified": null,
+      "notes": "Beehiiv newsletters run on their own domains, so _bhlid is stripped everywhere. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Meetup",
+      "category": "Events & travel",
+      "input": "https://www.meetup.com/some-group/events/301234567/?recId=abc-123&recSource=ml-popular-events&searchId=def-456&eventOrigin=find_page%24all",
+      "expected": "https://www.meetup.com/some-group/events/301234567/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Ticketmaster",
+      "category": "Events & travel",
+      "input": "https://www.ticketmaster.com.au/some-artist-tickets/artist/123456?utm_source=share&utm_medium=app",
+      "expected": "https://www.ticketmaster.com.au/some-artist-tickets/artist/123456",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Ticketek (AU)",
+      "category": "Events & travel",
+      "input": "https://premier.ticketek.com.au/shows/show.aspx?sh=SOMESHOW26&utm_source=share",
+      "expected": "https://premier.ticketek.com.au/shows/show.aspx?sh=SOMESHOW26",
+      "verified": null,
+      "notes": "sh= picks the show and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Moshtix (AU)",
+      "category": "Events & travel",
+      "input": "https://www.moshtix.com.au/v2/event/some-gig/123456?utm_source=share",
+      "expected": "https://www.moshtix.com.au/v2/event/some-gig/123456",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Humanitix (AU)",
+      "category": "Events & travel",
+      "input": "https://events.humanitix.com/some-event?utm_source=share",
+      "expected": "https://events.humanitix.com/some-event",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Tripadvisor",
+      "category": "Events & travel",
+      "input": "https://www.tripadvisor.com.au/Restaurant_Review-g255060-d1234567-Reviews-Some_Place-Sydney_New_South_Wales.html?m=19905",
+      "expected": "https://www.tripadvisor.com.au/Restaurant_Review-g255060-d1234567-Reviews-Some_Place-Sydney_New_South_Wales.html?m=19905",
+      "verified": null,
+      "notes": "Passed through unchanged: m= is under review rather than guessed at. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "GetYourGuide / Klook",
+      "category": "Events & travel",
+      "input": "https://www.klook.com/en-AU/activity/12345-some-tour-sydney/?spm=Home.SearchSuggest_LIST&clickId=abc123",
+      "expected": "https://www.klook.com/en-AU/activity/12345-some-tour-sydney/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Apple Maps",
+      "category": "Maps & ride-share",
+      "input": "https://maps.apple.com/?address=1%20Some%20St,%20Sydney%20NSW%202000&ll=-33.86,151.21&q=Some%20Place",
+      "expected": "https://maps.apple.com/?address=1%20Some%20St,%20Sydney%20NSW%202000&ll=-33.86,151.21&q=Some%20Place",
+      "verified": null,
+      "notes": "Every param places the pin: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Waze",
+      "category": "Maps & ride-share",
+      "input": "https://waze.com/ul?ll=-33.8688,151.2093&navigate=yes&utm_source=waze_app&utm_campaign=default",
+      "expected": "https://waze.com/ul?ll=-33.8688,151.2093&navigate=yes",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Yelp",
+      "category": "Maps & ride-share",
+      "input": "https://www.yelp.com.au/biz/some-cafe-sydney?uid=AbCdEfGhIjKlMnOpQrStUv&utm_campaign=www_business_share_popup&utm_medium=copy_link&utm_source=(direct)",
+      "expected": "https://www.yelp.com.au/biz/some-cafe-sydney",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Deezer",
+      "category": "Video & music",
+      "input": "https://www.deezer.com/en/track/123456789?host=0&deferredFl=1&utm_source=deezer&utm_content=track-123456789&utm_medium=mobile",
+      "expected": "https://www.deezer.com/en/track/123456789",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Seek (AU)",
+      "category": "Work & productivity",
+      "input": "https://www.seek.com.au/job/80123456?type=standout&ref=search-standalone",
+      "expected": "https://www.seek.com.au/job/80123456?type=standout",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "Found this https://www.bing.com/ck/a?!&&p=0123abcd&ptn=3&u=a1aHR0cHM6Ly93d3cuZXhhbXBsZS5jb20uYXUvc29tZS1wYWdlP2lkPTQyJnV0bV9zb3VyY2U9YmluZw&ntb=1",
+      "expected": "Found this https://www.example.com.au/some-page?id=42",
+      "verified": null,
+      "notes": "Unwrapped, then the inner link is cleaned. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Flipboard",
+      "category": "News & newsletters",
+      "input": "https://flipboard.com/@someone/some-magazine-a1b2c3d4z?utm_source=share&utm_medium=ios",
+      "expected": "https://flipboard.com/@someone/some-magazine-a1b2c3d4z",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Mailchimp click links",
+      "category": "News & newsletters",
+      "input": "https://shop.example.com.au/sale?utm_source=newsletter&utm_campaign=spring&mc_cid=a1b2c3d4e5&mc_eid=f6e5d4c3b2",
+      "expected": "https://shop.example.com.au/sale",
+      "verified": null,
+      "notes": "Where a resolved list-manage.com click link lands: mc_cid and mc_eid identify the campaign and subscriber. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com.au/s?keywords=usb+c+cable&crid=2ABCDEF&sprefix=usb%2Caps%2C250&ref=nb_sb_noss",
+      "expected": "https://www.amazon.com.au/s?keywords=usb+c+cable",
+      "verified": null,
+      "notes": "On a search link keywords is the query and must stay. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Google Maps short links",
+      "category": "Maps & ride-share",
+      "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&hl=en",
+      "expected": "https://www.google.com/maps/place/Sydney+Opera+House/@-33.85,151.21,17z?entry=ttu",
+      "verified": null,
+      "notes": "Unwrapped from the consent page, then g_st stripped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     }
   ],
   "shortLinks": [
@@ -310,6 +1321,240 @@
       "url": "https://d.didiglobal.com/xxxxxxx",
       "known": false,
       "notes": "Deliberately not resolved for now (#5)."
+    },
+    {
+      "source": "Google Maps",
+      "url": "https://maps.app.goo.gl/AbCdEfGhIjKlMn123",
+      "known": true
+    },
+    {
+      "source": "Reddit",
+      "url": "https://redd.it/1abcd2e",
+      "known": true
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/r/melbourne/s/AbCdEf1234",
+      "known": true,
+      "notes": "App share link: a short link on a path of reddit.com."
+    },
+    {
+      "source": "Reddit",
+      "url": "https://reddit.com/r/melbourne/s/AbCdEf1234/",
+      "known": true,
+      "notes": "Trailing slash and no www."
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/",
+      "known": false,
+      "notes": "A full post link isn't a short link."
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/r/s/s/x/extra",
+      "known": false,
+      "notes": "Extra segments don't match."
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/share/p/1AbCdEfGh/",
+      "known": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/share/1AbCdEfGh/",
+      "known": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/someone/posts/123",
+      "known": false
+    },
+    {
+      "source": "Lookalike",
+      "url": "https://notreddit.com/r/x/s/abc",
+      "known": false
+    },
+    {
+      "source": "Pinterest",
+      "url": "https://pin.it/AbCdEf12",
+      "known": true
+    },
+    {
+      "source": "LinkedIn",
+      "url": "https://lnkd.in/gAbCdEf",
+      "known": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://fb.me/abc123",
+      "known": true
+    },
+    {
+      "source": "SoundCloud",
+      "url": "https://on.soundcloud.com/AbCdEf",
+      "known": true
+    },
+    {
+      "source": "eBay",
+      "url": "https://ebay.us/AbCdEf",
+      "known": true
+    },
+    {
+      "source": "AliExpress",
+      "url": "https://a.aliexpress.com/_mAbCdEf",
+      "known": true
+    },
+    {
+      "source": "Flipboard",
+      "url": "https://flip.it/AbCdEf",
+      "known": true
+    },
+    {
+      "source": "Deezer",
+      "url": "https://link.deezer.com/s/AbCdEfGh",
+      "known": true
+    },
+    {
+      "source": "Mailchimp",
+      "url": "https://example.us12.list-manage.com/track/click?u=0123abcd&id=4567ef&e=89abcd",
+      "known": true
+    },
+    {
+      "source": "Mailchimp",
+      "url": "https://example.us12.list-manage.com/subscribe?u=0123abcd&id=4567ef",
+      "known": false
+    },
+    {
+      "source": "Mailchimp",
+      "url": "https://list-manage.com.evil.example/track/click?u=1",
+      "known": false
+    },
+    {
+      "source": "YouTube",
+      "url": "https://www.google.com/url?q=https://youtu.be/dQw4w9WgXcQ&sa=D",
+      "known": true,
+      "notes": "A short link inside a redirect link is unwrapped first, then resolved."
+    },
+    {
+      "source": "Facebook (remaining)",
+      "url": "https://www.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Fshare%2Fp%2FAbCdEf%2F",
+      "known": true,
+      "notes": "A sign-in page wrapping a share link is unwrapped to the share link."
+    }
+  ],
+  "unwrap": [
+    {
+      "source": "Gmail / Google Docs",
+      "input": "https://www.google.com/url?q=https://youtu.be/dQw4w9WgXcQ?si%3Dabc&sa=D",
+      "expected": "https://youtu.be/dQw4w9WgXcQ?si=abc",
+      "notes": "Unwrapped before the short-link check, so the youtu.be link inside still gets resolved."
+    },
+    {
+      "source": "Facebook",
+      "input": "https://l.facebook.com/l.php?u=https%3A%2F%2Ft.co%2Fabc123&h=AT0",
+      "expected": "https://t.co/abc123"
+    },
+    {
+      "source": "Generic",
+      "input": "https://example.com/?u=https%3A%2F%2Fother.com",
+      "expected": "https://example.com/?u=https%3A%2F%2Fother.com",
+      "notes": "Not a known wrapper: unchanged."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&ptn=3&ver=2&hsh=4&fclid=1a2b3c4d&u=a1aHR0cHM6Ly93d3cuZXhhbXBsZS5jb20uYXUvc29tZS1wYWdlP2lkPTQyJnV0bV9zb3VyY2U9YmluZw&ntb=1",
+      "expected": "https://www.example.com.au/some-page?id=42&utm_source=bing",
+      "verified": null,
+      "notes": "u= is \"a1\" plus base64url. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1aHR0cHM6Ly93d3cuZXhhbXBsZS5jb20vw7xuw69jb2RlL3BhdGg&ntb=1",
+      "expected": "https://www.example.com/ünïcode/path",
+      "verified": null,
+      "notes": "Non-ASCII in the decoded link survives. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1!!notbase64&ntb=1",
+      "expected": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1!!notbase64&ntb=1",
+      "verified": null,
+      "notes": "Malformed base64 is left alone rather than guessed at."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&u=https%3A%2F%2Fexample.com%2F&ntb=1",
+      "expected": "https://www.bing.com/ck/a?!&&p=0123abcd&u=https%3A%2F%2Fexample.com%2F&ntb=1",
+      "verified": null,
+      "notes": "Without the a1 prefix it isn't Bing's format, so it's left alone."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1amF2YXNjcmlwdDphbGVydCgxKQ&ntb=1",
+      "expected": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1amF2YXNjcmlwdDphbGVydCgxKQ&ntb=1",
+      "verified": null,
+      "notes": "Only http(s) links are unwrapped."
+    },
+    {
+      "source": "Google Maps short links",
+      "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&m=0&pc=m&uxe=eomtm&cm=2&hl=en&src=1",
+      "expected": "https://www.google.com/maps/place/Sydney+Opera+House/@-33.85,151.21,17z?entry=ttu&g_st=ic",
+      "notes": "Where a resolved maps.app.goo.gl link can land on a cookie-less device. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook (remaining)",
+      "input": "https://www.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Fsomeone%2Fposts%2Fpfbid0AbCdEf",
+      "expected": "https://www.facebook.com/someone/posts/pfbid0AbCdEf",
+      "notes": "Where a resolved Facebook short link can land when not signed in. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook (remaining)",
+      "input": "https://www.facebook.com/login/?next=%2Fsomeone%2Fposts%2F1",
+      "expected": "https://www.facebook.com/login/?next=%2Fsomeone%2Fposts%2F1",
+      "notes": "A relative next= isn't a full link, so it's left alone."
+    },
+    {
+      "source": "AliExpress",
+      "input": "https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005001234567890.html%3FsourceType%3D1%26spm%3Dabc",
+      "expected": "https://www.aliexpress.com/item/1005001234567890.html?sourceType=1&spm=abc",
+      "notes": "Where a.aliexpress.com share links land; the inner link is cleaned afterwards. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook (remaining)",
+      "input": "https://www.facebook.com/login/?next=https%3A%2F%2Fevil.example%2Fphish",
+      "expected": "https://www.facebook.com/login/?next=https%3A%2F%2Fevil.example%2Fphish",
+      "notes": "Facebook's sign-in page only continues to Facebook, so an outside next= is left alone rather than made into a direct link."
+    },
+    {
+      "source": "Google Maps short links",
+      "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fevil.example%2Fphish&gl=AU",
+      "expected": "https://consent.google.com/ml?continue=https%3A%2F%2Fevil.example%2Fphish&gl=AU",
+      "notes": "Google's consent page only continues to Google's own sites, so an outside continue= is left alone."
+    },
+    {
+      "source": "AliExpress",
+      "input": "https://star.aliexpress.com/share/share.htm?redirectUrl=https%3A%2F%2Fevil.example%2Fphish",
+      "expected": "https://star.aliexpress.com/share/share.htm?redirectUrl=https%3A%2F%2Fevil.example%2Fphish",
+      "notes": "AliExpress's share page is only unwrapped to AliExpress links."
+    },
+    {
+      "source": "Gmail / Google Docs",
+      "input": "https://www.google.com/url?q=https://example.com/%E2%80%AEtxt.exe&sa=D",
+      "expected": "https://www.google.com/url?q=https://example.com/%E2%80%AEtxt.exe&sa=D",
+      "notes": "U+202E (right-to-left override) would disguise the link, so it isn't unwrapped."
+    },
+    {
+      "source": "Gmail / Google Docs",
+      "input": "https://www.google.com/url?q=https%3A%2F%2Fexample.com%2F%٣F&sa=D",
+      "expected": "https://www.google.com/url?q=https%3A%2F%2Fexample.com%2F%٣F&sa=D",
+      "notes": "Only ASCII hex digits count in a percent escape; this one is malformed, so it's left alone."
     }
   ]
 }

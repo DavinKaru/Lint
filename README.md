@@ -11,7 +11,7 @@ Links shared from social apps, search engines, and news sites are routinely deco
 Lint has no visible UI beyond the OS share sheet:
 1. You tap "Share" on a link in any app.
 2. You pick Lint from the share sheet.
-3. Lint strips known tracking parameters from the URL.
+3. Lint unwraps known redirect links (like Gmail's `google.com/url?q=…` or Facebook's `l.facebook.com`) to the real link, then strips known tracking parameters from it.
 4. The OS share sheet reopens with the cleaned link, ready to send wherever you originally intended.
 
 The one exception: for known short links, Lint briefly shows a small loading screen while it resolves the short link's real destination on-device — everything else stays instant with no UI of Lint's own (on iOS, the system shows Lint's sheet behind the re-opened share sheet). See [`PRIVACY.md`](PRIVACY.md) for exactly which domains, what that involves, and why it's safe.

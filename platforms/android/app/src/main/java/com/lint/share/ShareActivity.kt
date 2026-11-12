@@ -32,9 +32,12 @@ class ShareActivity : Activity() {
         }
 
         val urlMatch = UrlCleaner.findFirstUrl(sharedText)
+        // Peel off redirect wrappers first (offline), so a short link hidden inside one, e.g. a
+        // youtu.be link in a Gmail google.com/url?q=... link, still gets resolved.
+        val targetUrl = urlMatch?.let { UrlCleaner.unwrap(it.url) }
 
-        if (urlMatch != null && ShortLinkResolver.isKnownShortLink(urlMatch.url)) {
-            Log.d(TAG, "known short link detected, resolving: ${urlMatch.url}")
+        if (urlMatch != null && targetUrl != null && ShortLinkResolver.isKnownShortLink(targetUrl)) {
+            Log.d(TAG, "known short link detected, resolving: $targetUrl")
             // Overlays the theme with the user's system/wallpaper palette (Android 12+); a
             // no-op on older versions, which just keep Material3's static baseline colors.
             DynamicColors.applyToActivityIfAvailable(this)
@@ -49,8 +52,8 @@ class ShareActivity : Activity() {
             // redirect to the full URL, so resolve first. Runs off the main thread since it
             // hits the network; every other link below completes with no thread hop and no UI.
             Thread {
-                val resolvedUrl = ShortLinkResolver.resolveOverNetwork(urlMatch.url)
-                if (resolvedUrl == urlMatch.url) {
+                val resolvedUrl = ShortLinkResolver.resolveOverNetwork(targetUrl)
+                if (resolvedUrl == targetUrl) {
                     Log.w(TAG, "resolution failed or timed out, falling back to original short link")
                 } else {
                     Log.d(TAG, "resolved to: $resolvedUrl")

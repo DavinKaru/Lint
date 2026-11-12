@@ -33,6 +33,20 @@ class SharedLinkCasesTest {
     }
 
     @Test
+    fun `unwraps every shared unwrap case`() {
+        val unwrap = cases.getJSONArray("unwrap")
+        assertTrue("no unwrap cases found", unwrap.length() > 0)
+
+        val failures = (0 until unwrap.length()).map { unwrap.getJSONObject(it) }.mapNotNull { case ->
+            val actual = UrlCleaner.unwrap(case.getString("input"))
+            val expected = case.getString("expected")
+            if (actual == expected) null
+            else "${case.getString("source")}:\n  input:    ${case.getString("input")}\n  expected: $expected\n  actual:   $actual"
+        }
+        assertEquals("Failing shared unwrap cases:\n" + failures.joinToString("\n"), 0, failures.size)
+    }
+
+    @Test
     fun `matches every shared short link case`() {
         val shortLinks = cases.getJSONArray("shortLinks")
         assertTrue("no short link cases found", shortLinks.length() > 0)
@@ -40,7 +54,7 @@ class SharedLinkCasesTest {
         val failures = (0 until shortLinks.length()).map { shortLinks.getJSONObject(it) }.mapNotNull { case ->
             val url = case.getString("url")
             val expected = case.getBoolean("known")
-            if (ShortLinkResolver.isKnownShortLink(url) == expected) null
+            if (ShortLinkResolver.isKnownShortLink(UrlCleaner.unwrap(url)) == expected) null
             else "${case.getString("source")}: $url should ${if (expected) "" else "not "}be a known short link"
         }
         assertEquals("Failing shared short link cases:\n" + failures.joinToString("\n"), 0, failures.size)
