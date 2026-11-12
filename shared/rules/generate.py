@@ -29,6 +29,7 @@ def fail(message: str) -> None:
 def validate(rules: dict) -> None:
     """Catches the mistakes that would silently break links or drift."""
     check_literals(rules)
+    check_keys(rules)
     params = [p for group in rules["trackingParams"] for p in group["params"]]
     prefixes = [p for group in rules["trackingPrefixes"] for p in group["prefixes"]]
     hosts = [h for group in rules["shortLinkHosts"] for h in group["hosts"]]
@@ -80,8 +81,12 @@ def validate(rules: dict) -> None:
             fail(f'redirect wrapper "{label}": targetSites, when given, must not be empty')
     check_listed_once(rules.get("redirectWrappers", []), lambda g: [(s, p) for s in g["sites"] for p in g["paths"]], "redirect wrappers listed twice")
     check_listed_once(rules.get("pathWrappers", []), lambda g: [(s, g["prefix"]) for s in g["sites"]], "path wrappers listed twice")
-    check_listed_once([g for g in rules["siteParams"] if "paths" in g],
-                      lambda g: [(s, p, q) for s in g["sites"] for p in g["paths"] for q in g["params"]], "path-scoped siteParams listed twice")
+    scoped = [(s, normal_path(p), q, g["source"]) for g in rules["siteParams"] if "paths" in g
+              for s in g["sites"] for p in g["paths"] for q in g["params"]]
+    for i, (s1, p1, q1, src1) in enumerate(scoped):
+        for s2, p2, q2, src2 in scoped[i + 1:]:
+            if p1 == p2 and q1 == q2 and sites_overlap(s1, s2):
+                fail(f'path-scoped siteParams listed twice: "{q1}" on {s1} and {s2} {p1} ({src1}, {src2})')
     for section, kind, key in (("shortLinkPaths", "short-link path", "provider"), ("deadEndPages", "dead-end page", "source")):
         for group in rules.get(section, []):
             label = group[key]
@@ -93,7 +98,7 @@ def validate(rules: dict) -> None:
             check_segment_paths(group["paths"], f'{kind} "{label}"')
             if not isinstance(group.get("identifiesYou", False), bool) or ("identifiesYou" in group and section != "shortLinkPaths"):
                 fail(f'{kind} "{label}": identifiesYou should be true or false, and only on shortLinkPaths')
-        check_listed_once(rules.get(section, []), lambda g: [(s, p) for s in g["sites"] for p in g["paths"]], f"{section} listed twice")
+        check_listed_once(rules.get(section, []), lambda g: [(s, normal_path(p)) for s in g["sites"] for p in g["paths"]], f"{section} listed twice")
     for group in rules.get("pathWrappers", []):
         label = group["source"]
         for site in group["sites"]:
@@ -106,8 +111,13 @@ def validate(rules: dict) -> None:
     for group in rules["siteParams"]:
         if "paths" not in group:
             continue
+        if not group["sites"] or not group["params"]:
+            fail(f'siteParams "{group["source"]}" needs sites and params')
+        if any(path.strip("/") == "**" for path in group["paths"]):
+            fail(f'siteParams "{group["source"]}": a "/**" path is the whole site, so leave out paths instead')
         for site in group["sites"]:
-            wide = {p for g in rules["siteParams"] if "paths" not in g and site in g["sites"] for p in g["params"]}
+            wide = {p for g in rules["siteParams"] if "paths" not in g
+                    for s in g["sites"] if sites_overlap(site, s) for p in g["params"]}
             for param in group["params"]:
                 if param in params or param in wide or any(param.startswith(x) for x in prefixes):
                     fail(f'siteParams "{group["source"]}": "{param}" is already stripped everywhere on {site}')
@@ -121,6 +131,48 @@ def check_listed_once(groups: list, keys, message: str) -> None:
         fail(f"{message}: {', '.join(repeated)}")
 
 
+ALLOWED_KEYS = {
+    "trackingPrefixes": {"prefixes", "source", "notes"},
+    "trackingParams": {"params", "source", "notes"},
+    "siteParams": {"sites", "paths", "params", "source", "notes"},
+    "shortLinkHosts": {"hosts", "provider", "notes"},
+    "neverStrip": {"params", "source", "notes"},
+    "redirectWrappers": {"sites", "paths", "params", "base64Prefix", "targetSites", "source", "notes"},
+    "pathWrappers": {"sites", "prefix", "scheme", "source", "notes"},
+    "shortLinkPaths": {"sites", "paths", "identifiesYou", "provider", "notes"},
+    "deadEndPages": {"sites", "paths", "source", "notes"},
+}
+
+
+def check_keys(rules: dict) -> None:
+    """Refuses unknown sections and keys, so a typo (e.g. "path" for "paths") can't silently widen a rule."""
+    for section, groups in rules.items():
+        if section in ("_about", "version"):
+            continue
+        if section not in ALLOWED_KEYS:
+            fail(f'unknown section "{section}"')
+        for group in groups:
+            unknown = sorted(set(group) - ALLOWED_KEYS[section])
+            if unknown:
+                fail(f'{section} "{group.get("source", group.get("provider"))}": unknown key {", ".join(unknown)}')
+
+
+def sites_overlap(a: str, b: str) -> bool:
+    """True if some host could match both site keys (same matching as UrlCleaner.hostMatches)."""
+    def matches(host: str, key: str) -> bool:
+        if not key.endswith(".*"):
+            return host == key or host.endswith("." + key)
+        name = re.escape(key[:-2])
+        return re.fullmatch(rf"(.+\.)?{name}\.(com|[a-z]{{2}}|(com|co)\.[a-z]{{2}})", host) is not None
+    concrete = lambda key: key[:-2] + ".com" if key.endswith(".*") else key
+    return matches(concrete(a), b) or matches(concrete(b), a)
+
+
+def normal_path(path: str) -> str:
+    """A path pattern without its trailing slash, so "/dp/*" and "/dp/*/" compare equal."""
+    return "/" + path.strip("/")
+
+
 def check_segment_paths(paths: list, label: str) -> None:
     """Segment patterns: "/"-separated names, "*" for any one segment, and a final "**" for any rest."""
     if not paths:
@@ -129,6 +181,8 @@ def check_segment_paths(paths: list, label: str) -> None:
         segments = path.strip("/").split("/")
         if not path.startswith("/") or any(not s or ("*" in s and s not in ("*", "**")) for s in segments) or "**" in segments[:-1]:
             fail(f'{label}: "{path}" should be "/"-separated segments, each a name or a whole "*", optionally ending in "**"')
+        if any(c in path for c in "?#%"):
+            fail(f'{label}: "{path}" can\'t contain "?", "#" or "%": paths are matched before the query, still percent-encoded')
 
 
 def check_literals(rules: dict) -> None:
@@ -210,7 +264,7 @@ def kotlin(rules: dict) -> str:
         out.append(f"        {quoted(group['hosts'])},")
     out += ["    )", ""]
 
-    out.append("    /** Short links that live on a path of a normal site; each \"*\" matches one path segment. */")
+    out.append("    /** Short links that live on a path of a normal site (see UrlCleaner.pathMatches). */")
     out.append("    val SHORT_LINK_PATHS: List<ShortLinkPath> = listOf(")
     for group in rules.get("shortLinkPaths", []):
         out += comment_lines(group, "        // ")
@@ -318,7 +372,7 @@ def swift(rules: dict) -> str:
         out.append(f"        {quoted(group['hosts'])},")
     out += ["    ]", ""]
 
-    out.append("    /// Short links that live on a path of a normal site; each \"*\" matches one path segment.")
+    out.append("    /// Short links that live on a path of a normal site (see `UrlCleaner.pathMatches`).")
     out.append("    static let shortLinkPaths: [ShortLinkPath] = [")
     for group in rules.get("shortLinkPaths", []):
         out += comment_lines(group, "        // ")

@@ -241,7 +241,7 @@ internal object GeneratedRules {
         "link.deezer.com",
     )
 
-    /** Short links that live on a path of a normal site; each "*" matches one path segment. */
+    /** Short links that live on a path of a normal site (see UrlCleaner.pathMatches). */
     val SHORT_LINK_PATHS: List<ShortLinkPath> = listOf(
         // Reddit
         //   App share links like reddit.com/r/<sub>/s/<code>; the full post link carries share_id and utm_*.

@@ -602,6 +602,14 @@
       "notes": "A group-board invite: invite_code and sender are the invite and must stay. Written for the test set, not taken from a real share."
     },
     {
+      "source": "Pinterest",
+      "category": "Social",
+      "input": "https://www.pinterest.com/pin/?invite_code=abc123&sender=987654321",
+      "expected": "https://www.pinterest.com/pin/?invite_code=abc123&sender=987654321",
+      "verified": null,
+      "notes": "/pin/ without a pin id isn't a pin page, so the invite params stay. Written for the test set, not taken from a real share."
+    },
+    {
       "source": "LinkedIn",
       "category": "Social",
       "input": "https://www.linkedin.com/posts/someone_some-post-activity-7250000000000000000-AbCd?utm_source=share&utm_medium=member_android&rcm=ACoAAA1bCdE",
@@ -1266,6 +1274,30 @@
       "notes": "The same product page in another language (/-/en/): keywords is stripped like on /dp/ pages, and qid is search tracking. Written for the test set, not taken from a real share."
     },
     {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/dp/B0ABCDEF12?keywords=wireless+mouse&th=1",
+      "expected": "https://www.amazon.com/dp/B0ABCDEF12?th=1",
+      "verified": null,
+      "notes": "A plain /dp/ product link: keywords is the search that found it. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com.au/gp/aw/d/B0ABCDEF12/?keywords=kettle&psc=1",
+      "expected": "https://www.amazon.com.au/gp/aw/d/B0ABCDEF12/?psc=1",
+      "verified": null,
+      "notes": "The mobile /gp/aw/d/ product link. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/dp/?keywords=kettle",
+      "expected": "https://www.amazon.com/dp/?keywords=kettle",
+      "verified": null,
+      "notes": "/dp/ without a product isn't a product page, so keywords stays. Written for the test set, not taken from a real share."
+    },
+    {
       "source": "Google Maps short links",
       "category": "Maps & ride-share",
       "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&hl=en",
@@ -1474,6 +1506,11 @@
       "url": "https://www.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Fshare%2Fp%2FAbCdEf%2F",
       "known": true,
       "notes": "A sign-in page wrapping a share link is unwrapped to the share link."
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/r//s/abc123",
+      "known": false
     }
   ],
   "unwrap": [
@@ -1688,6 +1725,41 @@
     {
       "source": "Lookalike",
       "url": "https://login.example.com/login/",
+      "deadEnd": false
+    },
+    {
+      "source": "LinkedIn",
+      "url": "https://www.linkedin.com/login?session_redirect=%2Ffeed%2F",
+      "deadEnd": true
+    },
+    {
+      "source": "LinkedIn",
+      "url": "https://www.linkedin.com/uas/login?session_redirect=%2Ffeed%2F",
+      "deadEnd": true
+    },
+    {
+      "source": "X",
+      "url": "https://x.com/login",
+      "deadEnd": true
+    },
+    {
+      "source": "X",
+      "url": "https://twitter.com/i/flow/login?redirect_after_login=%2Fexample%2Fstatus%2F1",
+      "deadEnd": true
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/account/login/?dest=%2Fr%2Fexample%2F",
+      "deadEnd": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/LOGIN/",
+      "deadEnd": false
+    },
+    {
+      "source": "Google",
+      "url": "https://accounts.google.com.evil.example/ServiceLogin",
       "deadEnd": false
     }
   ]

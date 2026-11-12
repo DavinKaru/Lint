@@ -17,7 +17,7 @@ assert every case, so a rule change that breaks a case fails on both. It's also 
 - **`deadEnds`**: whether a URL is a sign-in or consent page that resolving a short link stops
   before (`isDeadEnd`). Ordinary pages on the same sites belong here too, as `deadEnd: false`.
 
-Each case records its `source` (the app or site), `category` (the same categories as the
+Each case records its `source` (the app or site); `clean` cases also record `category` (the same categories as the
 [Link support board](https://github.com/users/DavinKaru/projects/1)), `verified` (the date it was
 last checked against a real share from the app, or `null` for cases written from documentation
 or by hand) and optional `notes`.

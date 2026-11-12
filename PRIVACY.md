@@ -7,7 +7,7 @@ all. There is one deliberate, narrow exception.
 
 Some tracking parameters only appear after a short link redirects to its full destination — the
 short link itself carries none. To clean those, Lint needs to know the destination first. When a
-shared link's host is exactly one of the domains below (or, for the few listed share paths, its host and path match exactly), `ShortLinkResolver` follows the redirect
+shared link's host is exactly one of the domains below (or, for the few listed share paths, its host and path match that path's pattern), `ShortLinkResolver` follows the redirect
 before cleaning.
 
 This table is the single source of truth for which domains Lint resolves — nothing else in this
