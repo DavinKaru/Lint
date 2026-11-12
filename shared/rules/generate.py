@@ -29,10 +29,12 @@ def fail(message: str) -> None:
 def validate(rules: dict) -> None:
     """Catches the mistakes that would silently break links or drift."""
     check_literals(rules)
+    check_keys(rules)
     params = [p for group in rules["trackingParams"] for p in group["params"]]
     prefixes = [p for group in rules["trackingPrefixes"] for p in group["prefixes"]]
     hosts = [h for group in rules["shortLinkHosts"] for h in group["hosts"]]
-    sites = [s for group in rules["siteParams"] for s in group["sites"]]
+    # A site can have one site-wide siteParams entry; entries with paths are separate rules.
+    sites = [s for group in rules["siteParams"] if "paths" not in group for s in group["sites"]]
 
     for name, values in (("trackingParams", params), ("trackingPrefixes", prefixes),
                          ("shortLinkHosts", hosts), ("siteParams sites", sites)):
@@ -49,9 +51,12 @@ def validate(rules: dict) -> None:
     for prefix in prefixes:
         if not prefix.endswith("_"):
             fail(f'prefix "{prefix}" should end with "_" so it can\'t swallow ordinary names')
-    for site in sites:
+    for site in (s for group in rules["siteParams"] for s in group["sites"]):
         if not SITE_KEY.match(site):
             fail(f'site "{site}" should be a lowercase domain, optionally ending in ".*"')
+    for group in rules["siteParams"]:
+        if "paths" in group:
+            check_segment_paths(group["paths"], f'siteParams "{group["source"]}"')
     for host in hosts:
         if not HOST.match(host):
             fail(f'short-link host "{host}" should be a lowercase domain')
@@ -74,19 +79,26 @@ def validate(rules: dict) -> None:
                 fail(f'redirect wrapper "{label}": target site "{site}" should be a lowercase domain')
         if "targetSites" in group and not group["targetSites"]:
             fail(f'redirect wrapper "{label}": targetSites, when given, must not be empty')
-    pairs = [(site, path) for group in rules.get("redirectWrappers", []) for site in group["sites"] for path in group["paths"]]
-    overlapping = sorted({f"{s} {p}" for s, p in pairs if pairs.count((s, p)) > 1})
-    if overlapping:
-        fail(f"redirect wrappers listed twice: {', '.join(overlapping)}")
-    for group in rules.get("shortLinkPaths", []):
-        label = group["provider"]
-        for site in group["sites"]:
-            if not SITE_KEY.match(site):
-                fail(f'short-link path "{label}": site "{site}" should be a lowercase domain')
-        for path in group["paths"]:
-            segments = path.strip("/").split("/")
-            if not path.startswith("/") or any(not s or ("*" in s and s != "*") for s in segments):
-                fail(f'short-link path "{label}": "{path}" should be "/"-separated segments, each a name or a whole "*"')
+    check_listed_once(rules.get("redirectWrappers", []), lambda g: [(s, p) for s in g["sites"] for p in g["paths"]], "redirect wrappers listed twice")
+    check_listed_once(rules.get("pathWrappers", []), lambda g: [(s, g["prefix"]) for s in g["sites"]], "path wrappers listed twice")
+    scoped = [(s, normal_path(p), q, g["source"]) for g in rules["siteParams"] if "paths" in g
+              for s in g["sites"] for p in g["paths"] for q in g["params"]]
+    for i, (s1, p1, q1, src1) in enumerate(scoped):
+        for s2, p2, q2, src2 in scoped[i + 1:]:
+            if p1 == p2 and q1 == q2 and sites_overlap(s1, s2):
+                fail(f'path-scoped siteParams listed twice: "{q1}" on {s1} and {s2} {p1} ({src1}, {src2})')
+    for section, kind, key in (("shortLinkPaths", "short-link path", "provider"), ("deadEndPages", "dead-end page", "source")):
+        for group in rules.get(section, []):
+            label = group[key]
+            if not group["sites"] or not group["paths"]:
+                fail(f'{kind} "{label}" needs sites and paths')
+            for site in group["sites"]:
+                if not SITE_KEY.match(site):
+                    fail(f'{kind} "{label}": site "{site}" should be a lowercase domain')
+            check_segment_paths(group["paths"], f'{kind} "{label}"')
+            if not isinstance(group.get("identifiesYou", False), bool) or ("identifiesYou" in group and section != "shortLinkPaths"):
+                fail(f'{kind} "{label}": identifiesYou should be true or false, and only on shortLinkPaths')
+        check_listed_once(rules.get(section, []), lambda g: [(s, normal_path(p)) for s in g["sites"] for p in g["paths"]], f"{section} listed twice")
     for group in rules.get("pathWrappers", []):
         label = group["source"]
         for site in group["sites"]:
@@ -96,6 +108,95 @@ def validate(rules: dict) -> None:
             fail(f'path wrapper "{label}": prefix should start and end with "/"')
         if group["scheme"] not in ("http", "https"):
             fail(f'path wrapper "{label}": scheme should be http or https')
+    for group in rules["siteParams"]:
+        if "paths" not in group:
+            continue
+        if not group["sites"] or not group["params"]:
+            fail(f'siteParams "{group["source"]}" needs sites and params')
+        # A pattern of only "*" and "**" segments ("/*/**", "/*") would also cover search pages like
+        # Amazon's /s, where the same param is the content.
+        if any(all(seg in ("*", "**") for seg in path.strip("/").split("/")) for path in group["paths"]):
+            fail(f'siteParams "{group["source"]}": every path needs at least one named segment; '
+                 'one made only of "*" and "**" covers almost the whole site')
+        for site in group["sites"]:
+            wide = {p for g in rules["siteParams"] if "paths" not in g
+                    for s in g["sites"] if sites_overlap(site, s) for p in g["params"]}
+            for param in group["params"]:
+                if param in params or param in wide or any(param.startswith(x) for x in prefixes):
+                    fail(f'siteParams "{group["source"]}": "{param}" is already stripped everywhere on {site}')
+
+
+def check_listed_once(groups: list, keys, message: str) -> None:
+    """Fails if any key (e.g. a (site, path) pair) comes from more than one place."""
+    pairs = [k for group in groups for k in keys(group)]
+    repeated = sorted({" ".join(k) for k in pairs if pairs.count(k) > 1})
+    if repeated:
+        fail(f"{message}: {', '.join(repeated)}")
+
+
+ALLOWED_KEYS = {
+    "trackingPrefixes": {"prefixes", "source", "notes"},
+    "trackingParams": {"params", "source", "notes"},
+    "siteParams": {"sites", "paths", "params", "source", "notes"},
+    "shortLinkHosts": {"hosts", "provider", "notes"},
+    "neverStrip": {"params", "source", "notes"},
+    "redirectWrappers": {"sites", "paths", "params", "base64Prefix", "targetSites", "source", "notes"},
+    "pathWrappers": {"sites", "prefix", "scheme", "source", "notes"},
+    "shortLinkPaths": {"sites", "paths", "identifiesYou", "provider", "notes"},
+    "deadEndPages": {"sites", "paths", "source", "notes"},
+}
+
+
+def check_keys(rules: dict) -> None:
+    """Refuses unknown sections and keys, so a typo (e.g. "path" for "paths") can't silently widen a rule."""
+    for section, groups in rules.items():
+        if section in ("_about", "version"):
+            continue
+        if section not in ALLOWED_KEYS:
+            fail(f'unknown section "{section}"')
+        for group in groups:
+            unknown = sorted(set(group) - ALLOWED_KEYS[section])
+            if unknown:
+                fail(f'{section} "{group.get("source", group.get("provider"))}": unknown key {", ".join(unknown)}')
+
+
+def sites_overlap(a: str, b: str) -> bool:
+    """True if some host could match both site keys (same matching as UrlCleaner.hostMatches)."""
+    def matches(host: str, key: str) -> bool:
+        if not key.endswith(".*"):
+            return host == key or host.endswith("." + key)
+        name = re.escape(key[:-2])
+        return re.fullmatch(rf"(.+\.)?{name}\.(com|[a-z]{{2}}|(com|co)\.[a-z]{{2}})", host) is not None
+    def hosts(key: str, other: str) -> list:
+        """Hosts key matches, tried against other: a wildcard gets .com and the other key's own
+        ending, so www.amazon.* meets amazon.co.uk (at www.amazon.co.uk)."""
+        if not key.endswith(".*"):
+            return [key]
+        endings = {"com"}
+        if not other.endswith(".*"):
+            labels = other.split(".")
+            endings |= {labels[-1], ".".join(labels[-2:])}
+        return [f"{key[:-2]}.{ending}" for ending in endings]
+    return any(matches(h, b) for h in hosts(a, b)) or any(matches(h, a) for h in hosts(b, a))
+
+
+def normal_path(path: str) -> str:
+    """A path pattern without its trailing slash, so "/dp/*" and "/dp/*/" compare equal."""
+    return "/" + path.strip("/")
+
+
+def check_segment_paths(paths: list, label: str) -> None:
+    """Segment patterns: "/"-separated names, "*" for any one segment, and a final "**" for any rest."""
+    if not paths:
+        fail(f"{label}: paths, when given, must not be empty")
+    for path in paths:
+        segments = path.strip("/").split("/")
+        if not path.startswith("/") or any(not s or ("*" in s and s not in ("*", "**")) for s in segments) or "**" in segments[:-1]:
+            fail(f'{label}: "{path}" should be "/"-separated segments, each a name or a whole "*", optionally ending in "**"')
+        # Paths are matched before the query and still percent-encoded, so a pattern with "?", "#",
+        # "%", a space or other characters a URL path never holds unencoded could never match.
+        if not re.fullmatch(r"[A-Za-z0-9._~!&'()*+,;=:@/-]+", path):
+            fail(f'{label}: "{path}" can only hold characters a URL path keeps unencoded (no "?", "#", "%" or spaces)')
 
 
 def check_literals(rules: dict) -> None:
@@ -154,9 +255,20 @@ def kotlin(rules: dict) -> str:
     out.append("     */")
     out.append("    val SITE_PARAMS: Map<String, Set<String>> = mapOf(")
     for group in rules["siteParams"]:
+        if "paths" in group:
+            continue
         out += comment_lines(group, "        // ")
         for site in group["sites"]:
             out.append(f"        {json.dumps(site)} to setOf({quoted(group['params'])}),")
+    out += ["    )", ""]
+
+    out.append("    /** Params only stripped on some pages of a site (see UrlCleaner.pathMatches). */")
+    out.append("    val SITE_PATH_PARAMS: List<SitePathParams> = listOf(")
+    for group in rules["siteParams"]:
+        if "paths" not in group:
+            continue
+        out += comment_lines(group, "        // ")
+        out.append(f"        SitePathParams(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])}), setOf({quoted(group['params'])})),")
     out += ["    )", ""]
 
     out.append("    /** Hosts whose links are resolved (redirects followed) before cleaning. */")
@@ -166,11 +278,12 @@ def kotlin(rules: dict) -> str:
         out.append(f"        {quoted(group['hosts'])},")
     out += ["    )", ""]
 
-    out.append("    /** Short links that live on a path of a normal site; each \"*\" matches one path segment. */")
+    out.append("    /** Short links that live on a path of a normal site (see UrlCleaner.pathMatches). */")
     out.append("    val SHORT_LINK_PATHS: List<ShortLinkPath> = listOf(")
     for group in rules.get("shortLinkPaths", []):
         out += comment_lines(group, "        // ")
-        out.append(f"        ShortLinkPath(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])})),")
+        extra = ", identifiesYou = true" if group.get("identifiesYou") else ""
+        out.append(f"        ShortLinkPath(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])}){extra}),")
     out += ["    )", ""]
 
     out.append("    /** Redirect links that carry the real link in a query param; unwrapped offline. */")
@@ -188,6 +301,13 @@ def kotlin(rules: dict) -> str:
     for group in rules.get("pathWrappers", []):
         out += comment_lines(group, "        // ")
         out.append(f"        PathWrapper(listOf({quoted(group['sites'])}), {json.dumps(group['prefix'])}, {json.dumps(group['scheme'])}),")
+    out += ["    )", ""]
+
+    out.append("    /** Sign-in and consent pages: a short link that redirects to one stops at the hop before. */")
+    out.append("    val DEAD_END_PAGES: List<SitePaths> = listOf(")
+    for group in rules.get("deadEndPages", []):
+        out += comment_lines(group, "        // ")
+        out.append(f"        SitePaths(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])})),")
     out += ["    )", "}", ""]
 
     out.append("/**")
@@ -206,8 +326,17 @@ def kotlin(rules: dict) -> str:
     out.append("/** A redirect on [sites] whose path after [prefix] is the real link, without its [scheme]. */")
     out.append("internal data class PathWrapper(val sites: List<String>, val prefix: String, val scheme: String)")
     out.append("")
-    out.append("/** Short links on [sites] whose path matches one of [paths] (\"*\" = one segment). */")
-    out.append("internal data class ShortLinkPath(val sites: List<String>, val paths: List<String>)")
+    out.append("/**")
+    out.append(" * Short links on [sites] whose path matches one of [paths] (see UrlCleaner.pathMatches). If [identifiesYou],")
+    out.append(" * the link itself identifies the person sharing it, so it's never kept in place of a sign-in page.")
+    out.append(" */")
+    out.append("internal data class ShortLinkPath(val sites: List<String>, val paths: List<String>, val identifiesYou: Boolean = false)")
+    out.append("")
+    out.append("/** [params] stripped on [sites], but only where the path matches one of [paths] (see UrlCleaner.pathMatches). */")
+    out.append("internal data class SitePathParams(val sites: List<String>, val paths: List<String>, val params: Set<String>)")
+    out.append("")
+    out.append("/** Pages on [sites] whose path matches one of [paths] (see UrlCleaner.pathMatches). */")
+    out.append("internal data class SitePaths(val sites: List<String>, val paths: List<String>)")
     out.append("")
     return "\n".join(out)
 
@@ -234,9 +363,20 @@ def swift(rules: dict) -> str:
     out.append("    /// matches that name on any country domain (see `UrlCleaner.hostMatches`).")
     out.append("    static let siteParams: [String: Set<String>] = [")
     for group in rules["siteParams"]:
+        if "paths" in group:
+            continue
         out += comment_lines(group, "        // ")
         for site in group["sites"]:
             out.append(f"        {json.dumps(site)}: [{quoted(group['params'])}],")
+    out += ["    ]", ""]
+
+    out.append("    /// Params only stripped on some pages of a site (see `UrlCleaner.pathMatches`).")
+    out.append("    static let sitePathParams: [SitePathParams] = [")
+    for group in rules["siteParams"]:
+        if "paths" not in group:
+            continue
+        out += comment_lines(group, "        // ")
+        out.append(f"        SitePathParams(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}], params: [{quoted(group['params'])}]),")
     out += ["    ]", ""]
 
     out.append("    /// Hosts whose links are resolved (redirects followed) before cleaning.")
@@ -246,11 +386,12 @@ def swift(rules: dict) -> str:
         out.append(f"        {quoted(group['hosts'])},")
     out += ["    ]", ""]
 
-    out.append("    /// Short links that live on a path of a normal site; each \"*\" matches one path segment.")
+    out.append("    /// Short links that live on a path of a normal site (see `UrlCleaner.pathMatches`).")
     out.append("    static let shortLinkPaths: [ShortLinkPath] = [")
     for group in rules.get("shortLinkPaths", []):
         out += comment_lines(group, "        // ")
-        out.append(f"        ShortLinkPath(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}]),")
+        extra = ", identifiesYou: true" if group.get("identifiesYou") else ""
+        out.append(f"        ShortLinkPath(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}]{extra}),")
     out += ["    ]", ""]
 
     out.append("    /// Redirect links that carry the real link in a query param; unwrapped offline.")
@@ -268,6 +409,13 @@ def swift(rules: dict) -> str:
     for group in rules.get("pathWrappers", []):
         out += comment_lines(group, "        // ")
         out.append(f"        PathWrapper(sites: [{quoted(group['sites'])}], prefix: {json.dumps(group['prefix'])}, scheme: {json.dumps(group['scheme'])}),")
+    out += ["    ]", ""]
+
+    out.append("    /// Sign-in and consent pages: a short link that redirects to one stops at the hop before.")
+    out.append("    static let deadEndPages: [SitePaths] = [")
+    for group in rules.get("deadEndPages", []):
+        out += comment_lines(group, "        // ")
+        out.append(f"        SitePaths(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}]),")
     out += ["    ]", "}", ""]
 
     out.append("/// A redirect on `sites` at `paths` (a trailing \"*\" matches any rest) whose first valid `params` value is the real")
@@ -281,8 +429,23 @@ def swift(rules: dict) -> str:
     out.append("    var targetSites: [String]? = nil")
     out.append("}")
     out.append("")
-    out.append("/// Short links on `sites` whose path matches one of `paths` (\"*\" = one segment).")
+    out.append("/// Short links on `sites` whose path matches one of `paths` (see `UrlCleaner.pathMatches`). If `identifiesYou`,")
+    out.append("/// the link itself identifies the person sharing it, so it's never kept in place of a sign-in page.")
     out.append("struct ShortLinkPath: Sendable {")
+    out.append("    let sites: [String]")
+    out.append("    let paths: [String]")
+    out.append("    var identifiesYou = false")
+    out.append("}")
+    out.append("")
+    out.append("/// `params` stripped on `sites`, but only where the path matches one of `paths` (see `UrlCleaner.pathMatches`).")
+    out.append("struct SitePathParams: Sendable {")
+    out.append("    let sites: [String]")
+    out.append("    let paths: [String]")
+    out.append("    let params: Set<String>")
+    out.append("}")
+    out.append("")
+    out.append("/// Pages on `sites` whose path matches one of `paths` (see `UrlCleaner.pathMatches`).")
+    out.append("struct SitePaths: Sendable {")
     out.append("    let sites: [String]")
     out.append("    let paths: [String]")
     out.append("}")

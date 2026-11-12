@@ -165,4 +165,104 @@ class ShortLinkResolverTest {
 
         assertEquals("https://www.tiktok.com/@user/video/1234567890?_r=1&_t=8abcde", result)
     }
+
+    @Test
+    fun `stops at the hop before a sign-in page`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://fb.watch/abc123" -> HopResponse(302, "https://www.facebook.com/watch/?v=1234567890")
+                "https://www.facebook.com/watch/?v=1234567890" -> HopResponse(302, "/login/?next=%2Fwatch%2F%3Fv%3D1234567890")
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals("https://www.facebook.com/watch/?v=1234567890", ShortLinkResolver.followRedirects("https://fb.watch/abc123", fetcher))
+    }
+
+    @Test
+    fun `keeps the short link when it redirects straight to a sign-in page`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://fb.watch/abc123" -> HopResponse(302, "https://www.facebook.com/login.php?next=%2Fwatch%2F")
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals("https://fb.watch/abc123", ShortLinkResolver.followRedirects("https://fb.watch/abc123", fetcher))
+    }
+
+    @Test
+    fun `takes the real link from a consent page that carries it in full`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://youtu.be/dQw4w9WgXcQ" -> HopResponse(
+                    302,
+                    "https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ%26si%3Dabc&gl=AU",
+                )
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals(
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=abc",
+            ShortLinkResolver.followRedirects("https://youtu.be/dQw4w9WgXcQ", fetcher),
+        )
+    }
+
+    @Test
+    fun `shares the sign-in page rather than a click link that identifies you`() {
+        val start = "https://example.us1.list-manage.com/track/click?u=abc&id=def&e=SUBSCRIBER"
+        val signIn = "https://www.facebook.com/login/?next=%2Fevents%2F1234567890"
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            if (url == start) HopResponse(302, signIn) else throw AssertionError("unexpected url: $url")
+        }
+
+        assertEquals(signIn, ShortLinkResolver.followRedirects(start, fetcher))
+    }
+
+    @Test
+    fun `never takes a sign-in page out of a consent page`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://youtu.be/dQw4w9WgXcQ" -> HopResponse(301, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ" -> HopResponse(
+                    302,
+                    "https://consent.youtube.com/m?continue=https%3A%2F%2Faccounts.google.com%2FServiceLogin%3Fcontinue%3Dx",
+                )
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals("https://www.youtube.com/watch?v=dQw4w9WgXcQ", ShortLinkResolver.followRedirects("https://youtu.be/dQw4w9WgXcQ", fetcher))
+    }
+
+    @Test
+    fun `never shares a tracking hop on another site before a sign-in page`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            when (url) {
+                "https://t.co/abc123" -> HopResponse(301, "https://trk.example.com/c?sub=SUB123")
+                "https://trk.example.com/c?sub=SUB123" -> HopResponse(302, "https://accounts.google.com/ServiceLogin?continue=x")
+                else -> throw AssertionError("unexpected url: $url")
+            }
+        }
+
+        assertEquals("https://t.co/abc123", ShortLinkResolver.followRedirects("https://t.co/abc123", fetcher))
+    }
+
+    @Test
+    fun `an empty Location header ends the chain`() {
+        val fetcher = ShortLinkResolver.HopFetcher { url ->
+            if (url == "https://youtu.be/v1") HopResponse(302, "") else throw AssertionError("unexpected url: $url")
+        }
+
+        assertEquals("https://youtu.be/v1", ShortLinkResolver.followRedirects("https://youtu.be/v1", fetcher))
+    }
+
+    @Test
+    fun `same site means the same last two labels, or three for country domains`() {
+        assertTrue(ShortLinkResolver.sameSite("https://www.youtube.com/watch", "https://consent.youtube.com/m"))
+        assertTrue(ShortLinkResolver.sameSite("https://www.amazon.co.uk/dp/x", "https://amazon.co.uk/ap/signin"))
+        assertFalse(ShortLinkResolver.sameSite("https://www.amazon.co.uk/dp/x", "https://www.example.co.uk/"))
+        assertFalse(ShortLinkResolver.sameSite("https://trk.example.com/c", "https://accounts.google.com/"))
+    }
 }

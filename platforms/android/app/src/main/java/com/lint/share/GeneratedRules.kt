@@ -95,7 +95,7 @@ internal object GeneratedRules {
         //   Added to links resolved from maps.app.goo.gl: g_st is the share type and g_ep encodes the share context. entry= is left alone.
         "google.*" to setOf("g_st", "g_ep"),
         // Amazon (full links, every country domain)
-        //   Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is kept: older search links (amazon.com/s?keywords=...) use it as the query.
+        //   Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query.
         "amazon.*" to setOf("crid", "dib", "dib_tag", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "linkCode", "linkId", "creativeASIN", "social_share", "_encoding", "ref_"),
         // Apple Music, Podcasts and App Store
         //   uo and ct are campaign/origin tracking. i= (the track or episode), mt= and app= are kept; the at= affiliate token is kept too.
@@ -107,7 +107,7 @@ internal object GeneratedRules {
         //   r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it.
         "substack.com" to setOf("r", "showWelcomeOnShare"),
         // Pinterest
-        //   Added to pins opened from pin.it share links. invite_code and sender identify the sharer but are kept: Pinterest also uses them for group-board and sign-up invites.
+        //   Added to pins opened from pin.it share links. invite_code and sender are only stripped on pin pages (below): Pinterest also uses them for group-board and sign-up invites.
         "pinterest.*" to setOf("sfo", "mweb_unauth_id"),
         // LinkedIn
         //   rcm identifies the member who shared a post; lipi, midToken, midSig and trkEmail are page and email tracking. otpToken (email sign-in) is deliberately not listed.
@@ -193,6 +193,16 @@ internal object GeneratedRules {
         "deezer.com" to setOf("deferredFl", "host"),
     )
 
+    /** Params only stripped on some pages of a site (see UrlCleaner.pathMatches). */
+    val SITE_PATH_PARAMS: List<SitePathParams> = listOf(
+        // Amazon product pages
+        //   keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query. /-/<lang>/ paths are the same pages in another language.
+        SitePathParams(listOf("amazon.*"), listOf("/dp/*/**", "/*/dp/*/**", "/gp/product/*/**", "/gp/aw/d/*/**", "/-/*/dp/*/**", "/-/*/*/dp/*/**", "/-/*/gp/product/*/**", "/-/*/gp/aw/d/*/**"), setOf("keywords")),
+        // Pinterest pin pages
+        //   Who shared the pin. Only stripped on /pin/<id>/ pages: on group-board and sign-up links they are the invite.
+        SitePathParams(listOf("pinterest.*"), listOf("/pin/*/**"), setOf("invite_code", "sender")),
+    )
+
     /** Hosts whose links are resolved (redirects followed) before cleaning. */
     val SHORT_LINK_HOSTS: Set<String> = setOf(
         // Amazon
@@ -231,7 +241,7 @@ internal object GeneratedRules {
         "link.deezer.com",
     )
 
-    /** Short links that live on a path of a normal site; each "*" matches one path segment. */
+    /** Short links that live on a path of a normal site (see UrlCleaner.pathMatches). */
     val SHORT_LINK_PATHS: List<ShortLinkPath> = listOf(
         // Reddit
         //   App share links like reddit.com/r/<sub>/s/<code>; the full post link carries share_id and utm_*.
@@ -240,8 +250,8 @@ internal object GeneratedRules {
         //   Share links like facebook.com/share/p/<code>/ and /share/r/<code>/.
         ShortLinkPath(listOf("facebook.com"), listOf("/share/*", "/share/*/*")),
         // Mailchimp
-        //   Newsletter click links on <account>.<dc>.list-manage.com. The e= param identifies the subscriber, so resolving replaces it with the destination. Resolving counts as a click by the person sharing.
-        ShortLinkPath(listOf("list-manage.com"), listOf("/track/click")),
+        //   Newsletter click links on <account>.<dc>.list-manage.com. The e= param identifies the subscriber, so resolving replaces it with the destination. Resolving counts as a click by the person sharing. identifiesYou: if it redirects straight to a sign-in page, that page is shared rather than this link.
+        ShortLinkPath(listOf("list-manage.com"), listOf("/track/click"), identifiesYou = true),
     )
 
     /** Redirect links that carry the real link in a query param; unwrapped offline. */
@@ -295,6 +305,29 @@ internal object GeneratedRules {
         //   google.com/amp/s/<host>/<path> shows another site's AMP page; the original is https://<host>/<path>.
         PathWrapper(listOf("google.*"), "/amp/s/", "https"),
     )
+
+    /** Sign-in and consent pages: a short link that redirects to one stops at the hop before. */
+    val DEAD_END_PAGES: List<SitePaths> = listOf(
+        // Google and YouTube cookie consent
+        SitePaths(listOf("consent.google.com", "consent.youtube.com"), listOf("/**")),
+        // Google sign-in
+        //   Only the interactive sign-in pages: other accounts.google.com pages (CheckCookie, ...) can pass a browser straight on to the content.
+        SitePaths(listOf("accounts.google.com"), listOf("/ServiceLogin/**", "/signin/**", "/v3/signin/**", "/AccountChooser/**", "/InteractiveLogin/**")),
+        // Facebook sign-in
+        SitePaths(listOf("facebook.com"), listOf("/login/**", "/login.php")),
+        // Instagram sign-in
+        SitePaths(listOf("instagram.com"), listOf("/accounts/login/**")),
+        // LinkedIn sign-in wall
+        SitePaths(listOf("linkedin.com"), listOf("/authwall/**", "/login/**", "/uas/login/**")),
+        // X / Twitter sign-in
+        SitePaths(listOf("x.com", "twitter.com"), listOf("/login/**", "/i/flow/login/**")),
+        // Reddit sign-in
+        SitePaths(listOf("reddit.com"), listOf("/login/**", "/account/login/**")),
+        // TikTok sign-in
+        SitePaths(listOf("tiktok.com"), listOf("/login/**")),
+        // Amazon sign-in
+        SitePaths(listOf("amazon.*"), listOf("/ap/signin/**")),
+    )
 }
 
 /**
@@ -313,5 +346,14 @@ internal data class RedirectWrapper(
 /** A redirect on [sites] whose path after [prefix] is the real link, without its [scheme]. */
 internal data class PathWrapper(val sites: List<String>, val prefix: String, val scheme: String)
 
-/** Short links on [sites] whose path matches one of [paths] ("*" = one segment). */
-internal data class ShortLinkPath(val sites: List<String>, val paths: List<String>)
+/**
+ * Short links on [sites] whose path matches one of [paths] (see UrlCleaner.pathMatches). If [identifiesYou],
+ * the link itself identifies the person sharing it, so it's never kept in place of a sign-in page.
+ */
+internal data class ShortLinkPath(val sites: List<String>, val paths: List<String>, val identifiesYou: Boolean = false)
+
+/** [params] stripped on [sites], but only where the path matches one of [paths] (see UrlCleaner.pathMatches). */
+internal data class SitePathParams(val sites: List<String>, val paths: List<String>, val params: Set<String>)
+
+/** Pages on [sites] whose path matches one of [paths] (see UrlCleaner.pathMatches). */
+internal data class SitePaths(val sites: List<String>, val paths: List<String>)

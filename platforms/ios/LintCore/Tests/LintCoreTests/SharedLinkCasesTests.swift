@@ -28,10 +28,18 @@ struct SharedLinkCasesTests {
         var testDescription: String { "\(source): \(input.prefix(80))" }
     }
 
+    struct DeadEndCase: Decodable, Sendable, CustomTestStringConvertible {
+        let source: String
+        let url: String
+        let deadEnd: Bool
+        var testDescription: String { "\(source): \(url)" }
+    }
+
     struct Cases: Decodable, Sendable {
         let clean: [CleanCase]
         let unwrap: [UnwrapCase]
         let shortLinks: [ShortLinkCase]
+        let deadEnds: [DeadEndCase]
     }
 
     /// Found relative to this file, so it works from any checkout (repo root is five levels up).
@@ -54,6 +62,7 @@ struct SharedLinkCasesTests {
     @Test func sharedCasesAreNotEmpty() {
         #expect(!Self.cases.clean.isEmpty)
         #expect(!Self.cases.shortLinks.isEmpty)
+        #expect(!Self.cases.deadEnds.isEmpty)
     }
 
     @Test(arguments: cases.clean)
@@ -70,5 +79,10 @@ struct SharedLinkCasesTests {
     func matchesSharedShortLinkCase(_ testCase: ShortLinkCase) {
         // Unwrapped first, as the share flow does, so a short link inside a redirect link counts.
         #expect(ShortLinkResolver.isKnownShortLink(UrlCleaner.unwrap(testCase.url)) == testCase.known)
+    }
+
+    @Test(arguments: cases.deadEnds)
+    func matchesSharedDeadEndCase(_ testCase: DeadEndCase) {
+        #expect(ShortLinkResolver.isDeadEnd(testCase.url) == testCase.deadEnd)
     }
 }

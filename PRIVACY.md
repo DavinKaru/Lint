@@ -7,7 +7,7 @@ all. There is one deliberate, narrow exception.
 
 Some tracking parameters only appear after a short link redirects to its full destination — the
 short link itself carries none. To clean those, Lint needs to know the destination first. When a
-shared link's host is exactly one of the domains below (or, for the few listed share paths, its host and path match exactly), `ShortLinkResolver` follows the redirect
+shared link's host is exactly one of the domains below (or, for the few listed share paths, its host and path match that path's pattern), `ShortLinkResolver` follows the redirect
 before cleaning.
 
 This table is the single source of truth for which domains Lint resolves — nothing else in this
@@ -52,6 +52,15 @@ hasn't been tested on a real device yet.
 - If the request times out, fails, or the provider's server responds unexpectedly, Lint gives up
   and passes the original short link through unchanged. It never blocks or crashes the share
   flow.
+- If a redirect lands on a sign-in or consent page (Facebook's login page, Google's cookie
+  consent, LinkedIn's sign-in wall, ... listed as `deadEndPages` in
+  [`shared/rules/rules.json`](shared/rules/rules.json)), Lint stops there without requesting it:
+  - if the page carries the full link it continues to (a consent page's `continue=`, a Facebook
+    sign-in page's `next=`) and that isn't another sign-in page, Lint uses that link;
+  - otherwise it keeps the link from the step before when that's on the same site as the sign-in
+    page (the post or video it was protecting), and the original short link if not;
+  - except when that link identifies you (a Mailchimp click link carries your subscriber ID): then
+    Lint shares the sign-in page itself, which still leads to the content once signed in.
 
 Lint doesn't attempt to defeat bot detection (e.g. by mimicking a real browser's full network
 fingerprint) to force a blocked provider like Amazon to resolve — that would be fragile, an arms

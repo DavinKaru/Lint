@@ -509,9 +509,25 @@
       "source": "Amazon",
       "category": "Shopping",
       "input": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3?crid=2ABCDEF&dib=eyJ2IjoiMSJ9&dib_tag=se&keywords=noise+cancelling+headphones&qid=1730000000&sprefix=noise%2Caps%2C250&sr=8-3",
-      "expected": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3?keywords=noise+cancelling+headphones",
+      "expected": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3",
       "verified": null,
-      "notes": "Search context including the search terms. The /ref=... path segment is left for now. Format from public documentation and observed behaviour, not yet checked against a real share from the phone. keywords is kept for now (it's the query on search links); stripping it only on /dp/ links needs path-scoped rules (#29)."
+      "notes": "Search context including the search terms: keywords is stripped on product pages (it's still kept on search links). The /ref=... path segment is left for now. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.co.uk/gp/product/B0ABCDEF12?keywords=electric+kettle&th=1",
+      "expected": "https://www.amazon.co.uk/gp/product/B0ABCDEF12?th=1",
+      "verified": null,
+      "notes": "Older /gp/product/ product links: keywords is the search that found it. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/gp/help/customer/display.html?keywords=returns",
+      "expected": "https://www.amazon.com/gp/help/customer/display.html?keywords=returns",
+      "verified": null,
+      "notes": "keywords is only stripped on product pages; elsewhere it can be the query. Written for the test set, not taken from a real share."
     },
     {
       "source": "Amazon",
@@ -573,9 +589,25 @@
       "source": "Pinterest",
       "category": "Social",
       "input": "https://www.pinterest.com.au/pin/123456789012345678/?invite_code=abc123&sender=987654321&sfo=1",
-      "expected": "https://www.pinterest.com.au/pin/123456789012345678/?invite_code=abc123&sender=987654321",
+      "expected": "https://www.pinterest.com.au/pin/123456789012345678/",
       "verified": null,
-      "notes": "invite_code and sender stay: they also carry board invites. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+      "notes": "On a pin page invite_code and sender only say who shared it. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Pinterest",
+      "category": "Social",
+      "input": "https://www.pinterest.com/exampleuser/example-board/?invite_code=abc123&sender=987654321",
+      "expected": "https://www.pinterest.com/exampleuser/example-board/?invite_code=abc123&sender=987654321",
+      "verified": null,
+      "notes": "A group-board invite: invite_code and sender are the invite and must stay. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Pinterest",
+      "category": "Social",
+      "input": "https://www.pinterest.com/pin/?invite_code=abc123&sender=987654321",
+      "expected": "https://www.pinterest.com/pin/?invite_code=abc123&sender=987654321",
+      "verified": null,
+      "notes": "/pin/ without a pin id isn't a pin page, so the invite params stay. Written for the test set, not taken from a real share."
     },
     {
       "source": "LinkedIn",
@@ -1234,6 +1266,54 @@
       "notes": "On a search link keywords is the query and must stay. Written for the test set, not taken from a real share."
     },
     {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.co.jp/-/en/Example-Product/dp/B0ABCDEF12/ref=sr_1_1?keywords=example&qid=1730000000",
+      "expected": "https://www.amazon.co.jp/-/en/Example-Product/dp/B0ABCDEF12/ref=sr_1_1",
+      "verified": null,
+      "notes": "The same product page in another language (/-/en/): keywords is stripped like on /dp/ pages, and qid is search tracking. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/dp/B0ABCDEF12?keywords=wireless+mouse&th=1",
+      "expected": "https://www.amazon.com/dp/B0ABCDEF12?th=1",
+      "verified": null,
+      "notes": "A plain /dp/ product link: keywords is the search that found it. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com.au/gp/aw/d/B0ABCDEF12/?keywords=kettle&psc=1",
+      "expected": "https://www.amazon.com.au/gp/aw/d/B0ABCDEF12/?psc=1",
+      "verified": null,
+      "notes": "The mobile /gp/aw/d/ product link. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/-/es/gp/product/B0ABCDEF12?keywords=kettle&th=1",
+      "expected": "https://www.amazon.com/-/es/gp/product/B0ABCDEF12?th=1",
+      "verified": null,
+      "notes": "A /gp/product/ page in another language (/-/es/). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/-/es/s?keywords=kettle",
+      "expected": "https://www.amazon.com/-/es/s?keywords=kettle",
+      "verified": null,
+      "notes": "A search in another language (/-/es/s): keywords is the search itself, so it stays. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/dp/?keywords=kettle",
+      "expected": "https://www.amazon.com/dp/?keywords=kettle",
+      "verified": null,
+      "notes": "/dp/ without a product isn't a product page, so keywords stays. Written for the test set, not taken from a real share."
+    },
+    {
       "source": "Google Maps short links",
       "category": "Maps & ride-share",
       "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&hl=en",
@@ -1442,6 +1522,11 @@
       "url": "https://www.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Fshare%2Fp%2FAbCdEf%2F",
       "known": true,
       "notes": "A sign-in page wrapping a share link is unwrapped to the share link."
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/r//s/abc123",
+      "known": false
     }
   ],
   "unwrap": [
@@ -1555,6 +1640,159 @@
       "input": "https://www.google.com/url?q=https%3A%2F%2Fexample.com%2F%٣F&sa=D",
       "expected": "https://www.google.com/url?q=https%3A%2F%2Fexample.com%2F%٣F&sa=D",
       "notes": "Only ASCII hex digits count in a percent escape; this one is malformed, so it's left alone."
+    },
+    {
+      "source": "YouTube",
+      "input": "https://consent.youtube.com/m?continue=https%3A%2F%2Fevil.example%5C%40www.youtube.com%2Fwatch%3Fv%3Dabc",
+      "expected": "https://consent.youtube.com/m?continue=https%3A%2F%2Fevil.example%5C%40www.youtube.com%2Fwatch%3Fv%3Dabc",
+      "notes": "A backslash target is left alone: browsers read \\ as /, so this would open evil.example even though it looks like youtube.com."
+    }
+  ],
+  "deadEnds": [
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/login/?next=%2Fwatch%2F%3Fv%3D1234567890",
+      "deadEnd": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://m.facebook.com/login.php?next=https%3A%2F%2Fm.facebook.com%2Fstory.php",
+      "deadEnd": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/loginhelp",
+      "deadEnd": false
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/watch/?v=1234567890",
+      "deadEnd": false
+    },
+    {
+      "source": "YouTube",
+      "url": "https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ",
+      "deadEnd": true
+    },
+    {
+      "source": "YouTube",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "deadEnd": false
+    },
+    {
+      "source": "Google",
+      "url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fdocs.google.com%2F",
+      "deadEnd": true
+    },
+    {
+      "source": "Google",
+      "url": "https://consent.google.com/",
+      "deadEnd": true
+    },
+    {
+      "source": "Google",
+      "url": "https://www.google.com/accounts",
+      "deadEnd": false
+    },
+    {
+      "source": "Instagram",
+      "url": "https://www.instagram.com/accounts/login/?next=%2Fp%2FABC123%2F",
+      "deadEnd": true
+    },
+    {
+      "source": "Instagram",
+      "url": "https://www.instagram.com/p/ABC123/",
+      "deadEnd": false
+    },
+    {
+      "source": "LinkedIn",
+      "url": "https://www.linkedin.com/authwall?trk=bf&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fexample",
+      "deadEnd": true
+    },
+    {
+      "source": "LinkedIn",
+      "url": "https://www.linkedin.com/posts/example-activity-1234567890",
+      "deadEnd": false
+    },
+    {
+      "source": "X",
+      "url": "https://x.com/i/flow/login?redirect_after_login=%2Fexample%2Fstatus%2F1",
+      "deadEnd": true
+    },
+    {
+      "source": "X",
+      "url": "https://x.com/login_example/status/1234567890",
+      "deadEnd": false
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/login/?dest=https%3A%2F%2Fwww.reddit.com%2Fr%2Fexample%2F",
+      "deadEnd": true
+    },
+    {
+      "source": "TikTok",
+      "url": "https://www.tiktok.com/login?redirect_url=https%3A%2F%2Fwww.tiktok.com%2F%40example",
+      "deadEnd": true
+    },
+    {
+      "source": "Amazon",
+      "url": "https://www.amazon.co.uk/ap/signin?openid.return_to=https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB0ABCDEF12",
+      "deadEnd": true
+    },
+    {
+      "source": "Amazon",
+      "url": "https://www.amazon.co.uk/dp/B0ABCDEF12",
+      "deadEnd": false
+    },
+    {
+      "source": "Lookalike",
+      "url": "https://login.example.com/login/",
+      "deadEnd": false
+    },
+    {
+      "source": "LinkedIn",
+      "url": "https://www.linkedin.com/login?session_redirect=%2Ffeed%2F",
+      "deadEnd": true
+    },
+    {
+      "source": "LinkedIn",
+      "url": "https://www.linkedin.com/uas/login?session_redirect=%2Ffeed%2F",
+      "deadEnd": true
+    },
+    {
+      "source": "X",
+      "url": "https://x.com/login",
+      "deadEnd": true
+    },
+    {
+      "source": "X",
+      "url": "https://twitter.com/i/flow/login?redirect_after_login=%2Fexample%2Fstatus%2F1",
+      "deadEnd": true
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/account/login/?dest=%2Fr%2Fexample%2F",
+      "deadEnd": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/LOGIN/",
+      "deadEnd": false
+    },
+    {
+      "source": "Google",
+      "url": "https://accounts.google.com.evil.example/ServiceLogin",
+      "deadEnd": false
+    },
+    {
+      "source": "Google",
+      "url": "https://accounts.google.com/CheckCookie?continue=https%3A%2F%2Fwww.google.com%2Fmaps",
+      "deadEnd": false
+    },
+    {
+      "source": "Google",
+      "url": "https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fdocs.google.com%2F",
+      "deadEnd": true
     }
   ]
 }

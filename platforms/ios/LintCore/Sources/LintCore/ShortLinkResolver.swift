@@ -51,22 +51,35 @@ public enum ShortLinkResolver {
         guard let components = URLComponents(string: url), let rawHost = components.host else { return false }
         let host = rawHost.lowercased()
         if GeneratedRules.shortLinkHosts.contains(host) { return true }
-        let segments = trimmedSegments(components.percentEncodedPath)
-        return GeneratedRules.shortLinkPaths.contains { rule in
-            rule.sites.contains { UrlCleaner.hostMatches(host, $0) } &&
-                rule.paths.contains { pathMatchesSegments(segments, $0) }
+        return GeneratedRules.shortLinkPaths.contains { UrlCleaner.onPage(host, components.percentEncodedPath, $0.sites, $0.paths) }
+    }
+
+    /// True if `a` and `b` are on the same site: the same last two host labels, or three for
+    /// country domains like example.com.au or example.co.uk.
+    static func sameSite(_ a: String, _ b: String) -> Bool {
+        func site(_ url: String) -> String? {
+            guard let host = URLComponents(string: url)?.host?.lowercased() else { return nil }
+            let labels = host.split(separator: ".", omittingEmptySubsequences: false).map(String.init)
+            let keep = labels.count >= 3 && labels.last!.count == 2 && secondLevel.contains(labels[labels.count - 2]) ? 3 : 2
+            return labels.suffix(keep).joined(separator: ".")
         }
+        guard let siteA = site(a) else { return false }
+        return siteA == site(b)
     }
 
-    private static func trimmedSegments(_ path: String) -> [String] {
-        path.trimmingCharacters(in: CharacterSet(charactersIn: "/")).split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+    private static let secondLevel: Set<String> = ["com", "co", "net", "org", "gov", "edu", "ac"]
+
+    /// True if `url` is a short link that identifies the person sharing it (see `ShortLinkPath.identifiesYou`).
+    private static func identifiesYou(_ url: String) -> Bool {
+        guard let components = URLComponents(string: url), let host = components.host?.lowercased() else { return false }
+        return GeneratedRules.shortLinkPaths.contains { $0.identifiesYou && UrlCleaner.onPage(host, components.percentEncodedPath, $0.sites, $0.paths) }
     }
 
-    /// True if `segments` match `pattern` segment for segment, where "*" is any one non-empty segment.
-    private static func pathMatchesSegments(_ segments: [String], _ pattern: String) -> Bool {
-        let wanted = trimmedSegments(pattern)
-        return wanted.count == segments.count &&
-            zip(wanted, segments).allSatisfy { w, s in !s.isEmpty && (w == "*" || w == s) }
+    /// True if `url` is a sign-in or consent page (`GeneratedRules.deadEndPages`): where a short link
+    /// lands when the provider wants a signed-in browser, rather than the content itself.
+    public static func isDeadEnd(_ url: String) -> Bool {
+        guard let components = URLComponents(string: url), let host = components.host?.lowercased() else { return false }
+        return GeneratedRules.deadEndPages.contains { UrlCleaner.onPage(host, components.percentEncodedPath, $0.sites, $0.paths) }
     }
 
     /// Pure redirect-following logic. Starting from `startUrl`, calls `fetcher` for each hop and
@@ -75,6 +88,13 @@ public enum ShortLinkResolver {
     /// whatever URL was reached so far (confirming it doesn't redirect further). Falls back to
     /// `startUrl` unchanged if a hop throws, or if the chain still hasn't terminated after
     /// `maxHops` redirects (an unusually long or looping chain).
+    ///
+    /// A redirect to a sign-in or consent page (`isDeadEnd`) ends the chain without requesting it.
+    /// If that page carries the real link in full (a consent page's continue=, see
+    /// `UrlCleaner.unwrap`) and it isn't another sign-in page, that's the result. Otherwise it's the
+    /// hop before if it's on the same site as the sign-in page (else the original short link), unless
+    /// that link identifies the person sharing it (a Mailchimp click link); then the sign-in page
+    /// itself, which still leads to the content once signed in.
     public static func followRedirects(
         from startUrl: String,
         fetcher: HopFetcher,
@@ -88,13 +108,22 @@ public enum ShortLinkResolver {
             // A non-3xx (or missing Location) response means we've reached the final
             // destination -- not a failure. currentUrl still equals startUrl if this is the
             // very first hop, so this correctly covers "never redirected at all" too.
-            guard (300...399).contains(response.statusCode), let location = response.location else {
+            guard (300...399).contains(response.statusCode), let location = response.location,
+                  !location.trimmingCharacters(in: .whitespaces).isEmpty
+            else {
                 return currentUrl
             }
 
             guard let base = URL(string: currentUrl),
                   let next = URL(string: location, relativeTo: base)?.absoluteString
             else { return startUrl }
+            if isDeadEnd(next) {
+                let unwrapped = UrlCleaner.unwrap(next)
+                if unwrapped != next && !isDeadEnd(unwrapped) { return unwrapped }
+                // A hop on another site (a tracker, say) is only a redirect, never the content.
+                let before = currentUrl == startUrl || sameSite(currentUrl, next) ? currentUrl : startUrl
+                return identifiesYou(before) ? next : before
+            }
             currentUrl = next
         }
 

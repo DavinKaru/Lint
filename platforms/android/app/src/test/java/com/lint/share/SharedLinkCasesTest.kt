@@ -59,4 +59,18 @@ class SharedLinkCasesTest {
         }
         assertEquals("Failing shared short link cases:\n" + failures.joinToString("\n"), 0, failures.size)
     }
+
+    @Test
+    fun `matches every shared dead-end case`() {
+        val deadEnds = cases.getJSONArray("deadEnds")
+        assertTrue("no dead-end cases found", deadEnds.length() > 0)
+
+        val failures = (0 until deadEnds.length()).map { deadEnds.getJSONObject(it) }.mapNotNull { case ->
+            val url = case.getString("url")
+            val expected = case.getBoolean("deadEnd")
+            if (ShortLinkResolver.isDeadEnd(url) == expected) null
+            else "${case.getString("source")}: $url should ${if (expected) "" else "not "}be a dead-end page"
+        }
+        assertEquals("Failing shared dead-end cases:\n" + failures.joinToString("\n"), 0, failures.size)
+    }
 }

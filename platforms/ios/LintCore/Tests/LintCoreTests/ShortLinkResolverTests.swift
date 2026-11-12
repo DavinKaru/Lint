@@ -229,6 +229,90 @@ struct ShortLinkResolverTests {
         #expect(!recorded.isEmpty)
         #expect(recorded.allSatisfy { $0 <= .milliseconds(200) })
     }
+
+    @Test func stopsAtTheHopBeforeASignInPage() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://fb.watch/abc123",
+            fetcher: fetcher([
+                "https://fb.watch/abc123": HopResponse(statusCode: 302, location: "https://www.facebook.com/watch/?v=1234567890"),
+                "https://www.facebook.com/watch/?v=1234567890": HopResponse(statusCode: 302, location: "/login/?next=%2Fwatch%2F%3Fv%3D1234567890"),
+            ])
+        )
+        #expect(result == "https://www.facebook.com/watch/?v=1234567890")
+    }
+
+    @Test func keepsTheShortLinkWhenItRedirectsStraightToASignInPage() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://fb.watch/abc123",
+            fetcher: fetcher([
+                "https://fb.watch/abc123": HopResponse(statusCode: 302, location: "https://www.facebook.com/login.php?next=%2Fwatch%2F"),
+            ])
+        )
+        #expect(result == "https://fb.watch/abc123")
+    }
+
+    @Test func takesTheRealLinkFromAConsentPageThatCarriesItInFull() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://youtu.be/dQw4w9WgXcQ",
+            fetcher: fetcher([
+                "https://youtu.be/dQw4w9WgXcQ": HopResponse(
+                    statusCode: 302,
+                    location: "https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ%26si%3Dabc&gl=AU"
+                ),
+            ])
+        )
+        #expect(result == "https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=abc")
+    }
+
+    @Test func sharesTheSignInPageRatherThanAClickLinkThatIdentifiesYou() async {
+        let start = "https://example.us1.list-manage.com/track/click?u=abc&id=def&e=SUBSCRIBER"
+        let signIn = "https://www.facebook.com/login/?next=%2Fevents%2F1234567890"
+        let result = await ShortLinkResolver.followRedirects(
+            from: start,
+            fetcher: fetcher([start: HopResponse(statusCode: 302, location: signIn)])
+        )
+        #expect(result == signIn)
+    }
+
+    @Test func neverTakesASignInPageOutOfAConsentPage() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://youtu.be/dQw4w9WgXcQ",
+            fetcher: fetcher([
+                "https://youtu.be/dQw4w9WgXcQ": HopResponse(statusCode: 301, location: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ": HopResponse(
+                    statusCode: 302,
+                    location: "https://consent.youtube.com/m?continue=https%3A%2F%2Faccounts.google.com%2FServiceLogin%3Fcontinue%3Dx"
+                ),
+            ])
+        )
+        #expect(result == "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    }
+
+    @Test func neverSharesATrackingHopOnAnotherSiteBeforeASignInPage() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://t.co/abc123",
+            fetcher: fetcher([
+                "https://t.co/abc123": HopResponse(statusCode: 301, location: "https://trk.example.com/c?sub=SUB123"),
+                "https://trk.example.com/c?sub=SUB123": HopResponse(statusCode: 302, location: "https://accounts.google.com/ServiceLogin?continue=x"),
+            ])
+        )
+        #expect(result == "https://t.co/abc123")
+    }
+
+    @Test func anEmptyLocationHeaderEndsTheChain() async {
+        let result = await ShortLinkResolver.followRedirects(
+            from: "https://youtu.be/v1",
+            fetcher: fetcher(["https://youtu.be/v1": HopResponse(statusCode: 302, location: "")])
+        )
+        #expect(result == "https://youtu.be/v1")
+    }
+
+    @Test func sameSiteMeansTheSameLastTwoLabelsOrThreeForCountryDomains() {
+        #expect(ShortLinkResolver.sameSite("https://www.youtube.com/watch", "https://consent.youtube.com/m"))
+        #expect(ShortLinkResolver.sameSite("https://www.amazon.co.uk/dp/x", "https://amazon.co.uk/ap/signin"))
+        #expect(!ShortLinkResolver.sameSite("https://www.amazon.co.uk/dp/x", "https://www.example.co.uk/"))
+        #expect(!ShortLinkResolver.sameSite("https://trk.example.com/c", "https://accounts.google.com/"))
+    }
 }
 
 private actor TimeoutRecorder {
