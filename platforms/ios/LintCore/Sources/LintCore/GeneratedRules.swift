@@ -271,6 +271,9 @@ enum GeneratedRules {
         RedirectWrapper(sites: ["vk.com"], paths: ["/away.php"], params: ["to"]),
         // Tumblr link redirects
         RedirectWrapper(sites: ["t.umblr.com"], paths: ["/redirect"], params: ["z"]),
+        // Bing search results
+        //   Bing's result links carry the real link in u= as "a1" followed by unpadded base64url.
+        RedirectWrapper(sites: ["bing.com"], paths: ["/ck/a"], params: ["u"], base64Prefix: "a1"),
     ]
 
     /// Redirect links that carry the real link in their path; unwrapped offline.
@@ -281,11 +284,13 @@ enum GeneratedRules {
     ]
 }
 
-/// A redirect on `sites` at `paths` (a trailing "*" matches any rest) whose first valid `params` value is the real link.
+/// A redirect on `sites` at `paths` (a trailing "*" matches any rest) whose first valid `params` value is the real
+/// link: percent-encoded, or if `base64Prefix` is set, that prefix followed by the link in unpadded base64url.
 struct RedirectWrapper: Sendable {
     let sites: [String]
     let paths: [String]
     let params: [String]
+    var base64Prefix: String? = nil
 }
 
 /// Short links on `sites` whose path matches one of `paths` ("*" = one segment).

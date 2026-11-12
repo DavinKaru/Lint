@@ -89,9 +89,10 @@ public enum UrlCleaner {
                   wrapper.paths.contains(where: { pathMatches(path, $0) })
             else { continue }
             for param in wrapper.params {
-                guard let pair = pairs.first(where: { $0.hasPrefix(param + "=") }),
-                      let target = percentDecode(String(pair.dropFirst(param.count + 1)))
-                else { continue }
+                guard let pair = pairs.first(where: { $0.hasPrefix(param + "=") }) else { continue }
+                let value = String(pair.dropFirst(param.count + 1))
+                let decoded = wrapper.base64Prefix.map { base64UrlDecode(value, prefix: $0) } ?? percentDecode(value)
+                guard let target = decoded else { continue }
                 if let valid = validTarget(target) { return valid }
             }
         }
@@ -110,6 +111,22 @@ public enum UrlCleaner {
         else { return nil }
         guard let host = URLComponents(string: target)?.host, !host.isEmpty else { return nil }
         return target
+    }
+
+    /// Decodes `value` if it's `prefix` followed by unpadded base64url (Bing's u=a1aHR0c... form), or
+    /// nil if it isn't or the bytes aren't valid UTF-8. Never falls back to percent-decoding: a
+    /// wrapper that uses base64 always does.
+    private static func base64UrlDecode(_ value: String, prefix: String) -> String? {
+        guard value.hasPrefix(prefix) else { return nil }
+        var body = String(value.dropFirst(prefix.count))
+        while body.hasSuffix("=") { body.removeLast() }
+        guard body.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }),
+              body.count % 4 != 1
+        else { return nil }
+        var standard = body.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        standard += String(repeating: "=", count: (4 - standard.count % 4) % 4)
+        guard let data = Data(base64Encoded: standard) else { return nil }
+        return String(data: data, encoding: .utf8)
     }
 
     /// Strict percent-decoding ("+" stays "+"): nil if malformed or not valid UTF-8.

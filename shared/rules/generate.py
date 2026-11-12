@@ -65,6 +65,9 @@ def validate(rules: dict) -> None:
         for path in group["paths"]:
             if not path.startswith("/") or "*" in path[:-1]:
                 fail(f'redirect wrapper "{label}": path "{path}" should start with "/" and may only end in "*"')
+        prefix = group.get("base64Prefix")
+        if prefix is not None and not re.fullmatch(r"[A-Za-z0-9]+", prefix):
+            fail(f'redirect wrapper "{label}": base64Prefix should be letters and digits')
     for group in rules.get("shortLinkPaths", []):
         label = group["provider"]
         for site in group["sites"]:
@@ -144,7 +147,8 @@ def kotlin(rules: dict) -> str:
     out.append("    val REDIRECT_WRAPPERS: List<RedirectWrapper> = listOf(")
     for group in rules.get("redirectWrappers", []):
         out += comment_lines(group, "        // ")
-        out.append(f"        RedirectWrapper(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])}), listOf({quoted(group['params'])})),")
+        b64 = f", base64Prefix = {json.dumps(group['base64Prefix'])}" if "base64Prefix" in group else ""
+        out.append(f"        RedirectWrapper(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])}), listOf({quoted(group['params'])}){b64}),")
     out += ["    )", ""]
 
     out.append("    /** Redirect links that carry the real link in their path; unwrapped offline. */")
@@ -154,8 +158,16 @@ def kotlin(rules: dict) -> str:
         out.append(f"        PathWrapper(listOf({quoted(group['sites'])}), {json.dumps(group['prefix'])}, {json.dumps(group['scheme'])}),")
     out += ["    )", "}", ""]
 
-    out.append("/** A redirect on [sites] at [paths] (a trailing \"*\" matches any rest) whose first valid [params] value is the real link. */")
-    out.append("internal data class RedirectWrapper(val sites: List<String>, val paths: List<String>, val params: List<String>)")
+    out.append("/**")
+    out.append(" * A redirect on [sites] at [paths] (a trailing \"*\" matches any rest) whose first valid [params] value is the real")
+    out.append(" * link: percent-encoded, or if [base64Prefix] is set, that prefix followed by the link in unpadded base64url.")
+    out.append(" */")
+    out.append("internal data class RedirectWrapper(")
+    out.append("    val sites: List<String>,")
+    out.append("    val paths: List<String>,")
+    out.append("    val params: List<String>,")
+    out.append("    val base64Prefix: String? = null,")
+    out.append(")")
     out.append("")
     out.append("/** A redirect on [sites] whose path after [prefix] is the real link, without its [scheme]. */")
     out.append("internal data class PathWrapper(val sites: List<String>, val prefix: String, val scheme: String)")
@@ -211,7 +223,8 @@ def swift(rules: dict) -> str:
     out.append("    static let redirectWrappers: [RedirectWrapper] = [")
     for group in rules.get("redirectWrappers", []):
         out += comment_lines(group, "        // ")
-        out.append(f"        RedirectWrapper(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}], params: [{quoted(group['params'])}]),")
+        b64 = f", base64Prefix: {json.dumps(group['base64Prefix'])}" if "base64Prefix" in group else ""
+        out.append(f"        RedirectWrapper(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}], params: [{quoted(group['params'])}]{b64}),")
     out += ["    ]", ""]
 
     out.append("    /// Redirect links that carry the real link in their path; unwrapped offline.")
@@ -221,11 +234,13 @@ def swift(rules: dict) -> str:
         out.append(f"        PathWrapper(sites: [{quoted(group['sites'])}], prefix: {json.dumps(group['prefix'])}, scheme: {json.dumps(group['scheme'])}),")
     out += ["    ]", "}", ""]
 
-    out.append("/// A redirect on `sites` at `paths` (a trailing \"*\" matches any rest) whose first valid `params` value is the real link.")
+    out.append("/// A redirect on `sites` at `paths` (a trailing \"*\" matches any rest) whose first valid `params` value is the real")
+    out.append("/// link: percent-encoded, or if `base64Prefix` is set, that prefix followed by the link in unpadded base64url.")
     out.append("struct RedirectWrapper: Sendable {")
     out.append("    let sites: [String]")
     out.append("    let paths: [String]")
     out.append("    let params: [String]")
+    out.append("    var base64Prefix: String? = nil")
     out.append("}")
     out.append("")
     out.append("/// Short links on `sites` whose path matches one of `paths` (\"*\" = one segment).")

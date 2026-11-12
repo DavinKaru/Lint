@@ -361,7 +361,9 @@
       "category": "Search & ads",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Bing redirects"
+      ]
     },
     {
       "name": "DuckDuckGo",

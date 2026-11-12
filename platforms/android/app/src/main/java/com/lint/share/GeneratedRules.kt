@@ -275,6 +275,9 @@ internal object GeneratedRules {
         RedirectWrapper(listOf("vk.com"), listOf("/away.php"), listOf("to")),
         // Tumblr link redirects
         RedirectWrapper(listOf("t.umblr.com"), listOf("/redirect"), listOf("z")),
+        // Bing search results
+        //   Bing's result links carry the real link in u= as "a1" followed by unpadded base64url.
+        RedirectWrapper(listOf("bing.com"), listOf("/ck/a"), listOf("u"), base64Prefix = "a1"),
     )
 
     /** Redirect links that carry the real link in their path; unwrapped offline. */
@@ -285,8 +288,16 @@ internal object GeneratedRules {
     )
 }
 
-/** A redirect on [sites] at [paths] (a trailing "*" matches any rest) whose first valid [params] value is the real link. */
-internal data class RedirectWrapper(val sites: List<String>, val paths: List<String>, val params: List<String>)
+/**
+ * A redirect on [sites] at [paths] (a trailing "*" matches any rest) whose first valid [params] value is the real
+ * link: percent-encoded, or if [base64Prefix] is set, that prefix followed by the link in unpadded base64url.
+ */
+internal data class RedirectWrapper(
+    val sites: List<String>,
+    val paths: List<String>,
+    val params: List<String>,
+    val base64Prefix: String? = null,
+)
 
 /** A redirect on [sites] whose path after [prefix] is the real link, without its [scheme]. */
 internal data class PathWrapper(val sites: List<String>, val prefix: String, val scheme: String)

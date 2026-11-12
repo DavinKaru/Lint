@@ -1033,6 +1033,20 @@
         "z"
       ],
       "source": "Tumblr link redirects"
+    },
+    {
+      "sites": [
+        "bing.com"
+      ],
+      "paths": [
+        "/ck/a"
+      ],
+      "params": [
+        "u"
+      ],
+      "base64Prefix": "a1",
+      "source": "Bing search results",
+      "notes": "Bing's result links carry the real link in u= as \"a1\" followed by unpadded base64url."
     }
   ],
   "pathWrappers": [

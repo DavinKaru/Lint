@@ -90,7 +90,9 @@ object UrlCleaner {
             if (wrapper.sites.none { hostMatches(host, it) } || wrapper.paths.none { pathMatches(path, it) }) continue
             for (param in wrapper.params) {
                 val pair = pairs.firstOrNull { it.startsWith("$param=") } ?: continue
-                val target = percentDecode(pair.substringAfter("=")) ?: continue
+                val value = pair.substringAfter("=")
+                val prefix = wrapper.base64Prefix
+                val target = (if (prefix != null) base64UrlDecode(value, prefix) else percentDecode(value)) ?: continue
                 validTarget(target)?.let { return it }
             }
         }
@@ -107,6 +109,41 @@ object UrlCleaner {
         if (target.any { it.isWhitespace() || it.isISOControl() }) return null
         val uri = try { URI(target) } catch (e: URISyntaxException) { return null }
         return if (uri.host.isNullOrEmpty()) null else target
+    }
+
+    /**
+     * Decodes [value] if it's [prefix] followed by unpadded base64url (Bing's u=a1aHR0c... form), or
+     * null if it isn't or the bytes aren't valid UTF-8. Never falls back to percent-decoding: a
+     * wrapper that uses base64 always does.
+     */
+    private fun base64UrlDecode(value: String, prefix: String): String? {
+        if (!value.startsWith(prefix)) return null
+        // Hand-rolled rather than java.util.Base64, which needs API 26 (minSdk is 24).
+        val bytes = ByteArrayOutputStream()
+        var buffer = 0
+        var bits = 0
+        for (c in value.removePrefix(prefix).trimEnd('=')) {
+            val sextet = when (c) {
+                in 'A'..'Z' -> c - 'A'
+                in 'a'..'z' -> c - 'a' + 26
+                in '0'..'9' -> c - '0' + 52
+                '-' -> 62
+                '_' -> 63
+                else -> return null
+            }
+            buffer = (buffer shl 6) or sextet
+            bits += 6
+            if (bits >= 8) {
+                bits -= 8
+                bytes.write((buffer shr bits) and 0xFF)
+            }
+        }
+        if (bits >= 6) return null // a lone trailing character can't encode a whole byte
+        return try {
+            Charsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(bytes.toByteArray())).toString()
+        } catch (e: CharacterCodingException) {
+            null
+        }
     }
 
     /** Strict percent-decoding ("+" stays "+"): null if malformed or not valid UTF-8. */

@@ -1200,6 +1200,14 @@
       "expected": "https://www.seek.com.au/job/80123456?type=standout",
       "verified": null,
       "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "Found this https://www.bing.com/ck/a?!&&p=0123abcd&ptn=3&u=a1aHR0cHM6Ly93d3cuZXhhbXBsZS5jb20uYXUvc29tZS1wYWdlP2lkPTQyJnV0bV9zb3VyY2U9YmluZw&ntb=1",
+      "expected": "Found this https://www.example.com.au/some-page?id=42",
+      "verified": null,
+      "notes": "Unwrapped, then the inner link is cleaned. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     }
   ],
   "shortLinks": [
@@ -1394,6 +1402,46 @@
       "input": "https://example.com/?u=https%3A%2F%2Fother.com",
       "expected": "https://example.com/?u=https%3A%2F%2Fother.com",
       "notes": "Not a known wrapper: unchanged."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&ptn=3&ver=2&hsh=4&fclid=1a2b3c4d&u=a1aHR0cHM6Ly93d3cuZXhhbXBsZS5jb20uYXUvc29tZS1wYWdlP2lkPTQyJnV0bV9zb3VyY2U9YmluZw&ntb=1",
+      "expected": "https://www.example.com.au/some-page?id=42&utm_source=bing",
+      "verified": null,
+      "notes": "u= is \"a1\" plus base64url. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1aHR0cHM6Ly93d3cuZXhhbXBsZS5jb20vw7xuw69jb2RlL3BhdGg&ntb=1",
+      "expected": "https://www.example.com/ünïcode/path",
+      "verified": null,
+      "notes": "Non-ASCII in the decoded link survives. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1!!notbase64&ntb=1",
+      "expected": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1!!notbase64&ntb=1",
+      "verified": null,
+      "notes": "Malformed base64 is left alone rather than guessed at."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&u=https%3A%2F%2Fexample.com%2F&ntb=1",
+      "expected": "https://www.bing.com/ck/a?!&&p=0123abcd&u=https%3A%2F%2Fexample.com%2F&ntb=1",
+      "verified": null,
+      "notes": "Without the a1 prefix it isn't Bing's format, so it's left alone."
+    },
+    {
+      "source": "Bing redirects",
+      "category": "Search & ads",
+      "input": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1amF2YXNjcmlwdDphbGVydCgxKQ&ntb=1",
+      "expected": "https://www.bing.com/ck/a?!&&p=0123abcd&u=a1amF2YXNjcmlwdDphbGVydCgxKQ&ntb=1",
+      "verified": null,
+      "notes": "Only http(s) links are unwrapped."
     }
   ]
 }
