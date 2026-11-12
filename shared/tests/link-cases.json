@@ -429,6 +429,142 @@
       "expected": "Read this: https://example.com/a thanks",
       "verified": null,
       "notes": "Wrapped link inside shared text. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "X / Twitter",
+      "category": "Social",
+      "input": "https://x.com/someone/status/1790000000000000000?s=46&t=AbCdEfGhIjKlMn",
+      "expected": "https://x.com/someone/status/1790000000000000000",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "X / Twitter",
+      "category": "Social",
+      "input": "https://twitter.com/someone/status/1790000000000000000?s=20",
+      "expected": "https://twitter.com/someone/status/1790000000000000000",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "X / Twitter",
+      "category": "Social",
+      "input": "https://example.com/page?s=20&t=abc",
+      "expected": "https://example.com/page?s=20&t=abc",
+      "verified": null,
+      "notes": "s and t are only stripped on X/Twitter. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Instagram",
+      "category": "Social",
+      "input": "https://www.instagram.com/p/C0abcDEFghi/?igsh=MTZ4bWl6bXo0&img_index=2",
+      "expected": "https://www.instagram.com/p/C0abcDEFghi/?img_index=2",
+      "verified": null,
+      "notes": "img_index picks the carousel photo and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Instagram",
+      "category": "Social",
+      "input": "https://www.instagram.com/reel/C0abcDEFghi/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==",
+      "expected": "https://www.instagram.com/reel/C0abcDEFghi/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Reddit",
+      "category": "Social",
+      "input": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/?share_id=AbC123xyz&utm_content=2&utm_medium=android_app&utm_name=androidcss&utm_source=share&utm_term=1",
+      "expected": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/",
+      "verified": null,
+      "notes": "Where an app /s/ share link resolves to. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Reddit",
+      "category": "Social",
+      "input": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/abc123x/?context=3&share_id=x",
+      "expected": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/abc123x/?context=3",
+      "verified": null,
+      "notes": "context picks how much of a comment thread to show and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "YouTube",
+      "category": "Video & music",
+      "input": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUKcmljayBhc3RsZXk%3D&t=42s",
+      "expected": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s",
+      "verified": null,
+      "notes": "pp encodes the search query; t (timestamp) must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "YouTube",
+      "category": "Video & music",
+      "input": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL123&index=3&si=abc",
+      "expected": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL123&index=3",
+      "verified": null,
+      "notes": "Playlist position must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3?crid=2ABCDEF&dib=eyJ2IjoiMSJ9&dib_tag=se&keywords=noise+cancelling+headphones&qid=1730000000&sprefix=noise%2Caps%2C250&sr=8-3",
+      "expected": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3",
+      "verified": null,
+      "notes": "Search context including the search terms. The /ref=... path segment is left for now. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/dp/B0ABCDEF12?th=1&psc=1&pd_rd_w=abc&pf_rd_p=def&pd_rd_r=ghi&content-id=amzn1.sym.x&tag=someone-20",
+      "expected": "https://www.amazon.com/dp/B0ABCDEF12?th=1&psc=1&tag=someone-20",
+      "verified": null,
+      "notes": "th and psc pick the product variant and must stay; the tag affiliate ID is kept pending a decision. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.co.uk/s?k=kettle&crid=1XYZ&sprefix=kett%2Caps%2C300&ref=nb_sb_ss_ts-doa-p_1_4&rh=n%3A123",
+      "expected": "https://www.amazon.co.uk/s?k=kettle&rh=n%3A123",
+      "verified": null,
+      "notes": "Search page: k (the search) and rh (filters) must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://example.com/item?keywords=red&sr=1",
+      "expected": "https://example.com/item?keywords=red&sr=1",
+      "verified": null,
+      "notes": "Amazon's names are only stripped on Amazon. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Maps",
+      "category": "Maps & ride-share",
+      "input": "https://www.google.com/maps/place/Royal+Exhibition+Building/@-37.8047,144.9717,17z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D&g_st=ic",
+      "expected": "https://www.google.com/maps/place/Royal+Exhibition+Building/@-37.8047,144.9717,17z/data=!3m1!4b1?entry=ttu",
+      "verified": null,
+      "notes": "Where maps.app.goo.gl resolves to. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Apple Music",
+      "category": "Video & music",
+      "input": "https://music.apple.com/au/album/some-album/1234567890?i=1234567891&uo=4&ct=share",
+      "expected": "https://music.apple.com/au/album/some-album/1234567890?i=1234567891",
+      "verified": null,
+      "notes": "i= is the track and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "App Store",
+      "category": "Video & music",
+      "input": "https://apps.apple.com/au/app/some-app/id123456789?mt=8&ct=share_sheet&uo=4",
+      "expected": "https://apps.apple.com/au/app/some-app/id123456789?mt=8",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Substack",
+      "category": "News & newsletters",
+      "input": "https://someone.substack.com/p/a-post-title?utm_campaign=post&utm_medium=web&r=2abcde&triedRedirect=true&showWelcomeOnShare=true",
+      "expected": "https://someone.substack.com/p/a-post-title?triedRedirect=true",
+      "verified": null,
+      "notes": "r is the sharer's referral ID; triedRedirect is left alone. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     }
   ],
   "shortLinks": [
@@ -510,6 +646,60 @@
       "url": "https://d.didiglobal.com/xxxxxxx",
       "known": false,
       "notes": "Deliberately not resolved for now (#5)."
+    },
+    {
+      "source": "Google Maps",
+      "url": "https://maps.app.goo.gl/AbCdEfGhIjKlMn123",
+      "known": true
+    },
+    {
+      "source": "Reddit",
+      "url": "https://redd.it/1abcd2e",
+      "known": true
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/r/melbourne/s/AbCdEf1234",
+      "known": true,
+      "notes": "App share link: a short link on a path of reddit.com."
+    },
+    {
+      "source": "Reddit",
+      "url": "https://reddit.com/r/melbourne/s/AbCdEf1234/",
+      "known": true,
+      "notes": "Trailing slash and no www."
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/r/melbourne/comments/1abcd2e/some_title/",
+      "known": false,
+      "notes": "A full post link isn't a short link."
+    },
+    {
+      "source": "Reddit",
+      "url": "https://www.reddit.com/r/s/s/x/extra",
+      "known": false,
+      "notes": "Extra segments don't match."
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/share/p/1AbCdEfGh/",
+      "known": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/share/1AbCdEfGh/",
+      "known": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://www.facebook.com/someone/posts/123",
+      "known": false
+    },
+    {
+      "source": "Lookalike",
+      "url": "https://notreddit.com/r/x/s/abc",
+      "known": false
     }
   ],
   "unwrap": [

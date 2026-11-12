@@ -183,10 +183,11 @@
       ],
       "params": [
         "feature",
-        "si"
+        "si",
+        "pp"
       ],
       "source": "YouTube",
-      "notes": "feature marks a video reached via a youtu.be short link; si is the per-share token identifying who shared it."
+      "notes": "feature marks a video reached via a youtu.be short link; si is the per-share token identifying who shared it. pp encodes the search that led to the video."
     },
     {
       "sites": [
@@ -246,6 +247,86 @@
       ],
       "source": "TikTok",
       "notes": "Appended once a vm.tiktok.com/vt.tiktok.com share link resolves, identifying the sharer's device/session and how the link was copied."
+    },
+    {
+      "sites": [
+        "x.com",
+        "twitter.com"
+      ],
+      "params": [
+        "s",
+        "t"
+      ],
+      "source": "X / Twitter",
+      "notes": "s says which share option was used (e.g. s=20, s=46); t is a per-share token identifying who shared it."
+    },
+    {
+      "sites": [
+        "google.*"
+      ],
+      "params": [
+        "g_st",
+        "g_ep"
+      ],
+      "source": "Google Maps",
+      "notes": "Added to links resolved from maps.app.goo.gl: g_st is the share type and g_ep encodes the share context. entry= is left alone."
+    },
+    {
+      "sites": [
+        "amazon.*"
+      ],
+      "params": [
+        "crid",
+        "dib",
+        "dib_tag",
+        "keywords",
+        "sprefix",
+        "sr",
+        "pd_rd_w",
+        "pd_rd_r",
+        "pd_rd_wg",
+        "pd_rd_i",
+        "pf_rd_p",
+        "pf_rd_r",
+        "pf_rd_s",
+        "pf_rd_t",
+        "pf_rd_i",
+        "pf_rd_m",
+        "content-id",
+        "linkCode",
+        "linkId",
+        "creativeASIN",
+        "social_share",
+        "_encoding",
+        "ref_"
+      ],
+      "source": "Amazon (full links, every country domain)",
+      "notes": "Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue)."
+    },
+    {
+      "sites": [
+        "music.apple.com",
+        "podcasts.apple.com",
+        "apps.apple.com",
+        "itunes.apple.com"
+      ],
+      "params": [
+        "uo",
+        "ct"
+      ],
+      "source": "Apple Music, Podcasts and App Store",
+      "notes": "uo and ct are campaign/origin tracking. i= (the track or episode), mt= and app= are kept; the at= affiliate token is kept too."
+    },
+    {
+      "sites": [
+        "substack.com"
+      ],
+      "params": [
+        "r",
+        "showWelcomeOnShare"
+      ],
+      "source": "Substack",
+      "notes": "r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it."
     }
   ],
   "shortLinkHosts": [
@@ -288,6 +369,19 @@
         "vt.tiktok.com"
       ],
       "provider": "TikTok"
+    },
+    {
+      "hosts": [
+        "maps.app.goo.gl"
+      ],
+      "provider": "Google Maps",
+      "notes": "Google Maps share links."
+    },
+    {
+      "hosts": [
+        "redd.it"
+      ],
+      "provider": "Reddit"
     }
   ],
   "neverStrip": [
@@ -480,6 +574,29 @@
       "scheme": "https",
       "source": "Google AMP viewer",
       "notes": "google.com/amp/s/<host>/<path> shows another site's AMP page; the original is https://<host>/<path>."
+    }
+  ],
+  "shortLinkPaths": [
+    {
+      "sites": [
+        "reddit.com"
+      ],
+      "paths": [
+        "/r/*/s/*"
+      ],
+      "provider": "Reddit",
+      "notes": "App share links like reddit.com/r/<sub>/s/<code>; the full post link carries share_id and utm_*."
+    },
+    {
+      "sites": [
+        "facebook.com"
+      ],
+      "paths": [
+        "/share/*",
+        "/share/*/*"
+      ],
+      "provider": "Facebook",
+      "notes": "Share links like facebook.com/share/p/<code>/ and /share/r/<code>/."
     }
   ]
 }

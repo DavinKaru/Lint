@@ -26,7 +26,7 @@ public enum UrlCleaner {
     /// country code, or "com."/"co." plus one (so eventbrite.com, eventbrite.ca, eventbrite.com.au,
     /// eventbrite.co.uk), plus subdomains of those. Lookalikes like noteventbrite.com or
     /// eventbrite.evil.com don't match.
-    private static func hostMatches(_ host: String, _ domain: String) -> Bool {
+    static func hostMatches(_ host: String, _ domain: String) -> Bool {
         guard domain.hasSuffix(".*") else { return host == domain || host.hasSuffix(".\(domain)") }
         let name = NSRegularExpression.escapedPattern(for: String(domain.dropLast(2)))
         let pattern = #"^(.+\.)?"# + name + #"\.(com|[a-z]{2}|(com|co)\.[a-z]{2})$"#

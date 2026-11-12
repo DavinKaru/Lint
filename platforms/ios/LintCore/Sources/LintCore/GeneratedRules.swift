@@ -59,9 +59,9 @@ enum GeneratedRules {
     /// matches that name on any country domain (see `UrlCleaner.hostMatches`).
     static let siteParams: [String: Set<String>] = [
         // YouTube
-        //   feature marks a video reached via a youtu.be short link; si is the per-share token identifying who shared it.
-        "youtube.com": ["feature", "si"],
-        "youtu.be": ["feature", "si"],
+        //   feature marks a video reached via a youtu.be short link; si is the per-share token identifying who shared it. pp encodes the search that led to the video.
+        "youtube.com": ["feature", "si", "pp"],
+        "youtu.be": ["feature", "si", "pp"],
         // Spotify
         //   si is the per-share token identifying who shared it.
         "spotify.com": ["si"],
@@ -77,6 +77,25 @@ enum GeneratedRules {
         // TikTok
         //   Appended once a vm.tiktok.com/vt.tiktok.com share link resolves, identifying the sharer's device/session and how the link was copied.
         "tiktok.com": ["is_from_webapp", "sender_device", "web_id", "share_app_id", "share_link_id", "share_item_id", "u_code", "_r", "_t"],
+        // X / Twitter
+        //   s says which share option was used (e.g. s=20, s=46); t is a per-share token identifying who shared it.
+        "x.com": ["s", "t"],
+        "twitter.com": ["s", "t"],
+        // Google Maps
+        //   Added to links resolved from maps.app.goo.gl: g_st is the share type and g_ep encodes the share context. entry= is left alone.
+        "google.*": ["g_st", "g_ep"],
+        // Amazon (full links, every country domain)
+        //   Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue).
+        "amazon.*": ["crid", "dib", "dib_tag", "keywords", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "linkCode", "linkId", "creativeASIN", "social_share", "_encoding", "ref_"],
+        // Apple Music, Podcasts and App Store
+        //   uo and ct are campaign/origin tracking. i= (the track or episode), mt= and app= are kept; the at= affiliate token is kept too.
+        "music.apple.com": ["uo", "ct"],
+        "podcasts.apple.com": ["uo", "ct"],
+        "apps.apple.com": ["uo", "ct"],
+        "itunes.apple.com": ["uo", "ct"],
+        // Substack
+        //   r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it.
+        "substack.com": ["r", "showWelcomeOnShare"],
     ]
 
     /// Hosts whose links are resolved (redirects followed) before cleaning.
@@ -94,6 +113,21 @@ enum GeneratedRules {
         "spoti.fi",
         // TikTok
         "vm.tiktok.com", "vt.tiktok.com",
+        // Google Maps
+        //   Google Maps share links.
+        "maps.app.goo.gl",
+        // Reddit
+        "redd.it",
+    ]
+
+    /// Short links that live on a path of a normal site; each "*" matches one path segment.
+    static let shortLinkPaths: [ShortLinkPath] = [
+        // Reddit
+        //   App share links like reddit.com/r/<sub>/s/<code>; the full post link carries share_id and utm_*.
+        ShortLinkPath(sites: ["reddit.com"], paths: ["/r/*/s/*"]),
+        // Facebook
+        //   Share links like facebook.com/share/p/<code>/ and /share/r/<code>/.
+        ShortLinkPath(sites: ["facebook.com"], paths: ["/share/*", "/share/*/*"]),
     ]
 
     /// Redirect links that carry the real link in a query param; unwrapped offline.
@@ -142,6 +176,12 @@ struct RedirectWrapper: Sendable {
     let sites: [String]
     let paths: [String]
     let params: [String]
+}
+
+/// Short links on `sites` whose path matches one of `paths` ("*" = one segment).
+struct ShortLinkPath: Sendable {
+    let sites: [String]
+    let paths: [String]
 }
 
 /// A redirect on `sites` whose path after `prefix` is the real link, without its `scheme`.

@@ -65,6 +65,15 @@ def validate(rules: dict) -> None:
         for path in group["paths"]:
             if not path.startswith("/") or "*" in path[:-1]:
                 fail(f'redirect wrapper "{label}": path "{path}" should start with "/" and may only end in "*"')
+    for group in rules.get("shortLinkPaths", []):
+        label = group["provider"]
+        for site in group["sites"]:
+            if not SITE_KEY.match(site):
+                fail(f'short-link path "{label}": site "{site}" should be a lowercase domain')
+        for path in group["paths"]:
+            segments = path.strip("/").split("/")
+            if not path.startswith("/") or any(not s or ("*" in s and s != "*") for s in segments):
+                fail(f'short-link path "{label}": "{path}" should be "/"-separated segments, each a name or a whole "*"')
     for group in rules.get("pathWrappers", []):
         label = group["source"]
         for site in group["sites"]:
@@ -124,6 +133,13 @@ def kotlin(rules: dict) -> str:
         out.append(f"        {quoted(group['hosts'])},")
     out += ["    )", ""]
 
+    out.append("    /** Short links that live on a path of a normal site; each \"*\" matches one path segment. */")
+    out.append("    val SHORT_LINK_PATHS: List<ShortLinkPath> = listOf(")
+    for group in rules.get("shortLinkPaths", []):
+        out += comment_lines(group, "        // ")
+        out.append(f"        ShortLinkPath(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])})),")
+    out += ["    )", ""]
+
     out.append("    /** Redirect links that carry the real link in a query param; unwrapped offline. */")
     out.append("    val REDIRECT_WRAPPERS: List<RedirectWrapper> = listOf(")
     for group in rules.get("redirectWrappers", []):
@@ -143,6 +159,9 @@ def kotlin(rules: dict) -> str:
     out.append("")
     out.append("/** A redirect on [sites] whose path after [prefix] is the real link, without its [scheme]. */")
     out.append("internal data class PathWrapper(val sites: List<String>, val prefix: String, val scheme: String)")
+    out.append("")
+    out.append("/** Short links on [sites] whose path matches one of [paths] (\"*\" = one segment). */")
+    out.append("internal data class ShortLinkPath(val sites: List<String>, val paths: List<String>)")
     out.append("")
     return "\n".join(out)
 
@@ -181,6 +200,13 @@ def swift(rules: dict) -> str:
         out.append(f"        {quoted(group['hosts'])},")
     out += ["    ]", ""]
 
+    out.append("    /// Short links that live on a path of a normal site; each \"*\" matches one path segment.")
+    out.append("    static let shortLinkPaths: [ShortLinkPath] = [")
+    for group in rules.get("shortLinkPaths", []):
+        out += comment_lines(group, "        // ")
+        out.append(f"        ShortLinkPath(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}]),")
+    out += ["    ]", ""]
+
     out.append("    /// Redirect links that carry the real link in a query param; unwrapped offline.")
     out.append("    static let redirectWrappers: [RedirectWrapper] = [")
     for group in rules.get("redirectWrappers", []):
@@ -200,6 +226,12 @@ def swift(rules: dict) -> str:
     out.append("    let sites: [String]")
     out.append("    let paths: [String]")
     out.append("    let params: [String]")
+    out.append("}")
+    out.append("")
+    out.append("/// Short links on `sites` whose path matches one of `paths` (\"*\" = one segment).")
+    out.append("struct ShortLinkPath: Sendable {")
+    out.append("    let sites: [String]")
+    out.append("    let paths: [String]")
     out.append("}")
     out.append("")
     out.append("/// A redirect on `sites` whose path after `prefix` is the real link, without its `scheme`.")

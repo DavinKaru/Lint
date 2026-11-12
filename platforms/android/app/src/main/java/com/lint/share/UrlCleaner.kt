@@ -34,7 +34,7 @@ object UrlCleaner {
      * eventbrite.co.uk), plus subdomains of those. Lookalikes like noteventbrite.com or
      * eventbrite.evil.com don't match.
      */
-    private fun hostMatches(host: String, domain: String): Boolean {
+    internal fun hostMatches(host: String, domain: String): Boolean {
         if (!domain.endsWith(".*")) return host == domain || host.endsWith(".$domain")
         val name = Regex.escape(domain.removeSuffix(".*"))
         return Regex("""^(.+\.)?$name\.(com|[a-z]{2}|(com|co)\.[a-z]{2})$""").matches(host)
