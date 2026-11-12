@@ -38,6 +38,8 @@ python3 shared/tests/coverage.py
 
 prints progress towards 1.0: how many sources on the target list (`targets.json`, mirroring the
 [Link support board](https://github.com/users/DavinKaru/projects/1)) have cases, and how many of
-those are verified against a real share. `--missing` lists the targets with no cases yet.
+those are verified against a real share. It also counts the ⚠ targets (where some params make the
+link work) that have cases but none verified from a real share yet: those are the ones to check on
+a phone first. `--missing` lists them, and the targets with no cases yet.
 
 When adding a source, add its case `source` name to the matching target's `sources` in `targets.json`.

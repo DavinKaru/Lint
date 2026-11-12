@@ -26,6 +26,7 @@ def main() -> None:
 
     rows = defaultdict(lambda: {"total": 0, "covered": 0, "verified": 0})
     missing = []
+    risky_unverified = []
     for target in targets:
         own = [c for source in target["sources"] or [target["name"]] for c in by_source.get(source, [])]
         row = rows[target["category"] or "Uncategorised"]
@@ -34,6 +35,8 @@ def main() -> None:
             row["covered"] += 1
             if any(c.get("verified") for c in own):
                 row["verified"] += 1
+            elif target["breakRisk"]:
+                risky_unverified.append(target)
         else:
             missing.append(target)
 
@@ -44,6 +47,8 @@ def main() -> None:
 
     print(f"Target sources: {covered}/{total} have test cases ({covered * 100 // total}%), "
           f"{verified} verified against a real share ({verified * 100 // total}%). 1.0 needs 95%.")
+    print(f"{len(risky_unverified)} of the covered targets are ⚠ (some params make the link work) and have "
+          f"no case verified from a real share yet (--missing lists them).")
     print(f"Test set: {len(clean)} clean cases ({unverified_cases} not yet verified from a phone), "
           f"{len(cases.get('unwrap', []))} unwrap cases, {len(cases['shortLinks'])} short-link cases.\n")
     print(f"{'Category':<22}{'Targets':>8}{'Covered':>9}{'Verified':>10}")
@@ -51,6 +56,9 @@ def main() -> None:
         print(f"{category:<22}{row['total']:>8}{row['covered']:>9}{row['verified']:>10}")
 
     if "--missing" in sys.argv:
+        print("\n⚠ with cases but no real share yet:")
+        for target in sorted(risky_unverified, key=lambda t: (t["category"] or "", t["name"])):
+            print(f"  {target['category']}: {target['name']}")
         print("\nNo cases yet (first batch first):")
         for target in sorted(missing, key=lambda t: (t["priority"] != "first", t["category"] or "", t["name"])):
             flag = " ⚠" if target["breakRisk"] else ""

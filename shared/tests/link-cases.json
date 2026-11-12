@@ -1439,7 +1439,7 @@
       "input": "https://www.booking.com/hotel/au/example.html?aid=1234567&label=ABC123&sid=abc123&checkin=2027-01-10&checkout=2027-01-12&group_adults=2&group_children=1&age=7&no_rooms=1&utm_medium=ABC123",
       "expected": "https://www.booking.com/hotel/au/example.html?aid=1234567&label=ABC123&sid=abc123&checkin=2027-01-10&checkout=2027-01-12&group_adults=2&group_children=1&age=7&no_rooms=1",
       "verified": null,
-      "notes": "Dates, guests, ages and rooms must stay; aid is the affiliate ID and is kept (#28). label and sid are tracking but are left in until a real share is checked. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+      "notes": "Dates, guests, ages and rooms must stay; aid (the affiliate ID) and label (the partner's sub-ID for it) are kept (#28). sid is a session ID but is left in: no Booking.com rules yet, only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
     },
     {
       "source": "Expedia",
@@ -1455,7 +1455,7 @@
       "input": "https://www.google.com/travel/flights/search?tfs=CBwQAhoeEgoyMDI3LTAxLTEwagcIARIDU1lEcgcIARIDTUVM&tfu=EgYIABAAGAA&hl=en&gl=AU&curr=AUD&utm_source=ABC123",
       "expected": "https://www.google.com/travel/flights/search?tfs=CBwQAhoeEgoyMDI3LTAxLTEwagcIARIDU1lEcgcIARIDTUVM&tfu=EgYIABAAGAA&hl=en&gl=AU&curr=AUD",
       "verified": null,
-      "notes": "tfs is the whole search (route, dates, passengers, cabin) and must stay, along with tfu, hl, gl and curr. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+      "notes": "tfs is the whole search (route, dates, passengers, cabin) and must stay, along with tfu, hl, gl and curr. No Google Flights rules yet: only the global rules and the general google.* ones (cd, ei, g_st, g_ep) apply until a real share is checked. Format from public sources, not taken from a real share."
     },
     {
       "source": "Skyscanner",
