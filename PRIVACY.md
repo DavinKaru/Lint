@@ -8,10 +8,12 @@ all. There is one deliberate, narrow exception.
 Lint removes parameters that track you: who shared a link, from which app, what you searched
 for, which ad you clicked. It deliberately keeps **affiliate IDs**, the parameters that credit
 whoever recommended a product (see `affiliateParams` in
-[`shared/rules/rules.json`](shared/rules/rules.json)). Some of them, like Walmart's `sourceid`,
-are per-click IDs, so the affiliate network can connect a purchase to that click. That's the
-point of a referral, and it's a deliberate trade-off: Lint won't take money away from the person
-who made the recommendation.
+[`shared/rules/rules.json`](shared/rules/rules.json)), even where a site uses the same params for
+its own ads (Temu's `_x_ads_*`, eBay's `mkcid`), since Lint can't tell the two apart. Some of
+them are per-click IDs, so the affiliate network can connect a purchase to that click: Walmart's
+`sourceid`, and AliExpress's `aff_fcid` and `aff_trace_key`. That's the point of a referral, and
+it's a deliberate trade-off: Lint won't take money away from the person who made the
+recommendation.
 
 Referral codes that an app adds when **you** share a link (Substack's `r`, Eventbrite's `aff`)
 are different: they identify you as the sharer, so Lint removes them like any other share

@@ -573,17 +573,17 @@
       "source": "Apple Music",
       "category": "Video & music",
       "input": "https://music.apple.com/au/album/some-album/1234567890?i=1234567891&uo=4&ct=share",
-      "expected": "https://music.apple.com/au/album/some-album/1234567890?i=1234567891",
+      "expected": "https://music.apple.com/au/album/some-album/1234567890?i=1234567891&ct=share",
       "verified": null,
-      "notes": "i= is the track and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+      "notes": "i= is the track and must stay. uo is stripped; ct is kept, since Apple's affiliate links use it for the affiliate's campaign (#28). Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
       "source": "App Store",
       "category": "Video & music",
       "input": "https://apps.apple.com/au/app/some-app/id123456789?mt=8&ct=share_sheet&uo=4",
-      "expected": "https://apps.apple.com/au/app/some-app/id123456789?mt=8",
+      "expected": "https://apps.apple.com/au/app/some-app/id123456789?mt=8&ct=share_sheet",
       "verified": null,
-      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+      "notes": "uo is stripped; ct is kept, since Apple's affiliate and App Store campaign links use it (#28). Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
       "source": "Substack",
@@ -856,6 +856,14 @@
       "expected": "https://www.ebay.com/itm/123456789012?mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5330000000&customid=example&toolid=10001&mkevt=1",
       "verified": null,
       "notes": "An eBay Partner Network link: EPN needs campid with mkcid, mkrid and mkevt to credit the partner, so all stay (#28). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "eBay",
+      "category": "Shopping",
+      "input": "https://www.ebay.com/itm/123456789012?mkevt=1&mkcid=1&mkrid=711-53200-19255-0&campid=5330000000&toolid=10001&customid=example&amdata=enc%3AAQAAAAAAexample&_trkparms=abc",
+      "expected": "https://www.ebay.com/itm/123456789012?mkevt=1&mkcid=1&mkrid=711-53200-19255-0&campid=5330000000&toolid=10001&customid=example&amdata=enc%3AAQAAAAAAexample",
+      "verified": null,
+      "notes": "An EPN priority-listing link: amdata carries the listing's payload and is kept with the affiliate params (#28). Format from eBay's EPN docs, not taken from a real share."
     },
     {
       "source": "eBay",

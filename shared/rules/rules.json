@@ -328,11 +328,10 @@
         "itunes.apple.com"
       ],
       "params": [
-        "uo",
-        "ct"
+        "uo"
       ],
       "source": "Apple Music, Podcasts and App Store",
-      "notes": "uo and ct are origin and campaign tracking (the share sheet adds ct=share). i= (the track or episode), mt= and app= are kept, and so is the at= affiliate token (see affiliateParams)."
+      "notes": "uo is origin tracking. i= (the track or episode), mt= and app= are kept, and so are the at= affiliate token and ct= campaign token (see affiliateParams)."
     },
     {
       "sites": [
@@ -529,8 +528,7 @@
         "ssspo",
         "sssrc",
         "ssuid",
-        "widget_ver",
-        "amdata"
+        "widget_ver"
       ],
       "source": "eBay",
       "notes": "Search and share-sheet (sss*) tracking. var= picks the variation and epid= the product, so both are kept, and so are the eBay Partner Network params (see affiliateParams). eBay's own app shares carry mkcid, mkrid and mkevt too; they're kept as well, since they can't be told apart from a partner's."
@@ -1308,10 +1306,11 @@
         "apple.com"
       ],
       "params": [
-        "at"
+        "at",
+        "ct"
       ],
       "source": "Apple Services Performance Partners",
-      "notes": "at credits the affiliate. ct (campaign text) is still stripped: Apple's share sheet uses it for its own share tracking (ct=share), and at alone credits the affiliate."
+      "notes": "at credits the affiliate and ct is the affiliate's own campaign token (https://performance-partners.apple.com/linking), like Amazon's ascsubtag. App Store Connect campaign links use ct too."
     },
     {
       "sites": [
@@ -1323,10 +1322,11 @@
         "toolid",
         "mkcid",
         "mkrid",
-        "mkevt"
+        "mkevt",
+        "amdata"
       ],
       "source": "eBay Partner Network",
-      "notes": "campid identifies the partner and customid is their sub-ID; EPN needs mkcid, mkrid and mkevt with it to credit the click."
+      "notes": "campid identifies the partner and customid is their sub-ID; EPN needs mkcid, mkrid and mkevt with it to credit the click, and amdata carries a priority listing's payload (https://developer.ebay.com/api-docs/buy/static/ref-epn-link.html)."
     },
     {
       "sites": [
@@ -1339,7 +1339,8 @@
         "aff_fsk",
         "sk"
       ],
-      "source": "AliExpress Portals"
+      "source": "AliExpress Portals",
+      "notes": "sk and aff_fsk identify the affiliate link. aff_fcid and aff_trace_key look like per-click IDs (see PRIVACY.md), kept because the affiliate network uses them to credit the click."
     },
     {
       "sites": [

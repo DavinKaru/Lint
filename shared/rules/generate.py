@@ -130,9 +130,11 @@ def validate(rules: dict) -> None:
 
 def check_affiliates(rules: dict, params: list, prefixes: list) -> None:
     """Lint keeps affiliate IDs (#28): no rule may strip an affiliateParams param on its site."""
-    for group in rules.get("affiliateParams", []):
-        if not group["sites"] or not group["params"]:
-            fail(f'affiliate params "{group["source"]}" needs sites and params')
+    if not rules.get("affiliateParams"):
+        fail("affiliateParams is missing or empty: it records the affiliate IDs Lint keeps (#28)")
+    for group in rules["affiliateParams"]:
+        if not group.get("source") or not group.get("sites") or not group.get("params"):
+            fail(f'affiliate params "{group.get("source", "?")}" needs a source, sites and params')
         for site in group["sites"]:
             if not SITE_KEY.match(site):
                 fail(f'affiliate params "{group["source"]}": site "{site}" should be a lowercase domain')
@@ -191,7 +193,9 @@ def sites_overlap(a: str, b: str) -> bool:
         ending, so www.amazon.* meets amazon.co.uk (at www.amazon.co.uk)."""
         if not key.endswith(".*"):
             return [key]
-        endings = {"com"}
+        # One of each ending a wildcard matches ("com", "uk", "com.au", "co.uk"), so that
+        # amazon.* meets amazon.com.* and amazon.co.*, plus the other key's own ending.
+        endings = {"com", "uk", "com.au", "co.uk"}
         if not other.endswith(".*"):
             labels = other.split(".")
             endings |= {labels[-1], ".".join(labels[-2:])}
