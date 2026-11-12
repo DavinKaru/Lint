@@ -7,14 +7,18 @@
       "category": "Events & travel",
       "priority": "first",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Airbnb"
+      ]
     },
     {
       "name": "Booking.com",
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Booking.com"
+      ]
     },
     {
       "name": "Eventbrite",
@@ -30,7 +34,9 @@
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Expedia"
+      ]
     },
     {
       "name": "Fever",
@@ -55,7 +61,9 @@
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Google Flights"
+      ]
     },
     {
       "name": "Humanitix (AU)",
@@ -96,7 +104,9 @@
       "category": "Events & travel",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Skyscanner"
+      ]
     },
     {
       "name": "Ticketek (AU)",
@@ -173,21 +183,27 @@
       "category": "Maps & ride-share",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Lyft trip share"
+      ]
     },
     {
       "name": "Ola trip share",
       "category": "Maps & ride-share",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Ola trip share"
+      ]
     },
     {
       "name": "Uber trip share",
       "category": "Maps & ride-share",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Uber trip share"
+      ]
     },
     {
       "name": "Waze",
@@ -338,7 +354,9 @@
       "category": "News & newsletters",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "SMH / The Age (AU)"
+      ]
     },
     {
       "name": "Substack",
@@ -608,7 +626,9 @@
       "category": "Shopping",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Shopify stores"
+      ]
     },
     {
       "name": "Target",
