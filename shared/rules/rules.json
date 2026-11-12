@@ -296,7 +296,6 @@
         "crid",
         "dib",
         "dib_tag",
-        "keywords",
         "sprefix",
         "sr",
         "pd_rd_w",
@@ -318,7 +317,7 @@
         "ref_"
       ],
       "source": "Amazon (full links, every country domain)",
-      "notes": "Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue)."
+      "notes": "Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is kept: older search links (amazon.com/s?keywords=...) use it as the query."
     },
     {
       "sites": [

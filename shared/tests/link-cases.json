@@ -509,9 +509,9 @@
       "source": "Amazon",
       "category": "Shopping",
       "input": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3?crid=2ABCDEF&dib=eyJ2IjoiMSJ9&dib_tag=se&keywords=noise+cancelling+headphones&qid=1730000000&sprefix=noise%2Caps%2C250&sr=8-3",
-      "expected": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3",
+      "expected": "https://www.amazon.com.au/Some-Product-Name/dp/B0ABCDEF12/ref=sr_1_3?keywords=noise+cancelling+headphones",
       "verified": null,
-      "notes": "Search context including the search terms. The /ref=... path segment is left for now. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+      "notes": "Search context including the search terms. The /ref=... path segment is left for now. Format from public documentation and observed behaviour, not yet checked against a real share from the phone. keywords is kept for now (it's the query on search links); stripping it only on /dp/ links needs path-scoped rules."
     },
     {
       "source": "Amazon",
@@ -1224,6 +1224,14 @@
       "expected": "https://shop.example.com.au/sale",
       "verified": null,
       "notes": "Where a resolved list-manage.com click link lands: mc_cid and mc_eid identify the campaign and subscriber. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com.au/s?keywords=usb+c+cable&crid=2ABCDEF&sprefix=usb%2Caps%2C250&ref=nb_sb_noss",
+      "expected": "https://www.amazon.com.au/s?keywords=usb+c+cable",
+      "verified": null,
+      "notes": "On a search link keywords is the query and must stay. Written for the test set, not taken from a real share."
     }
   ],
   "shortLinks": [

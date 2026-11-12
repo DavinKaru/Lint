@@ -95,8 +95,8 @@ internal object GeneratedRules {
         //   Added to links resolved from maps.app.goo.gl: g_st is the share type and g_ep encodes the share context. entry= is left alone.
         "google.*" to setOf("g_st", "g_ep"),
         // Amazon (full links, every country domain)
-        //   Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue).
-        "amazon.*" to setOf("crid", "dib", "dib_tag", "keywords", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "linkCode", "linkId", "creativeASIN", "social_share", "_encoding", "ref_"),
+        //   Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is kept: older search links (amazon.com/s?keywords=...) use it as the query.
+        "amazon.*" to setOf("crid", "dib", "dib_tag", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "linkCode", "linkId", "creativeASIN", "social_share", "_encoding", "ref_"),
         // Apple Music, Podcasts and App Store
         //   uo and ct are campaign/origin tracking. i= (the track or episode), mt= and app= are kept; the at= affiliate token is kept too.
         "music.apple.com" to setOf("uo", "ct"),
