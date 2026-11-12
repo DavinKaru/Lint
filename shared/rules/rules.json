@@ -232,7 +232,7 @@
         "sg"
       ],
       "source": "Eventbrite",
-      "notes": "aff records how a link was shared (e.g. ebdsshandroid, ebdsshsms); sg is a long per-share token. Eventbrite uses a domain per country, hence the wildcard."
+      "notes": "aff records how a link was shared (e.g. ebdsshandroid, ebdsshsms) and sg is a long per-share token, both added when you share. Eventbrite uses a domain per country, hence the wildcard."
     },
     {
       "sites": [
@@ -356,7 +356,7 @@
         "showWelcomeOnShare"
       ],
       "source": "Substack",
-      "notes": "r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it."
+      "notes": "r is the referral ID of whoever shared the link, added when you share, so it identifies you and is removed (unlike affiliate IDs, see affiliateParams). triedRedirect is left alone because custom-domain redirects use it."
     },
     {
       "sites": [
@@ -543,7 +543,7 @@
         "amdata"
       ],
       "source": "eBay",
-      "notes": "Search and share-sheet (sss*) tracking. var= picks the variation and epid= the product, so both are kept, and so are the eBay Partner Network params (see affiliateParams)."
+      "notes": "Search and share-sheet (sss*) tracking. var= picks the variation and epid= the product, so both are kept, and so are the eBay Partner Network params (see affiliateParams). eBay's own app shares carry mkcid, mkrid and mkevt too; they're kept as well, since they can't be told apart from a partner's."
     },
     {
       "sites": [
@@ -627,16 +627,10 @@
         "refer_page_sn",
         "_x_sessn_id",
         "share_uin",
-        "_x_vst_scene",
-        "_x_ads_channel",
-        "_x_ads_sub_channel",
-        "_x_ads_account",
-        "_x_ads_set",
-        "_x_ads_id",
-        "_x_ads_creative_id"
+        "_x_vst_scene"
       ],
       "source": "Temu",
-      "notes": "Session, sharer (share_uin) and ad tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept."
+      "notes": "Session and sharer (share_uin) tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept, and so are the _x_ads_* params, which credit Temu affiliates (see affiliateParams)."
     },
     {
       "sites": [
@@ -1308,6 +1302,21 @@
     },
     {
       "sites": [
+        "temu.com"
+      ],
+      "params": [
+        "_x_ads_channel",
+        "_x_ads_sub_channel",
+        "_x_ads_account",
+        "_x_ads_set",
+        "_x_ads_id",
+        "_x_ads_creative_id"
+      ],
+      "source": "Temu affiliates",
+      "notes": "Temu affiliate links carry the affiliate's channel and account in _x_ads_* (e.g. _x_ads_channel=kol_affiliate). Temu's own ad links use the same names; they're kept too."
+    },
+    {
+      "sites": [
         "klook.com"
       ],
       "params": [
@@ -1329,9 +1338,11 @@
         "booking.com"
       ],
       "params": [
-        "aid"
+        "aid",
+        "label"
       ],
-      "source": "Booking.com affiliates"
+      "source": "Booking.com affiliates",
+      "notes": "aid is the affiliate ID and label the partner's own sub-ID for it."
     }
   ]
 }

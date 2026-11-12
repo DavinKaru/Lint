@@ -131,6 +131,8 @@ def validate(rules: dict) -> None:
 def check_affiliates(rules: dict, params: list, prefixes: list) -> None:
     """Lint keeps affiliate IDs (#28): no rule may strip an affiliateParams param on its site."""
     for group in rules.get("affiliateParams", []):
+        if not group["sites"] or not group["params"]:
+            fail(f'affiliate params "{group["source"]}" needs sites and params')
         for site in group["sites"]:
             if not SITE_KEY.match(site):
                 fail(f'affiliate params "{group["source"]}": site "{site}" should be a lowercase domain')

@@ -75,7 +75,7 @@ enum GeneratedRules {
         //   eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook. referral_code, referral_story_type and tracking are added to shared Marketplace listings.
         "facebook.com": ["eid", "referral_code", "referral_story_type", "tracking"],
         // Eventbrite
-        //   aff records how a link was shared (e.g. ebdsshandroid, ebdsshsms); sg is a long per-share token. Eventbrite uses a domain per country, hence the wildcard.
+        //   aff records how a link was shared (e.g. ebdsshandroid, ebdsshsms) and sg is a long per-share token, both added when you share. Eventbrite uses a domain per country, hence the wildcard.
         "eventbrite.*": ["aff", "sg"],
         // Fever
         //   suid looks like a per-user/session ID on shared event links.
@@ -100,7 +100,7 @@ enum GeneratedRules {
         "apps.apple.com": ["uo", "ct"],
         "itunes.apple.com": ["uo", "ct"],
         // Substack
-        //   r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it.
+        //   r is the referral ID of whoever shared the link, added when you share, so it identifies you and is removed (unlike affiliate IDs, see affiliateParams). triedRedirect is left alone because custom-domain redirects use it.
         "substack.com": ["r", "showWelcomeOnShare"],
         // Pinterest
         //   Added to pins opened from pin.it share links. invite_code and sender are only stripped on pin pages (below): Pinterest also uses them for group-board and sign-up invites.
@@ -148,7 +148,7 @@ enum GeneratedRules {
         //   utlId is a per-share link ID (alongside utm_*). The view token in the path is kept.
         "canva.com": ["utlId"],
         // eBay
-        //   Search and share-sheet (sss*) tracking. var= picks the variation and epid= the product, so both are kept, and so are the eBay Partner Network params (see affiliateParams).
+        //   Search and share-sheet (sss*) tracking. var= picks the variation and epid= the product, so both are kept, and so are the eBay Partner Network params (see affiliateParams). eBay's own app shares carry mkcid, mkrid and mkevt too; they're kept as well, since they can't be told apart from a partner's.
         "ebay.*": ["_trkparms", "_trksid", "_from", "hash", "ssspo", "sssrc", "ssuid", "widget_ver", "amdata"],
         // AliExpress
         //   Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price. The aff_* and sk affiliate params are kept (see affiliateParams).
@@ -160,8 +160,8 @@ enum GeneratedRules {
         //   Share and page-source tracking. mallCode picks the warehouse and is kept.
         "shein.*": ["src_identifier", "src_module", "src_tab_page_id", "scici", "ici", "share_from", "url_from", "onelink"],
         // Temu
-        //   Session, sharer (share_uin) and ad tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept.
-        "temu.com": ["refer_page_name", "refer_page_id", "refer_page_sn", "_x_sessn_id", "share_uin", "_x_vst_scene", "_x_ads_channel", "_x_ads_sub_channel", "_x_ads_account", "_x_ads_set", "_x_ads_id", "_x_ads_creative_id"],
+        //   Session and sharer (share_uin) tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept, and so are the _x_ads_* params, which credit Temu affiliates (see affiliateParams).
+        "temu.com": ["refer_page_name", "refer_page_id", "refer_page_sn", "_x_sessn_id", "share_uin", "_x_vst_scene"],
         // Walmart
         //   ath* are recommendation-carousel tracking. classType and selected are kept, and so are the affiliate params (see affiliateParams).
         "walmart.com": ["athbdg", "athcpid", "athpgid", "athznid", "athieid", "athstid", "athguid", "athwpid", "athena", "athancid"],

@@ -842,6 +842,14 @@
       "notes": "An eBay Partner Network link: EPN needs campid with mkcid, mkrid and mkevt to credit the partner, so all stay (#28). Written for the test set, not taken from a real share."
     },
     {
+      "source": "eBay",
+      "category": "Shopping",
+      "input": "https://www.ebay.com/itm/123456789012?mkcid=16&mkevt=1&mkrid=711-127632-2357-0&ssspo=AbCd&sssrc=2349624&ssuid=xyz",
+      "expected": "https://www.ebay.com/itm/123456789012?mkcid=16&mkevt=1&mkrid=711-127632-2357-0",
+      "verified": null,
+      "notes": "eBay's own app share: the sss* share tracking goes, but mkcid, mkevt and mkrid stay, because they also credit eBay Partner Network affiliates and can't be told apart (#28). Written for the test set, not taken from a real share."
+    },
+    {
       "source": "AliExpress",
       "category": "Shopping",
       "input": "https://www.aliexpress.com/item/1005001234567890.html?spm=a2g0o.productlist.main.1.abc&algo_pvid=abc-123&aff_platform=link-c-tool&sk=_dAbCdE&gatewayAdapt=glo2aus&pdp_npi=4%40dis%21AUD%2110.00",
@@ -872,6 +880,14 @@
       "expected": "https://www.temu.com/au/some-item-g-601099512345678.html?_x_ns_sku_id=17592186044416",
       "verified": null,
       "notes": "_x_ns_sku_id picks the variant and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Temu",
+      "category": "Shopping",
+      "input": "https://www.temu.com/example-product-g-601099512345678.html?_x_ads_channel=kol_affiliate&_x_ads_account=1234567890&_x_campaign=affiliate&share_uin=ABC123&refer_page_name=home",
+      "expected": "https://www.temu.com/example-product-g-601099512345678.html?_x_ads_channel=kol_affiliate&_x_ads_account=1234567890&_x_campaign=affiliate",
+      "verified": null,
+      "notes": "An affiliate link: _x_ads_* credit the affiliate and stay (#28); share_uin (the sharer) and refer_page_name go. Written for the test set, not taken from a real share."
     },
     {
       "source": "Walmart",

@@ -13,6 +13,10 @@ are per-click IDs, so the affiliate network can connect a purchase to that click
 point of a referral, and it's a deliberate trade-off: Lint won't take money away from the person
 who made the recommendation.
 
+Referral codes that an app adds when **you** share a link (Substack's `r`, Eventbrite's `aff`)
+are different: they identify you as the sharer, so Lint removes them like any other share
+tracking.
+
 ## Short links
 
 Some tracking parameters only appear after a short link redirects to its full destination — the

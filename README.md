@@ -19,8 +19,11 @@ The one exception: for known short links, Lint briefly shows a small loading scr
 **Affiliate IDs are kept.** When a link credits whoever recommended it (Amazon's `tag`, Apple's
 `at`, eBay Partner Network's `campid`, AliExpress's `aff_*`, ...), Lint leaves those parameters
 alone: they're how creators and small sites get paid, and removing them doesn't make the link
-work any better. The search, session and share tracking around them is still removed. The full
-list is `affiliateParams` in [`shared/rules/rules.json`](shared/rules/rules.json).
+work any better. The search, session and share tracking around them is still removed, and so
+are referral codes an app adds when *you* share (Substack's `r`), since those identify you. The
+ones Lint guarantees to keep are listed as `affiliateParams` in
+[`shared/rules/rules.json`](shared/rules/rules.json); others are kept simply because no rule
+strips them.
 
 Which links Lint handles, which are being looked into, and which it deliberately leaves alone (and why) are tracked on the [Link support board](https://github.com/users/DavinKaru/projects/1). If a link isn't cleaned, [report it](https://github.com/DavinKaru/Lint/issues/new?template=link-not-cleaned.yml).
 
