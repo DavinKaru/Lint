@@ -96,6 +96,54 @@ enum GeneratedRules {
         // Substack
         //   r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it.
         "substack.com": ["r", "showWelcomeOnShare"],
+        // Pinterest
+        //   Added to pins opened from pin.it share links: invite_code and sender identify who shared it.
+        "pinterest.*": ["invite_code", "sender", "sfo", "mweb_unauth_id"],
+        // LinkedIn
+        //   rcm identifies the member who shared a post; lipi, midToken, midSig and trkEmail are page and email tracking. otpToken (email sign-in) is deliberately not listed.
+        "linkedin.com": ["rcm", "lipi", "midToken", "midSig", "trkEmail"],
+        // Threads
+        //   Per-share tracking tokens on post links.
+        "threads.net": ["xmt", "slof"],
+        "threads.com": ["xmt", "slof"],
+        // Tumblr
+        //   source=share marks how a post was shared.
+        "tumblr.com": ["source"],
+        // Quora
+        //   Share-sheet tracking on answer links.
+        "quora.com": ["ch", "oid", "share", "srid", "target_type"],
+        // SoundCloud
+        //   si is the per-share token, as on Spotify and YouTube.
+        "soundcloud.com": ["si"],
+        // Twitch
+        //   Share tracking on clip and channel links.
+        "twitch.tv": ["tt_medium", "tt_content", "tt_campaign"],
+        // Vimeo
+        //   share=copy marks how the link was copied. Private-video hashes (in the path or h=) are kept.
+        "vimeo.com": ["share"],
+        // Netflix
+        //   Share source and tracking IDs on title links. clip= is kept.
+        "netflix.com": ["s", "trkid", "trg"],
+        // Tidal
+        //   The bare ?u Tidal's share sheet appends.
+        "tidal.com": ["u"],
+        // Shazam
+        //   referrer=share on song links.
+        "shazam.com": ["referrer"],
+        // Google Docs and Drive
+        //   usp=sharing / drive_link / share_link only records which button made the link. resourcekey and everything else is kept.
+        "docs.google.com": ["usp"],
+        "drive.google.com": ["usp"],
+        // Notion
+        //   pvs is the page-view source.
+        "notion.so": ["pvs"],
+        "notion.site": ["pvs"],
+        // Figma
+        //   t is a per-share tracking token. node-id and everything else is kept.
+        "figma.com": ["t"],
+        // Canva
+        //   utlId is a per-share link ID (alongside utm_*). The view token in the path is kept.
+        "canva.com": ["utlId"],
     ]
 
     /// Hosts whose links are resolved (redirects followed) before cleaning.
@@ -118,6 +166,14 @@ enum GeneratedRules {
         "maps.app.goo.gl",
         // Reddit
         "redd.it",
+        // Pinterest
+        "pin.it",
+        // LinkedIn
+        "lnkd.in",
+        // Facebook
+        "fb.me",
+        // SoundCloud
+        "on.soundcloud.com",
     ]
 
     /// Short links that live on a path of a normal site; each "*" matches one path segment.

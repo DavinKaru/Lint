@@ -27,6 +27,10 @@ hasn't been tested on a real device yet.
 | `maps.app.goo.gl` | Google Maps | Not yet confirmed | Google Maps share links. Resolves to a `google.com/maps/…` link carrying `g_st`/`g_ep` share params, which are then stripped. Not yet tested on a real device. |
 | `redd.it`, and `reddit.com/r/<sub>/s/<code>` share paths | Reddit | Not yet confirmed | The Reddit app shares `/s/` links on reddit.com itself; only that exact path shape is resolved, never other reddit.com links. Resolves to the full post link carrying `share_id` and `utm_*`. Reddit may block non-browser requests, in which case the link is shared unchanged. Not yet tested on a real device. |
 | `facebook.com/share/…` share paths | Facebook | Not yet confirmed | Facebook's newer share links (`/share/p/<code>/`, `/share/r/<code>/`, `/share/<code>/`); only those path shapes are resolved. Not yet tested on a real device. |
+| `pin.it` | Pinterest | Not yet confirmed | Resolves to a pin link carrying `invite_code`/`sender`, which identify the sharer and are then stripped. Not yet tested on a real device. |
+| `lnkd.in` | LinkedIn | Not yet confirmed | LinkedIn's short links. Not yet tested on a real device. |
+| `fb.me` | Facebook | Not yet confirmed | Older Facebook short links. Not yet tested on a real device. |
+| `on.soundcloud.com` | SoundCloud | Not yet confirmed | Resolves to a track link carrying the `si` share token, then stripped. Not yet tested on a real device. |
 
 ### How resolution works
 

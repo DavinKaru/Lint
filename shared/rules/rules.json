@@ -327,6 +327,175 @@
       ],
       "source": "Substack",
       "notes": "r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it."
+    },
+    {
+      "sites": [
+        "pinterest.*"
+      ],
+      "params": [
+        "invite_code",
+        "sender",
+        "sfo",
+        "mweb_unauth_id"
+      ],
+      "source": "Pinterest",
+      "notes": "Added to pins opened from pin.it share links: invite_code and sender identify who shared it."
+    },
+    {
+      "sites": [
+        "linkedin.com"
+      ],
+      "params": [
+        "rcm",
+        "lipi",
+        "midToken",
+        "midSig",
+        "trkEmail"
+      ],
+      "source": "LinkedIn",
+      "notes": "rcm identifies the member who shared a post; lipi, midToken, midSig and trkEmail are page and email tracking. otpToken (email sign-in) is deliberately not listed."
+    },
+    {
+      "sites": [
+        "threads.net",
+        "threads.com"
+      ],
+      "params": [
+        "xmt",
+        "slof"
+      ],
+      "source": "Threads",
+      "notes": "Per-share tracking tokens on post links."
+    },
+    {
+      "sites": [
+        "tumblr.com"
+      ],
+      "params": [
+        "source"
+      ],
+      "source": "Tumblr",
+      "notes": "source=share marks how a post was shared."
+    },
+    {
+      "sites": [
+        "quora.com"
+      ],
+      "params": [
+        "ch",
+        "oid",
+        "share",
+        "srid",
+        "target_type"
+      ],
+      "source": "Quora",
+      "notes": "Share-sheet tracking on answer links."
+    },
+    {
+      "sites": [
+        "soundcloud.com"
+      ],
+      "params": [
+        "si"
+      ],
+      "source": "SoundCloud",
+      "notes": "si is the per-share token, as on Spotify and YouTube."
+    },
+    {
+      "sites": [
+        "twitch.tv"
+      ],
+      "params": [
+        "tt_medium",
+        "tt_content",
+        "tt_campaign"
+      ],
+      "source": "Twitch",
+      "notes": "Share tracking on clip and channel links."
+    },
+    {
+      "sites": [
+        "vimeo.com"
+      ],
+      "params": [
+        "share"
+      ],
+      "source": "Vimeo",
+      "notes": "share=copy marks how the link was copied. Private-video hashes (in the path or h=) are kept."
+    },
+    {
+      "sites": [
+        "netflix.com"
+      ],
+      "params": [
+        "s",
+        "trkid",
+        "trg"
+      ],
+      "source": "Netflix",
+      "notes": "Share source and tracking IDs on title links. clip= is kept."
+    },
+    {
+      "sites": [
+        "tidal.com"
+      ],
+      "params": [
+        "u"
+      ],
+      "source": "Tidal",
+      "notes": "The bare ?u Tidal's share sheet appends."
+    },
+    {
+      "sites": [
+        "shazam.com"
+      ],
+      "params": [
+        "referrer"
+      ],
+      "source": "Shazam",
+      "notes": "referrer=share on song links."
+    },
+    {
+      "sites": [
+        "docs.google.com",
+        "drive.google.com"
+      ],
+      "params": [
+        "usp"
+      ],
+      "source": "Google Docs and Drive",
+      "notes": "usp=sharing / drive_link / share_link only records which button made the link. resourcekey and everything else is kept."
+    },
+    {
+      "sites": [
+        "notion.so",
+        "notion.site"
+      ],
+      "params": [
+        "pvs"
+      ],
+      "source": "Notion",
+      "notes": "pvs is the page-view source."
+    },
+    {
+      "sites": [
+        "figma.com"
+      ],
+      "params": [
+        "t"
+      ],
+      "source": "Figma",
+      "notes": "t is a per-share tracking token. node-id and everything else is kept."
+    },
+    {
+      "sites": [
+        "canva.com"
+      ],
+      "params": [
+        "utlId"
+      ],
+      "source": "Canva",
+      "notes": "utlId is a per-share link ID (alongside utm_*). The view token in the path is kept."
     }
   ],
   "shortLinkHosts": [
@@ -382,6 +551,30 @@
         "redd.it"
       ],
       "provider": "Reddit"
+    },
+    {
+      "hosts": [
+        "pin.it"
+      ],
+      "provider": "Pinterest"
+    },
+    {
+      "hosts": [
+        "lnkd.in"
+      ],
+      "provider": "LinkedIn"
+    },
+    {
+      "hosts": [
+        "fb.me"
+      ],
+      "provider": "Facebook"
+    },
+    {
+      "hosts": [
+        "on.soundcloud.com"
+      ],
+      "provider": "SoundCloud"
     }
   ],
   "neverStrip": [

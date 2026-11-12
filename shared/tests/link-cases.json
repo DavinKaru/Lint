@@ -568,6 +568,230 @@
       "expected": "https://someone.substack.com/p/a-post-title?triedRedirect=true",
       "verified": null,
       "notes": "r is the sharer's referral ID; triedRedirect is left alone. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Pinterest",
+      "category": "Social",
+      "input": "https://www.pinterest.com.au/pin/123456789012345678/?invite_code=abc123&sender=987654321&sfo=1",
+      "expected": "https://www.pinterest.com.au/pin/123456789012345678/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "LinkedIn",
+      "category": "Social",
+      "input": "https://www.linkedin.com/posts/someone_some-post-activity-7250000000000000000-AbCd?utm_source=share&utm_medium=member_android&rcm=ACoAAA1bCdE",
+      "expected": "https://www.linkedin.com/posts/someone_some-post-activity-7250000000000000000-AbCd",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Threads",
+      "category": "Social",
+      "input": "https://www.threads.net/@someone/post/C9AbCdEfGhI?xmt=AQGzAbCdEf&slof=1",
+      "expected": "https://www.threads.net/@someone/post/C9AbCdEfGhI",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Tumblr",
+      "category": "Social",
+      "input": "https://www.tumblr.com/someone/765432109876543210/a-post?source=share",
+      "expected": "https://www.tumblr.com/someone/765432109876543210/a-post",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Quora",
+      "category": "Social",
+      "input": "https://www.quora.com/What-is-a-question/answer/Someone?ch=10&oid=12345&share=abcd1234&srid=3abc&target_type=answer",
+      "expected": "https://www.quora.com/What-is-a-question/answer/Someone",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Snapchat",
+      "category": "Social",
+      "input": "https://www.snapchat.com/add/someone?share_id=AbCdEf123&locale=en-AU",
+      "expected": "https://www.snapchat.com/add/someone?locale=en-AU",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Bluesky",
+      "category": "Social",
+      "input": "https://bsky.app/profile/someone.bsky.social/post/3kabcdefghi2x",
+      "expected": "https://bsky.app/profile/someone.bsky.social/post/3kabcdefghi2x",
+      "verified": null,
+      "notes": "Bluesky share links carry no tracking: passed through unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Mastodon",
+      "category": "Social",
+      "input": "https://aus.social/@someone/113456789012345678",
+      "expected": "https://aus.social/@someone/113456789012345678",
+      "verified": null,
+      "notes": "Mastodon post links carry no tracking: passed through unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Telegram",
+      "category": "Social",
+      "input": "https://t.me/somechannel/1234",
+      "expected": "https://t.me/somechannel/1234",
+      "verified": null,
+      "notes": "Passed through unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "WhatsApp",
+      "category": "Social",
+      "input": "https://whatsapp.com/channel/0029VaAbCdEfGhIjKlMn1234",
+      "expected": "https://whatsapp.com/channel/0029VaAbCdEfGhIjKlMn1234",
+      "verified": null,
+      "notes": "Passed through unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Discord",
+      "category": "Social",
+      "input": "https://discord.gg/AbCdEf12",
+      "expected": "https://discord.gg/AbCdEf12",
+      "verified": null,
+      "notes": "The invite code is the link: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "SoundCloud",
+      "category": "Video & music",
+      "input": "https://soundcloud.com/someartist/some-track?si=0123abcd4567ef89&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
+      "expected": "https://soundcloud.com/someartist/some-track",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Twitch",
+      "category": "Video & music",
+      "input": "https://clips.twitch.tv/SomeClipName-AbCdEf?tt_medium=clips_api&tt_content=url",
+      "expected": "https://clips.twitch.tv/SomeClipName-AbCdEf",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Vimeo",
+      "category": "Video & music",
+      "input": "https://vimeo.com/123456789/abcdef1234?share=copy",
+      "expected": "https://vimeo.com/123456789/abcdef1234",
+      "verified": null,
+      "notes": "The private-video hash in the path must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Vimeo",
+      "category": "Video & music",
+      "input": "https://player.vimeo.com/video/123456789?h=abcdef1234",
+      "expected": "https://player.vimeo.com/video/123456789?h=abcdef1234",
+      "verified": null,
+      "notes": "h= is the private-video hash: must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Netflix",
+      "category": "Video & music",
+      "input": "https://www.netflix.com/title/80100172?s=a&trkid=13747225&trg=cp&clip=81499054",
+      "expected": "https://www.netflix.com/title/80100172?clip=81499054",
+      "verified": null,
+      "notes": "clip= picks the clip and is kept. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Tidal",
+      "category": "Video & music",
+      "input": "https://tidal.com/browse/track/123456789?u",
+      "expected": "https://tidal.com/browse/track/123456789",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Shazam",
+      "category": "Video & music",
+      "input": "https://www.shazam.com/track/123456789/some-song?referrer=share",
+      "expected": "https://www.shazam.com/track/123456789/some-song",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Apple Podcasts",
+      "category": "Video & music",
+      "input": "https://podcasts.apple.com/au/podcast/some-show/id1234567890?i=1000654321098&uo=4",
+      "expected": "https://podcasts.apple.com/au/podcast/some-show/id1234567890?i=1000654321098",
+      "verified": null,
+      "notes": "i= is the episode and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Docs / Drive",
+      "category": "Work & productivity",
+      "input": "https://docs.google.com/document/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/edit?usp=sharing",
+      "expected": "https://docs.google.com/document/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/edit",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Docs / Drive",
+      "category": "Work & productivity",
+      "input": "https://drive.google.com/file/d/1AbCdEf/view?usp=drive_link&resourcekey=0-AbCdEf",
+      "expected": "https://drive.google.com/file/d/1AbCdEf/view?resourcekey=0-AbCdEf",
+      "verified": null,
+      "notes": "resourcekey is needed to open older shared files and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Notion",
+      "category": "Work & productivity",
+      "input": "https://www.notion.so/someone/Some-Page-0123456789abcdef0123456789abcdef?pvs=4",
+      "expected": "https://www.notion.so/someone/Some-Page-0123456789abcdef0123456789abcdef",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Figma",
+      "category": "Work & productivity",
+      "input": "https://www.figma.com/design/AbCdEfGh123/Some-File?node-id=12-34&t=AbCdEfGhIjKl-0",
+      "expected": "https://www.figma.com/design/AbCdEfGh123/Some-File?node-id=12-34",
+      "verified": null,
+      "notes": "node-id picks the frame and must stay. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Canva",
+      "category": "Work & productivity",
+      "input": "https://www.canva.com/design/DAGAbCdEf/AbCdEfGhIjKl/view?utm_content=DAGAbCdEf&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h0123abcd",
+      "expected": "https://www.canva.com/design/DAGAbCdEf/AbCdEfGhIjKl/view",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Dropbox",
+      "category": "Work & productivity",
+      "input": "https://www.dropbox.com/scl/fi/abc123/file.pdf?rlkey=xyz789&dl=0",
+      "expected": "https://www.dropbox.com/scl/fi/abc123/file.pdf?rlkey=xyz789&dl=0",
+      "verified": null,
+      "notes": "rlkey and dl are needed: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Zoom",
+      "category": "Work & productivity",
+      "input": "https://us02web.zoom.us/j/81234567890?pwd=AbCdEfGhIjKlMnOp.1",
+      "expected": "https://us02web.zoom.us/j/81234567890?pwd=AbCdEfGhIjKlMnOp.1",
+      "verified": null,
+      "notes": "pwd is the meeting password: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Microsoft Teams",
+      "category": "Work & productivity",
+      "input": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_AbCd%40thread.v2/0?context=%7b%22Tid%22%3a%22abc%22%7d",
+      "expected": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_AbCd%40thread.v2/0?context=%7b%22Tid%22%3a%22abc%22%7d",
+      "verified": null,
+      "notes": "Every param is needed: must stay unchanged. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "GitHub",
+      "category": "Work & productivity",
+      "input": "https://github.com/DavinKaru/Lint/pull/27?notification_referrer_id=NT_abc",
+      "expected": "https://github.com/DavinKaru/Lint/pull/27?notification_referrer_id=NT_abc",
+      "verified": null,
+      "notes": "Passed through unchanged; GitHub's own params are under review in #15. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     }
   ],
   "shortLinks": [
@@ -703,6 +927,26 @@
       "source": "Lookalike",
       "url": "https://notreddit.com/r/x/s/abc",
       "known": false
+    },
+    {
+      "source": "Pinterest",
+      "url": "https://pin.it/AbCdEf12",
+      "known": true
+    },
+    {
+      "source": "LinkedIn",
+      "url": "https://lnkd.in/gAbCdEf",
+      "known": true
+    },
+    {
+      "source": "Facebook",
+      "url": "https://fb.me/abc123",
+      "known": true
+    },
+    {
+      "source": "SoundCloud",
+      "url": "https://on.soundcloud.com/AbCdEf",
+      "known": true
     }
   ],
   "unwrap": [

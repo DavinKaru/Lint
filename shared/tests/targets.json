@@ -574,14 +574,18 @@
       "category": "Social",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Bluesky"
+      ]
     },
     {
       "name": "Discord",
       "category": "Social",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Discord"
+      ]
     },
     {
       "name": "Facebook (remaining)",
@@ -615,21 +619,27 @@
       "category": "Social",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Mastodon"
+      ]
     },
     {
       "name": "Pinterest",
       "category": "Social",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Pinterest"
+      ]
     },
     {
       "name": "Quora",
       "category": "Social",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Quora"
+      ]
     },
     {
       "name": "Reddit",
@@ -645,14 +655,18 @@
       "category": "Social",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Snapchat"
+      ]
     },
     {
       "name": "Telegram",
       "category": "Social",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Telegram"
+      ]
     },
     {
       "name": "Threads",
@@ -686,7 +700,9 @@
       "category": "Social",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "WhatsApp"
+      ]
     },
     {
       "name": "X / Twitter",
@@ -712,7 +728,9 @@
       "category": "Video & music",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Apple Podcasts"
+      ]
     },
     {
       "name": "Deezer",
@@ -726,21 +744,27 @@
       "category": "Video & music",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Netflix"
+      ]
     },
     {
       "name": "Shazam",
       "category": "Video & music",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Shazam"
+      ]
     },
     {
       "name": "SoundCloud",
       "category": "Video & music",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "SoundCloud"
+      ]
     },
     {
       "name": "Spotify",
@@ -756,21 +780,27 @@
       "category": "Video & music",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Tidal"
+      ]
     },
     {
       "name": "Twitch",
       "category": "Video & music",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Twitch"
+      ]
     },
     {
       "name": "Vimeo",
       "category": "Video & music",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Vimeo"
+      ]
     },
     {
       "name": "YouTube",
@@ -787,49 +817,63 @@
       "category": "Work & productivity",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Canva"
+      ]
     },
     {
       "name": "Dropbox",
       "category": "Work & productivity",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Dropbox"
+      ]
     },
     {
       "name": "Figma",
       "category": "Work & productivity",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Figma"
+      ]
     },
     {
       "name": "GitHub",
       "category": "Work & productivity",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "GitHub"
+      ]
     },
     {
       "name": "Google Docs / Drive",
       "category": "Work & productivity",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Google Docs / Drive"
+      ]
     },
     {
       "name": "Microsoft Teams",
       "category": "Work & productivity",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Microsoft Teams"
+      ]
     },
     {
       "name": "Notion",
       "category": "Work & productivity",
       "priority": "later",
       "breakRisk": false,
-      "sources": []
+      "sources": [
+        "Notion"
+      ]
     },
     {
       "name": "Seek (AU)",
@@ -843,7 +887,9 @@
       "category": "Work & productivity",
       "priority": "later",
       "breakRisk": true,
-      "sources": []
+      "sources": [
+        "Zoom"
+      ]
     }
   ]
 }
