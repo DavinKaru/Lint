@@ -93,8 +93,13 @@ def fetch(url: str, timeout: float, deadline: float) -> bytes:
         with urllib.request.urlopen(request, timeout=min(timeout, left())) as response:
             chunks, size = [], 0
             while size <= MAX_DOWNLOAD:
+                # read1 returns after one receive, and each receive waits at most until the
+                # deadline, so a server sending a byte at a time can't hold the job past it.
+                sock = getattr(getattr(getattr(response, "fp", None), "raw", None), "_sock", None)
+                if sock is not None:
+                    sock.settimeout(min(timeout, left()))
                 left()
-                chunk = response.read(CHUNK)
+                chunk = response.read1(CHUNK)
                 if not chunk:
                     break
                 chunks.append(chunk)
@@ -480,11 +485,17 @@ def parse_filter(data: bytes) -> ListData:
             continue
         key, value = action
         if exception:
-            parsed = filter_param(value) if key == "removeparam" and value and not value.startswith("~") else None
-            if parsed is None:
+            # Only plain site exceptions: an app= one (a desktop browser's webview) isn't about links.
+            if key != "removeparam" or "app" in options:
                 out.other += 1
+            elif not value:
+                out.exempt.update(("*", site) for site in sites)  # strip nothing on this site
             else:
-                out.exempt.update((parsed[1].lower(), site) for site in sites)
+                parsed = None if value.startswith("~") else filter_param(value)
+                if parsed is None:
+                    out.other += 1
+                else:
+                    out.exempt.update((parsed[1].lower(), site) for site in sites)
             continue
         if key == "urlskip":
             out.redirects.update(s for s in sites if s)
@@ -646,8 +657,10 @@ class Catalog:
             if any(s is not None and inside(s, h) for h in hosts for s in sites):
                 found.append(name)
         if not found:
-            brands = {brand(s) for s in sites}
-            found = [name for name, key in self.target_names if key in brands]
+            # By name only for targets with no case links yet; ones with links matched above.
+            brands = {brand(s) for s in sites if s}
+            hostless = {name for name, hosts in self.target_hosts if not hosts}
+            found = [name for name, key in self.target_names if key in brands and name in hostless]
         return found
 
 
@@ -702,10 +715,11 @@ def compare(lists: dict, catalog: Catalog, ranks: dict, min_lists: int) -> dict:
 
     def exemptions(name, sites) -> str:
         """Where a list says stripping name breaks a site: worth knowing before adding a rule."""
-        found = sorted({f"{list_name} exempts it on `{site or 'every site'}`"
-                        for list_name, site in exempt.get(name.lower(), ())
-                        if None in sites or site is None or any(site_matches(site, s) or site_matches(s, site)
-                                                                 for s in sites)})
+        # An exception counts for a row's site if it covers that site (not just a subdomain of it).
+        found = sorted({f"{list_name} exempts {'it' if param != '*' else 'every param'} on `{site or 'every site'}`"
+                        for param in (name.lower(), "*")
+                        for list_name, site in exempt.get(param, ())
+                        if None in sites or site is None or any(site_matches(s, site) for s in sites)})
         return "; ".join(found[:2]) + (f" (+{len(found) - 2} more)" if len(found) > 2 else "")
 
     def kept_reason(kind, name, sites) -> str | None:
@@ -930,7 +944,7 @@ def build(lists_status: dict, lists: dict, catalog: Catalog, ranks: dict, args, 
     report = report.replace("@", "@\u2060")
     if len(report) > args.max_chars:
         cut = report.rfind("\n", 0, args.max_chars - 60)
-        report = report[:cut] + "\n\n_Report cut short to fit the issue size limit._\n"
+        report = report[:cut if cut > 0 else args.max_chars - 60] + "\n\n_Report cut short to fit the issue size limit._\n"
     return report
 
 

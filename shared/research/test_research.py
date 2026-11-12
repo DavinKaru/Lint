@@ -124,6 +124,57 @@ class HelperTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "ran out of time"):
             research.fetch("http://127.0.0.1:9/", 5, research.time.monotonic() - 1)
 
+    def test_a_trickling_download_stops_at_the_deadline(self):
+        import http.client
+        import socket
+        import threading
+        client, server = socket.socketpair()
+
+        def trickle():
+            try:
+                server.sendall(b"HTTP/1.1 200 OK\r\nContent-Length: 100000\r\n\r\n")
+                for _ in range(50):
+                    server.sendall(b"x")
+                    research.time.sleep(0.1)
+            except OSError:
+                pass
+
+        threading.Thread(target=trickle, daemon=True).start()
+        response = http.client.HTTPResponse(client)
+        response.begin()
+        original = research.urllib.request.urlopen
+        research.urllib.request.urlopen = lambda *args, **kwargs: response
+        try:
+            start = research.time.monotonic()
+            with self.assertRaisesRegex(RuntimeError, "ran out of time|timed out"):
+                research.fetch("http://trickle.example/", 30, start + 1)
+            self.assertLess(research.time.monotonic() - start, 3)
+        finally:
+            research.urllib.request.urlopen = original
+            client.close()
+            server.close()
+
+    def test_exceptions_and_their_sites(self):
+        data = research.parse_filter(b"@@||archive.example^$removeparam\n"
+                                     b"@@||app.example^$app=browser.exe,removeparam=ocid\n"
+                                     b"@@||sub.shop.example^$removeparam=ref\n")
+        self.assertEqual(data.exempt, {("*", "archive.example"), ("ref", "sub.shop.example")})
+        lists = {"A": research.ListData(params={("param", "ref", "shop.example"), ("param", "zz", "archive.example")},
+                                        exempt=data.exempt)}
+        lists["B"] = research.ListData(params=lists["A"].params)
+        catalog = research.Catalog(json.loads((FIXTURES / "rules.json").read_text(encoding="utf-8")))
+        rows = {r.name: r.note for r in research.compare(lists, catalog, {}, 2)["site"]}
+        self.assertEqual(rows["ref"], "")  # an exception on a subdomain isn't the whole site's
+        self.assertEqual(rows["zz"], "A exempts every param on `archive.example`")
+
+    def test_targets_by_name_only_without_case_links(self):
+        cases = {"clean": [{"source": "Bigco Chat", "input": "", "expected": "https://chat.bigco.example/x"}]}
+        targets = {"targets": [{"name": "Bigco Chat", "sources": ["Bigco Chat"]},
+                               {"name": "Other Thing", "sources": []}]}
+        catalog = research.Catalog(json.loads((FIXTURES / "rules.json").read_text(encoding="utf-8")), cases, targets)
+        self.assertEqual(catalog.targets_for(["bigco.example"]), [])
+        self.assertEqual(catalog.targets_for(["other.example"]), ["Other Thing"])
+
 
 class ParserTests(unittest.TestCase):
     def test_filter_list(self):

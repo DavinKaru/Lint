@@ -42,8 +42,8 @@ rank:
   expected output (content IDs, variant selectors), affiliate IDs (`affiliateParams`, #28), and
   params Lint strips only on some pages of a site (`siteParams` with `paths`). For information only.
 
-When a filter list has an exception (`@@...$removeparam=`) for a lead's param on that site, the lead
-says so: it's the list saying that stripping it there breaks something. A list's site matches a
+When a filter list has an exception (`@@...$removeparam=`) for a lead's param on that site, or for
+every param there, the lead says so: it's the list saying that stripping it there breaks something. A list's site matches a
 target only if it's one of the target's hosts or inside one (`google.com` rules aren't Google
 Calendar's).
 
