@@ -31,10 +31,10 @@ LICENSE
   its own toolchain (bundled asset, generated source, etc.). `/shared/docs` holds design notes
   that apply across platforms rather than to one specific implementation.
 
-- **Until `/shared/rules` exists**, the tracking-parameter lists and short-link domains are
-  hand-copied between `UrlCleaner.kt`/`ShortLinkResolver.kt` (Android) and
-  `UrlCleaner.swift`/`ShortLinkResolver.swift` (iOS). Any change to one must be made to the
-  other in the same PR; each platform's tests are ports of each other, so keep those in step too.
+- **`/shared/rules/rules.json`** is the single source of truth for the tracking params, prefixes,
+  site-specific params and short-link domains on every platform. `shared/rules/generate.py` turns
+  it into `GeneratedRules.kt` (Android) and `GeneratedRules.swift` (iOS), which are committed, and
+  CI checks they match. Change rules there, never in platform code (see `shared/rules/README.md`).
 
 - **`/shared/tests/link-cases.json`** is the test set of real shared links that both platforms'
   tests load and check, so a rule change that breaks a case fails on both. Add a case for every

@@ -1,0 +1,307 @@
+{
+  "_about": "The single source of truth for Lint's cleaning rules on every platform. Edit this file, then run `python3 shared/rules/generate.py` to regenerate the Kotlin and Swift code (CI fails if they're out of date). See shared/rules/README.md.",
+  "version": 1,
+  "trackingPrefixes": [
+    {
+      "prefixes": [
+        "utm_"
+      ],
+      "source": "Google Analytics campaign tags (used everywhere)"
+    },
+    {
+      "prefixes": [
+        "mtm_"
+      ],
+      "source": "Matomo campaign tags"
+    },
+    {
+      "prefixes": [
+        "cp_smn_"
+      ],
+      "source": "Secret Media Network (Secret Melbourne, Secret London, ...)",
+      "notes": "Campaign tags it adds to partner links, e.g. Fever tickets (cp_smn_source, cp_smn_content, cp_smn_term). Distinctive enough to strip on every site, like utm_."
+    }
+  ],
+  "trackingParams": [
+    {
+      "params": [
+        "fbclid",
+        "gclid",
+        "gclsrc",
+        "dclid",
+        "gbraid",
+        "wbraid",
+        "msclkid",
+        "igshid",
+        "igsh",
+        "twclid",
+        "ttclid",
+        "yclid"
+      ],
+      "source": "Ad and social click IDs"
+    },
+    {
+      "params": [
+        "vero_id",
+        "vero_conv"
+      ],
+      "source": "Vero"
+    },
+    {
+      "params": [
+        "mc_cid",
+        "mc_eid"
+      ],
+      "source": "Mailchimp"
+    },
+    {
+      "params": [
+        "mkt_tok"
+      ],
+      "source": "Marketo"
+    },
+    {
+      "params": [
+        "_hsenc",
+        "_hsmi",
+        "__hsfp",
+        "__hssc",
+        "__hstc"
+      ],
+      "source": "HubSpot"
+    },
+    {
+      "params": [
+        "ref",
+        "ref_src"
+      ],
+      "source": "Generic referral",
+      "notes": "Generic names, under review in #15."
+    },
+    {
+      "params": [
+        "epik"
+      ],
+      "source": "Pinterest"
+    },
+    {
+      "params": [
+        "aqs",
+        "cd",
+        "ei",
+        "iflsig",
+        "pcampaignid",
+        "rlz",
+        "srsltid",
+        "sxsrf",
+        "uact",
+        "ved",
+        "_ga",
+        "_gl"
+      ],
+      "source": "Google (Ads, Analytics, Search, Shopping)",
+      "notes": "cd and ei are generic names, under review in #15."
+    },
+    {
+      "params": [
+        "comment_tracking",
+        "eav",
+        "mibextid",
+        "__tn__"
+      ],
+      "source": "Meta / Facebook",
+      "notes": "eid is Facebook-only, see siteParams."
+    },
+    {
+      "params": [
+        "ScCid"
+      ],
+      "source": "Snapchat"
+    },
+    {
+      "params": [
+        "correlation_id",
+        "rdt",
+        "ref_campaign",
+        "ref_source",
+        "share_id"
+      ],
+      "source": "Reddit",
+      "notes": "share_id is a generic name, under review in #15."
+    },
+    {
+      "params": [
+        "refId",
+        "trackingId",
+        "trk"
+      ],
+      "source": "LinkedIn",
+      "notes": "Generic names, under review in #15."
+    },
+    {
+      "params": [
+        "ascsubtag",
+        "camp",
+        "creative",
+        "dchild",
+        "qid",
+        "refRID",
+        "smid",
+        "spIA",
+        "srs"
+      ],
+      "source": "Amazon",
+      "notes": "camp, creative, qid, smid and srs are generic names, under review in #15."
+    },
+    {
+      "params": [
+        "__twitter_impression"
+      ],
+      "source": "Twitter / X"
+    },
+    {
+      "params": [
+        "pk_campaign",
+        "pk_kwd",
+        "pk_keyword",
+        "pk_medium",
+        "pk_source",
+        "pk_content",
+        "pk_cid",
+        "piwik_campaign",
+        "piwik_kwd"
+      ],
+      "source": "Matomo / Piwik (legacy)",
+      "notes": "Exact names only: a blanket pk_* or piwik_* prefix would hit ordinary params like ?pk_id=42."
+    }
+  ],
+  "siteParams": [
+    {
+      "sites": [
+        "youtube.com",
+        "youtu.be"
+      ],
+      "params": [
+        "feature",
+        "si"
+      ],
+      "source": "YouTube",
+      "notes": "feature marks a video reached via a youtu.be short link; si is the per-share token identifying who shared it."
+    },
+    {
+      "sites": [
+        "spotify.com"
+      ],
+      "params": [
+        "si"
+      ],
+      "source": "Spotify",
+      "notes": "si is the per-share token identifying who shared it."
+    },
+    {
+      "sites": [
+        "facebook.com"
+      ],
+      "params": [
+        "eid"
+      ],
+      "source": "Meta / Facebook",
+      "notes": "eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook."
+    },
+    {
+      "sites": [
+        "eventbrite.*"
+      ],
+      "params": [
+        "aff",
+        "sg"
+      ],
+      "source": "Eventbrite",
+      "notes": "aff records how a link was shared (e.g. ebdsshandroid, ebdsshsms); sg is a long per-share token. Eventbrite uses a domain per country, hence the wildcard."
+    },
+    {
+      "sites": [
+        "feverup.com"
+      ],
+      "params": [
+        "suid"
+      ],
+      "source": "Fever",
+      "notes": "suid looks like a per-user/session ID on shared event links."
+    },
+    {
+      "sites": [
+        "tiktok.com"
+      ],
+      "params": [
+        "is_from_webapp",
+        "sender_device",
+        "web_id",
+        "share_app_id",
+        "share_link_id",
+        "share_item_id",
+        "u_code",
+        "_r",
+        "_t"
+      ],
+      "source": "TikTok",
+      "notes": "Appended once a vm.tiktok.com/vt.tiktok.com share link resolves, identifying the sharer's device/session and how the link was copied."
+    }
+  ],
+  "shortLinkHosts": [
+    {
+      "hosts": [
+        "amzn.to",
+        "amzn.asia",
+        "a.co"
+      ],
+      "provider": "Amazon",
+      "notes": "Amazon blocks plain HTTP clients (#11); kept because it fails safe to the unresolved link."
+    },
+    {
+      "hosts": [
+        "youtu.be"
+      ],
+      "provider": "YouTube"
+    },
+    {
+      "hosts": [
+        "t.co"
+      ],
+      "provider": "Twitter / X"
+    },
+    {
+      "hosts": [
+        "fb.watch"
+      ],
+      "provider": "Facebook"
+    },
+    {
+      "hosts": [
+        "spoti.fi"
+      ],
+      "provider": "Spotify"
+    },
+    {
+      "hosts": [
+        "vm.tiktok.com",
+        "vt.tiktok.com"
+      ],
+      "provider": "TikTok"
+    }
+  ],
+  "neverStrip": [
+    {
+      "params": [
+        "cid"
+      ],
+      "notes": "Google Maps uses ?cid= to identify a place (#2). Too generic to scope to one tracking site."
+    },
+    {
+      "params": [
+        "eid"
+      ],
+      "notes": "Google Calendar uses ?eid= to identify an event (#2). Only stripped on Facebook (siteParams)."
+    }
+  ]
+}

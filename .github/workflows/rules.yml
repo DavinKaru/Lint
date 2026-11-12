@@ -1,0 +1,31 @@
+name: Rules
+
+# Checks that the generated rule code on both platforms matches shared/rules/rules.json, and that
+# the catalog passes generate.py's safety checks (e.g. nothing in neverStrip is stripped globally).
+on:
+  pull_request:
+    paths:
+      - "shared/rules/**"
+      - "platforms/android/app/src/main/java/com/lint/share/GeneratedRules.kt"
+      - "platforms/ios/LintCore/Sources/LintCore/GeneratedRules.swift"
+      - ".github/workflows/rules.yml"
+  push:
+    branches: [main]
+    paths:
+      - "shared/rules/**"
+      - "platforms/android/app/src/main/java/com/lint/share/GeneratedRules.kt"
+      - "platforms/ios/LintCore/Sources/LintCore/GeneratedRules.swift"
+      - ".github/workflows/rules.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Generated rules up to date
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check generated rules
+        run: python3 shared/rules/generate.py --check
