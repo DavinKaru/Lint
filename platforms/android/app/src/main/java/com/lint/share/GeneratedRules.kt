@@ -98,11 +98,11 @@ internal object GeneratedRules {
         //   Search and recommendation context on product links (sprefix carries what you searched for). Variant selectors th and psc are kept. Affiliate link params (tag, linkCode, linkId, ascsubtag, creativeASIN, camp, creative) are kept, see affiliateParams. keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query.
         "amazon.*" to setOf("crid", "dib", "dib_tag", "sprefix", "sr", "pd_rd_w", "pd_rd_r", "pd_rd_wg", "pd_rd_i", "pf_rd_p", "pf_rd_r", "pf_rd_s", "pf_rd_t", "pf_rd_i", "pf_rd_m", "content-id", "social_share", "_encoding", "ref_"),
         // Apple Music, Podcasts and App Store
-        //   uo and ct are origin and campaign tracking (the share sheet adds ct=share). i= (the track or episode), mt= and app= are kept, and so is the at= affiliate token (see affiliateParams).
-        "music.apple.com" to setOf("uo", "ct"),
-        "podcasts.apple.com" to setOf("uo", "ct"),
-        "apps.apple.com" to setOf("uo", "ct"),
-        "itunes.apple.com" to setOf("uo", "ct"),
+        //   uo is origin tracking. i= (the track or episode), mt= and app= are kept, and so are the at= affiliate token and ct= campaign token (see affiliateParams).
+        "music.apple.com" to setOf("uo"),
+        "podcasts.apple.com" to setOf("uo"),
+        "apps.apple.com" to setOf("uo"),
+        "itunes.apple.com" to setOf("uo"),
         // Substack
         //   r is the referral ID of whoever shared the link, added when you share, so it identifies you and is removed (unlike affiliate IDs, see affiliateParams). triedRedirect is left alone because custom-domain redirects use it.
         "substack.com" to setOf("r", "showWelcomeOnShare"),
@@ -153,7 +153,7 @@ internal object GeneratedRules {
         "canva.com" to setOf("utlId"),
         // eBay
         //   Search and share-sheet (sss*) tracking. var= picks the variation and epid= the product, so both are kept, and so are the eBay Partner Network params (see affiliateParams). eBay's own app shares carry mkcid, mkrid and mkevt too; they're kept as well, since they can't be told apart from a partner's.
-        "ebay.*" to setOf("_trkparms", "_trksid", "_from", "hash", "ssspo", "sssrc", "ssuid", "widget_ver", "amdata"),
+        "ebay.*" to setOf("_trkparms", "_trksid", "_from", "hash", "ssspo", "sssrc", "ssuid", "widget_ver"),
         // AliExpress
         //   Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price. The aff_* and sk affiliate params are kept (see affiliateParams).
         "aliexpress.*" to setOf("spm", "scm", "scm_id", "scm-url", "pvid", "algo_pvid", "algo_exp_id", "terminal_id", "afSmartRedirect", "gatewayAdapt", "sourceType", "srcSns", "businessType", "social_params", "tt", "utparam", "gps-id", "curPageLogUid", "bizType", "mp", "_randl_shipto"),
