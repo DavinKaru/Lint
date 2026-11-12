@@ -1,0 +1,16 @@
+{
+  "clean": [
+    {
+      "source": "Example Shop",
+      "input": "https://www.exampleshop.com/item/1?keepme=red&shop_trk=abc",
+      "expected": "https://www.exampleshop.com/item/1?keepme=red"
+    },
+    {
+      "source": "Video Site",
+      "input": "https://videosite.test/watch?v=1",
+      "expected": "https://videosite.test/watch?v=1"
+    }
+  ],
+  "shortLinks": [],
+  "unwrap": []
+}

@@ -1,0 +1,36 @@
+{
+  "providers": {
+    "globalRules": {
+      "urlPattern": ".*",
+      "rules": ["(?:%3F)?zz_click", "(?:%3F)?utm_[a-z]*", "zz_mail(?:id|ref)", "[^a-z]weird"],
+      "referralMarketing": ["zz_partner"]
+    },
+    "shop": {
+      "urlPattern": "^https?:\\/\\/(?:[a-z0-9-]+\\.)*?exampleshop(?:\\.[a-z]{2,}){1,}",
+      "rules": ["shop_trk", "shop_sess[a-z]*", "keepme"],
+      "redirections": ["^https?:\\/\\/(?:[a-z0-9-]+\\.)*?exampleshop(?:\\.[a-z]{2,}){1,}\\/out\\?to=([^&]*)"]
+    },
+    "video": {
+      "urlPattern": "^https?:\\/\\/(?:[a-z0-9-]+\\.)*?(videosite\\.test|vid\\.example)",
+      "rules": ["vs_share"]
+    },
+    "careless": {
+      "urlPattern": "^https?:\\/\\/(?:[a-z0-9-]+\\.)*?careless.example",
+      "rules": ["cl_id"]
+    },
+    "blocked": {
+      "urlPattern": "^https?:\\/\\/(?:[a-z0-9-]+\\.)*?adserver\\.example",
+      "completeProvider": true,
+      "rules": ["never_seen"]
+    },
+    "x` @someone `": {"urlPattern": "^https?:\\/\\/[a-z]+\\d\\.example\\.net", "rules": ["lost"]},
+    "unreadable": {
+      "urlPattern": "^https?:\\/\\/[a-z]+\\d\\.example\\.org",
+      "rules": ["lost"]
+    },
+    "ClearURLsTest": {
+      "urlPattern": "^https?:\\/\\/selftest\\.example\\/page",
+      "rules": ["selftest_param"]
+    }
+  }
+}

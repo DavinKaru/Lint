@@ -1,0 +1,16 @@
+{
+  "_about": "A tiny catalog for the research tests, in the shape of shared/rules/rules.json.",
+  "trackingPrefixes": [{"prefixes": ["utm_"], "source": "Fixture"}],
+  "trackingParams": [{"params": ["fixture_known"], "source": "Fixture"}],
+  "siteParams": [
+    {"sites": ["exampleshop.*"], "params": ["shop_trk"], "source": "Example Shop"},
+    {"sites": ["videosite.test"], "params": ["vs_other"], "source": "Video Site"},
+    {"sites": ["exampleshop.*"], "paths": ["/item/*/**"], "params": ["shop_kw"], "source": "Example Shop items"}
+  ],
+  "affiliateParams": [{"sites": ["exampleshop.*"], "params": ["shop_aff"], "source": "Example Shop affiliates"}],
+  "neverStrip": [{"params": ["zz_mailid"], "notes": "Pretend this one identifies content."}],
+  "shortLinkHosts": [],
+  "redirectWrappers": [],
+  "pathWrappers": [],
+  "shortLinkPaths": []
+}

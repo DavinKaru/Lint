@@ -52,3 +52,6 @@ DerivedData/
 # Python
 __pycache__/
 *.pyc
+
+# Param research downloads (never commit these, see NOTES.md)
+shared/research/cache/

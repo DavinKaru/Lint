@@ -1,0 +1,76 @@
+name: Param research
+
+# Once a month, compares Lint's rules with public tracking-param lists and posts the leads to one
+# "Param research report" issue (see shared/research/README.md). It never changes the rules. The
+# tests run on every PR that touches the script or the catalog, without the network.
+on:
+  schedule:
+    - cron: "23 5 1 * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "shared/research/**"
+      # The tests also load the real catalog, so a rules or cases change can't break the report.
+      - "shared/rules/**"
+      - "shared/tests/**"
+      - ".github/workflows/research.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: research-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Research script tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: python3 -m unittest discover -s shared/research -v
+
+  report:
+    name: Post the research report
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TITLE: Param research report
+    steps:
+      - uses: actions/checkout@v4
+
+      # Exits non-zero only if no tracking list could be downloaded, so a bad network day doesn't
+      # overwrite last month's report with an empty one. A single failed source is listed in it.
+      - name: Build the report
+        run: python3 shared/research/research.py --out "$RUNNER_TEMP/report.md"
+
+      # Updates the one open report issue, reopens the last closed one, or creates it. Cards on the
+      # Link support board (a Projects v2 board, which this token can't write to) are added by hand.
+      - name: Open or update the issue
+        run: |
+          gh label create research --color 5319e7 \
+            --description "Leads from the monthly param research report" 2>/dev/null || true
+          find_issue() {
+            gh issue list --label research --state "$1" --limit 50 --json number,title \
+              --jq '.[] | select(.title == env.TITLE) | .number' | head -n 1
+          }
+          number=$(find_issue open)
+          if [ -z "$number" ]; then
+            number=$(find_issue closed)
+            if [ -n "$number" ]; then gh issue reopen "$number"; fi
+          fi
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --body-file "$RUNNER_TEMP/report.md"
+            echo "Updated #$number"
+          else
+            gh issue create --title "$TITLE" --label research --body-file "$RUNNER_TEMP/report.md"
+          fi
