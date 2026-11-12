@@ -55,6 +55,26 @@ def validate(rules: dict) -> None:
         if not HOST.match(host):
             fail(f'short-link host "{host}" should be a lowercase domain')
 
+    for group in rules.get("redirectWrappers", []):
+        label = group["source"]
+        if not group["sites"] or not group["paths"] or not group["params"]:
+            fail(f'redirect wrapper "{label}" needs sites, paths and params')
+        for site in group["sites"]:
+            if not SITE_KEY.match(site):
+                fail(f'redirect wrapper "{label}": site "{site}" should be a lowercase domain')
+        for path in group["paths"]:
+            if not path.startswith("/") or "*" in path[:-1]:
+                fail(f'redirect wrapper "{label}": path "{path}" should start with "/" and may only end in "*"')
+    for group in rules.get("pathWrappers", []):
+        label = group["source"]
+        for site in group["sites"]:
+            if not SITE_KEY.match(site):
+                fail(f'path wrapper "{label}": site "{site}" should be a lowercase domain')
+        if not (group["prefix"].startswith("/") and group["prefix"].endswith("/")):
+            fail(f'path wrapper "{label}": prefix should start and end with "/"')
+        if group["scheme"] not in ("http", "https"):
+            fail(f'path wrapper "{label}": scheme should be http or https')
+
 
 def comment_lines(group: dict, prefix: str) -> list[str]:
     text = group["source"] if "source" in group else group["provider"]
@@ -102,7 +122,28 @@ def kotlin(rules: dict) -> str:
     for group in rules["shortLinkHosts"]:
         out += comment_lines(group, "        // ")
         out.append(f"        {quoted(group['hosts'])},")
+    out += ["    )", ""]
+
+    out.append("    /** Redirect links that carry the real link in a query param; unwrapped offline. */")
+    out.append("    val REDIRECT_WRAPPERS: List<RedirectWrapper> = listOf(")
+    for group in rules.get("redirectWrappers", []):
+        out += comment_lines(group, "        // ")
+        out.append(f"        RedirectWrapper(listOf({quoted(group['sites'])}), listOf({quoted(group['paths'])}), listOf({quoted(group['params'])})),")
+    out += ["    )", ""]
+
+    out.append("    /** Redirect links that carry the real link in their path; unwrapped offline. */")
+    out.append("    val PATH_WRAPPERS: List<PathWrapper> = listOf(")
+    for group in rules.get("pathWrappers", []):
+        out += comment_lines(group, "        // ")
+        out.append(f"        PathWrapper(listOf({quoted(group['sites'])}), {json.dumps(group['prefix'])}, {json.dumps(group['scheme'])}),")
     out += ["    )", "}", ""]
+
+    out.append("/** A redirect on [sites] at [paths] (a trailing \"*\" matches any rest) whose first valid [params] value is the real link. */")
+    out.append("internal data class RedirectWrapper(val sites: List<String>, val paths: List<String>, val params: List<String>)")
+    out.append("")
+    out.append("/** A redirect on [sites] whose path after [prefix] is the real link, without its [scheme]. */")
+    out.append("internal data class PathWrapper(val sites: List<String>, val prefix: String, val scheme: String)")
+    out.append("")
     return "\n".join(out)
 
 
@@ -138,7 +179,36 @@ def swift(rules: dict) -> str:
     for group in rules["shortLinkHosts"]:
         out += comment_lines(group, "        // ")
         out.append(f"        {quoted(group['hosts'])},")
+    out += ["    ]", ""]
+
+    out.append("    /// Redirect links that carry the real link in a query param; unwrapped offline.")
+    out.append("    static let redirectWrappers: [RedirectWrapper] = [")
+    for group in rules.get("redirectWrappers", []):
+        out += comment_lines(group, "        // ")
+        out.append(f"        RedirectWrapper(sites: [{quoted(group['sites'])}], paths: [{quoted(group['paths'])}], params: [{quoted(group['params'])}]),")
+    out += ["    ]", ""]
+
+    out.append("    /// Redirect links that carry the real link in their path; unwrapped offline.")
+    out.append("    static let pathWrappers: [PathWrapper] = [")
+    for group in rules.get("pathWrappers", []):
+        out += comment_lines(group, "        // ")
+        out.append(f"        PathWrapper(sites: [{quoted(group['sites'])}], prefix: {json.dumps(group['prefix'])}, scheme: {json.dumps(group['scheme'])}),")
     out += ["    ]", "}", ""]
+
+    out.append("/// A redirect on `sites` at `paths` (a trailing \"*\" matches any rest) whose first valid `params` value is the real link.")
+    out.append("struct RedirectWrapper: Sendable {")
+    out.append("    let sites: [String]")
+    out.append("    let paths: [String]")
+    out.append("    let params: [String]")
+    out.append("}")
+    out.append("")
+    out.append("/// A redirect on `sites` whose path after `prefix` is the real link, without its `scheme`.")
+    out.append("struct PathWrapper: Sendable {")
+    out.append("    let sites: [String]")
+    out.append("    let prefix: String")
+    out.append("    let scheme: String")
+    out.append("}")
+    out.append("")
     return "\n".join(out)
 
 

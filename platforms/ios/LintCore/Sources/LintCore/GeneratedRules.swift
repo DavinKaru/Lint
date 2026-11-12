@@ -95,4 +95,58 @@ enum GeneratedRules {
         // TikTok
         "vm.tiktok.com", "vt.tiktok.com",
     ]
+
+    /// Redirect links that carry the real link in a query param; unwrapped offline.
+    static let redirectWrappers: [RedirectWrapper] = [
+        // Google redirects (Gmail, Docs, Search)
+        //   Gmail and Google Docs wrap every link as google.com/url?q=<link>; search results use ?url=.
+        RedirectWrapper(sites: ["google.*"], paths: ["/url"], params: ["q", "url"]),
+        // Outlook Safe Links
+        //   Regional hosts like nam12.safelinks.protection.outlook.com, sometimes with an /ap/... path.
+        RedirectWrapper(sites: ["safelinks.protection.outlook.com"], paths: ["/*"], params: ["url"]),
+        // Facebook and Messenger link redirects
+        RedirectWrapper(sites: ["l.facebook.com", "lm.facebook.com", "l.messenger.com"], paths: ["/l.php"], params: ["u"]),
+        // Instagram link redirects
+        RedirectWrapper(sites: ["l.instagram.com"], paths: ["/"], params: ["u"]),
+        // Threads link redirects
+        RedirectWrapper(sites: ["l.threads.net", "l.threads.com"], paths: ["/"], params: ["u"]),
+        // YouTube description and comment links
+        RedirectWrapper(sites: ["youtube.com"], paths: ["/redirect"], params: ["q"]),
+        // LinkedIn link redirects
+        RedirectWrapper(sites: ["linkedin.com"], paths: ["/redir/redirect", "/safety/go"], params: ["url"]),
+        // Reddit outbound links
+        //   Path is the post ID, e.g. /t3_abc123.
+        RedirectWrapper(sites: ["out.reddit.com"], paths: ["/*"], params: ["url"]),
+        // DuckDuckGo result redirects
+        RedirectWrapper(sites: ["duckduckgo.com"], paths: ["/l/"], params: ["uddg"]),
+        // Slack link redirects
+        RedirectWrapper(sites: ["slack-redir.net"], paths: ["/link"], params: ["url"]),
+        // Steam link filter
+        RedirectWrapper(sites: ["steamcommunity.com"], paths: ["/linkfilter/"], params: ["u", "url"]),
+        // VK outbound links
+        RedirectWrapper(sites: ["vk.com"], paths: ["/away.php"], params: ["to"]),
+        // Tumblr link redirects
+        RedirectWrapper(sites: ["t.umblr.com"], paths: ["/redirect"], params: ["z"]),
+    ]
+
+    /// Redirect links that carry the real link in their path; unwrapped offline.
+    static let pathWrappers: [PathWrapper] = [
+        // Google AMP viewer
+        //   google.com/amp/s/<host>/<path> shows another site's AMP page; the original is https://<host>/<path>.
+        PathWrapper(sites: ["google.*"], prefix: "/amp/s/", scheme: "https"),
+    ]
+}
+
+/// A redirect on `sites` at `paths` (a trailing "*" matches any rest) whose first valid `params` value is the real link.
+struct RedirectWrapper: Sendable {
+    let sites: [String]
+    let paths: [String]
+    let params: [String]
+}
+
+/// A redirect on `sites` whose path after `prefix` is the real link, without its `scheme`.
+struct PathWrapper: Sendable {
+    let sites: [String]
+    let prefix: String
+    let scheme: String
 }

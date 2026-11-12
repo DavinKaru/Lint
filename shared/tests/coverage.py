@@ -20,13 +20,17 @@ def main() -> None:
     for case in clean:
         sources[case["category"]].add(case["source"])
 
-    print(f"{len(clean)} clean cases, {len(data['shortLinks'])} short-link cases\n")
+    unverified = sum(1 for case in clean if not case.get("verified"))
+    print(f"{len(clean)} clean cases ({unverified} not yet verified from a phone), "
+          f"{len(data.get('unwrap', []))} unwrap cases, {len(data['shortLinks'])} short-link cases\n")
     print(f"{'Category':<22}{'Cases':>6}  Sources")
     for category, count in sorted(by_category.items(), key=lambda item: (-item[1], item[0])):
         print(f"{category:<22}{count:>6}  {', '.join(sorted(sources[category]))}")
 
-    oldest = min(clean, key=lambda case: case["verified"])
-    print(f"\nOldest verification: {oldest['verified']} ({oldest['source']})")
+    verified = [case for case in clean if case.get("verified")]
+    if verified:
+        oldest = min(verified, key=lambda case: case["verified"])
+        print(f"\nOldest verification: {oldest['verified']} ({oldest['source']})")
 
 
 if __name__ == "__main__":

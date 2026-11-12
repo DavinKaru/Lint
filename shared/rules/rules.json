@@ -303,5 +303,183 @@
       ],
       "notes": "Google Calendar uses ?eid= to identify an event (#2). Only stripped on Facebook (siteParams)."
     }
+  ],
+  "redirectWrappers": [
+    {
+      "sites": [
+        "google.*"
+      ],
+      "paths": [
+        "/url"
+      ],
+      "params": [
+        "q",
+        "url"
+      ],
+      "source": "Google redirects (Gmail, Docs, Search)",
+      "notes": "Gmail and Google Docs wrap every link as google.com/url?q=<link>; search results use ?url=."
+    },
+    {
+      "sites": [
+        "safelinks.protection.outlook.com"
+      ],
+      "paths": [
+        "/*"
+      ],
+      "params": [
+        "url"
+      ],
+      "source": "Outlook Safe Links",
+      "notes": "Regional hosts like nam12.safelinks.protection.outlook.com, sometimes with an /ap/... path."
+    },
+    {
+      "sites": [
+        "l.facebook.com",
+        "lm.facebook.com",
+        "l.messenger.com"
+      ],
+      "paths": [
+        "/l.php"
+      ],
+      "params": [
+        "u"
+      ],
+      "source": "Facebook and Messenger link redirects"
+    },
+    {
+      "sites": [
+        "l.instagram.com"
+      ],
+      "paths": [
+        "/"
+      ],
+      "params": [
+        "u"
+      ],
+      "source": "Instagram link redirects"
+    },
+    {
+      "sites": [
+        "l.threads.net",
+        "l.threads.com"
+      ],
+      "paths": [
+        "/"
+      ],
+      "params": [
+        "u"
+      ],
+      "source": "Threads link redirects"
+    },
+    {
+      "sites": [
+        "youtube.com"
+      ],
+      "paths": [
+        "/redirect"
+      ],
+      "params": [
+        "q"
+      ],
+      "source": "YouTube description and comment links"
+    },
+    {
+      "sites": [
+        "linkedin.com"
+      ],
+      "paths": [
+        "/redir/redirect",
+        "/safety/go"
+      ],
+      "params": [
+        "url"
+      ],
+      "source": "LinkedIn link redirects"
+    },
+    {
+      "sites": [
+        "out.reddit.com"
+      ],
+      "paths": [
+        "/*"
+      ],
+      "params": [
+        "url"
+      ],
+      "source": "Reddit outbound links",
+      "notes": "Path is the post ID, e.g. /t3_abc123."
+    },
+    {
+      "sites": [
+        "duckduckgo.com"
+      ],
+      "paths": [
+        "/l/"
+      ],
+      "params": [
+        "uddg"
+      ],
+      "source": "DuckDuckGo result redirects"
+    },
+    {
+      "sites": [
+        "slack-redir.net"
+      ],
+      "paths": [
+        "/link"
+      ],
+      "params": [
+        "url"
+      ],
+      "source": "Slack link redirects"
+    },
+    {
+      "sites": [
+        "steamcommunity.com"
+      ],
+      "paths": [
+        "/linkfilter/"
+      ],
+      "params": [
+        "u",
+        "url"
+      ],
+      "source": "Steam link filter"
+    },
+    {
+      "sites": [
+        "vk.com"
+      ],
+      "paths": [
+        "/away.php"
+      ],
+      "params": [
+        "to"
+      ],
+      "source": "VK outbound links"
+    },
+    {
+      "sites": [
+        "t.umblr.com"
+      ],
+      "paths": [
+        "/redirect"
+      ],
+      "params": [
+        "z"
+      ],
+      "source": "Tumblr link redirects"
+    }
+  ],
+  "pathWrappers": [
+    {
+      "sites": [
+        "google.*"
+      ],
+      "prefix": "/amp/s/",
+      "scheme": "https",
+      "source": "Google AMP viewer",
+      "notes": "google.com/amp/s/<host>/<path> shows another site's AMP page; the original is https://<host>/<path>."
+    }
   ]
 }

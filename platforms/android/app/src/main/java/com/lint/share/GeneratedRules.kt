@@ -99,4 +99,50 @@ internal object GeneratedRules {
         // TikTok
         "vm.tiktok.com", "vt.tiktok.com",
     )
+
+    /** Redirect links that carry the real link in a query param; unwrapped offline. */
+    val REDIRECT_WRAPPERS: List<RedirectWrapper> = listOf(
+        // Google redirects (Gmail, Docs, Search)
+        //   Gmail and Google Docs wrap every link as google.com/url?q=<link>; search results use ?url=.
+        RedirectWrapper(listOf("google.*"), listOf("/url"), listOf("q", "url")),
+        // Outlook Safe Links
+        //   Regional hosts like nam12.safelinks.protection.outlook.com, sometimes with an /ap/... path.
+        RedirectWrapper(listOf("safelinks.protection.outlook.com"), listOf("/*"), listOf("url")),
+        // Facebook and Messenger link redirects
+        RedirectWrapper(listOf("l.facebook.com", "lm.facebook.com", "l.messenger.com"), listOf("/l.php"), listOf("u")),
+        // Instagram link redirects
+        RedirectWrapper(listOf("l.instagram.com"), listOf("/"), listOf("u")),
+        // Threads link redirects
+        RedirectWrapper(listOf("l.threads.net", "l.threads.com"), listOf("/"), listOf("u")),
+        // YouTube description and comment links
+        RedirectWrapper(listOf("youtube.com"), listOf("/redirect"), listOf("q")),
+        // LinkedIn link redirects
+        RedirectWrapper(listOf("linkedin.com"), listOf("/redir/redirect", "/safety/go"), listOf("url")),
+        // Reddit outbound links
+        //   Path is the post ID, e.g. /t3_abc123.
+        RedirectWrapper(listOf("out.reddit.com"), listOf("/*"), listOf("url")),
+        // DuckDuckGo result redirects
+        RedirectWrapper(listOf("duckduckgo.com"), listOf("/l/"), listOf("uddg")),
+        // Slack link redirects
+        RedirectWrapper(listOf("slack-redir.net"), listOf("/link"), listOf("url")),
+        // Steam link filter
+        RedirectWrapper(listOf("steamcommunity.com"), listOf("/linkfilter/"), listOf("u", "url")),
+        // VK outbound links
+        RedirectWrapper(listOf("vk.com"), listOf("/away.php"), listOf("to")),
+        // Tumblr link redirects
+        RedirectWrapper(listOf("t.umblr.com"), listOf("/redirect"), listOf("z")),
+    )
+
+    /** Redirect links that carry the real link in their path; unwrapped offline. */
+    val PATH_WRAPPERS: List<PathWrapper> = listOf(
+        // Google AMP viewer
+        //   google.com/amp/s/<host>/<path> shows another site's AMP page; the original is https://<host>/<path>.
+        PathWrapper(listOf("google.*"), "/amp/s/", "https"),
+    )
 }
+
+/** A redirect on [sites] at [paths] (a trailing "*" matches any rest) whose first valid [params] value is the real link. */
+internal data class RedirectWrapper(val sites: List<String>, val paths: List<String>, val params: List<String>)
+
+/** A redirect on [sites] whose path after [prefix] is the real link, without its [scheme]. */
+internal data class PathWrapper(val sites: List<String>, val prefix: String, val scheme: String)

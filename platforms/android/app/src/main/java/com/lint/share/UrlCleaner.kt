@@ -1,10 +1,14 @@
 package com.lint.share
 
+import java.io.ByteArrayOutputStream
 import java.net.URI
 import java.net.URISyntaxException
+import java.nio.ByteBuffer
+import java.nio.charset.CharacterCodingException
 
 /**
- * Strips known tracking query parameters from URLs found in shared text.
+ * Strips known tracking query parameters from URLs found in shared text, after unwrapping any
+ * known redirect link (e.g. google.com/url?q=...) to the real link inside it.
  */
 object UrlCleaner {
 
@@ -56,17 +60,94 @@ object UrlCleaner {
     }
 
     /**
-     * Removes tracking query parameters from a single URL string, preserving any
-     * non-tracking query parameters and the fragment. Returns null if the URL can't be parsed.
+     * Unwraps known redirect links (Gmail's google.com/url?q=..., l.facebook.com/l.php?u=...,
+     * Outlook Safe Links, ...) to the real link they point at, entirely offline. Wrappers inside
+     * wrappers are unwrapped too. Anything that isn't a known wrapper with a valid http(s) link
+     * inside is returned unchanged.
+     */
+    fun unwrap(url: String): String {
+        var current = url
+        repeat(MAX_UNWRAP_DEPTH) { current = unwrapOnce(current) ?: return current }
+        return current
+    }
+
+    private const val MAX_UNWRAP_DEPTH = 5
+
+    private fun unwrapOnce(url: String): String? {
+        val uri = try { URI(url) } catch (e: URISyntaxException) { return null }
+        val host = uri.host?.lowercase() ?: return null
+        val path = uri.rawPath.takeUnless { it.isNullOrEmpty() } ?: "/"
+
+        for (wrapper in GeneratedRules.PATH_WRAPPERS) {
+            if (wrapper.sites.none { hostMatches(host, it) } || !path.startsWith(wrapper.prefix)) continue
+            val rest = path.removePrefix(wrapper.prefix) +
+                (uri.rawQuery?.let { "?$it" } ?: "") + (uri.rawFragment?.let { "#$it" } ?: "")
+            return validTarget("${wrapper.scheme}://$rest")
+        }
+
+        val pairs = uri.rawQuery?.split("&") ?: return null
+        for (wrapper in GeneratedRules.REDIRECT_WRAPPERS) {
+            if (wrapper.sites.none { hostMatches(host, it) } || wrapper.paths.none { pathMatches(path, it) }) continue
+            for (param in wrapper.params) {
+                val pair = pairs.firstOrNull { it.startsWith("$param=") } ?: continue
+                val target = percentDecode(pair.substringAfter("=")) ?: continue
+                validTarget(target)?.let { return it }
+            }
+        }
+        return null
+    }
+
+    private fun pathMatches(path: String, pattern: String): Boolean =
+        if (pattern.endsWith("*")) path.startsWith(pattern.dropLast(1)) else path == pattern
+
+    /** [target] if it's an http(s) link that parses with a host, otherwise null. */
+    private fun validTarget(target: String): String? {
+        val lower = target.lowercase()
+        if (!lower.startsWith("http://") && !lower.startsWith("https://")) return null
+        if (target.any { it.isWhitespace() || it.isISOControl() }) return null
+        val uri = try { URI(target) } catch (e: URISyntaxException) { return null }
+        return if (uri.host.isNullOrEmpty()) null else target
+    }
+
+    /** Strict percent-decoding ("+" stays "+"): null if malformed or not valid UTF-8. */
+    private fun percentDecode(value: String): String? {
+        val bytes = ByteArrayOutputStream()
+        var i = 0
+        while (i < value.length) {
+            if (value[i] == '%') {
+                if (i + 2 >= value.length) return null
+                val hi = Character.digit(value[i + 1], 16)
+                val lo = Character.digit(value[i + 2], 16)
+                if (hi < 0 || lo < 0) return null
+                bytes.write(hi * 16 + lo)
+                i += 3
+            } else {
+                val next = value.indexOf('%', i).let { if (it < 0) value.length else it }
+                bytes.write(value.substring(i, next).toByteArray(Charsets.UTF_8))
+                i = next
+            }
+        }
+        return try {
+            Charsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(bytes.toByteArray())).toString()
+        } catch (e: CharacterCodingException) {
+            null
+        }
+    }
+
+    /**
+     * Unwraps [url] if it's a known redirect link (see [unwrap]), then removes tracking query
+     * parameters, preserving any non-tracking query parameters and the fragment. Returns null if
+     * the URL can't be parsed.
      */
     fun cleanUrl(url: String): String? {
+        val target = unwrap(url)
         val uri = try {
-            URI(url)
+            URI(target)
         } catch (e: URISyntaxException) {
             return null
         }
 
-        val rawQuery = uri.rawQuery ?: return url
+        val rawQuery = uri.rawQuery ?: return target
 
         val keptPairs = rawQuery.split("&")
             .filter { it.isNotEmpty() }

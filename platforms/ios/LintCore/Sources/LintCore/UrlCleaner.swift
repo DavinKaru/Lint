@@ -1,6 +1,7 @@
 import Foundation
 
-/// Strips known tracking query parameters from URLs found in shared text.
+/// Strips known tracking query parameters from URLs found in shared text, after unwrapping any
+/// known redirect link (e.g. google.com/url?q=...) to the real link inside it.
 ///
 /// Swift port of Android's `UrlCleaner.kt`. The rules both share live in shared/rules/rules.json.
 public enum UrlCleaner {
@@ -54,13 +55,100 @@ public enum UrlCleaner {
         return text.replacingCharacters(in: match.range, with: cleaned)
     }
 
-    /// Removes tracking query parameters from a single URL string, preserving any
-    /// non-tracking query parameters and the fragment. Returns nil if the URL can't be parsed.
+    /// Unwraps known redirect links (Gmail's google.com/url?q=..., l.facebook.com/l.php?u=...,
+    /// Outlook Safe Links, ...) to the real link they point at, entirely offline. Wrappers inside
+    /// wrappers are unwrapped too. Anything that isn't a known wrapper with a valid http(s) link
+    /// inside is returned unchanged.
+    public static func unwrap(_ url: String) -> String {
+        var current = url
+        for _ in 0..<maxUnwrapDepth {
+            guard let next = unwrapOnce(current) else { return current }
+            current = next
+        }
+        return current
+    }
+
+    private static let maxUnwrapDepth = 5
+
+    private static func unwrapOnce(_ url: String) -> String? {
+        guard let components = URLComponents(string: url), let host = components.host?.lowercased(), !host.isEmpty else { return nil }
+        let path = components.percentEncodedPath.isEmpty ? "/" : components.percentEncodedPath
+
+        for wrapper in GeneratedRules.pathWrappers {
+            guard wrapper.sites.contains(where: { hostMatches(host, $0) }), path.hasPrefix(wrapper.prefix) else { continue }
+            var rest = String(path.dropFirst(wrapper.prefix.count))
+            if let query = components.percentEncodedQuery { rest += "?" + query }
+            if let fragment = components.percentEncodedFragment { rest += "#" + fragment }
+            return validTarget(wrapper.scheme + "://" + rest)
+        }
+
+        guard let query = components.percentEncodedQuery else { return nil }
+        let pairs = query.split(separator: "&", omittingEmptySubsequences: true).map(String.init)
+        for wrapper in GeneratedRules.redirectWrappers {
+            guard wrapper.sites.contains(where: { hostMatches(host, $0) }),
+                  wrapper.paths.contains(where: { pathMatches(path, $0) })
+            else { continue }
+            for param in wrapper.params {
+                guard let pair = pairs.first(where: { $0.hasPrefix(param + "=") }),
+                      let target = percentDecode(String(pair.dropFirst(param.count + 1)))
+                else { continue }
+                if let valid = validTarget(target) { return valid }
+            }
+        }
+        return nil
+    }
+
+    private static func pathMatches(_ path: String, _ pattern: String) -> Bool {
+        pattern.hasSuffix("*") ? path.hasPrefix(String(pattern.dropLast())) : path == pattern
+    }
+
+    /// `target` if it's an http(s) link that parses with a host, otherwise nil.
+    private static func validTarget(_ target: String) -> String? {
+        let lower = target.lowercased()
+        guard lower.hasPrefix("http://") || lower.hasPrefix("https://") else { return nil }
+        guard !target.unicodeScalars.contains(where: { CharacterSet.whitespacesAndNewlines.contains($0) || CharacterSet.controlCharacters.contains($0) })
+        else { return nil }
+        guard let host = URLComponents(string: target)?.host, !host.isEmpty else { return nil }
+        return target
+    }
+
+    /// Strict percent-decoding ("+" stays "+"): nil if malformed or not valid UTF-8.
+    private static func percentDecode(_ value: String) -> String? {
+        let utf8 = Array(value.utf8)
+        var bytes: [UInt8] = []
+        bytes.reserveCapacity(utf8.count)
+        var i = 0
+        while i < utf8.count {
+            if utf8[i] == UInt8(ascii: "%") {
+                guard i + 2 < utf8.count, let hi = hexValue(utf8[i + 1]), let lo = hexValue(utf8[i + 2]) else { return nil }
+                bytes.append(hi << 4 | lo)
+                i += 3
+            } else {
+                bytes.append(utf8[i])
+                i += 1
+            }
+        }
+        return String(bytes: bytes, encoding: .utf8)
+    }
+
+    private static func hexValue(_ byte: UInt8) -> UInt8? {
+        switch byte {
+        case UInt8(ascii: "0")...UInt8(ascii: "9"): byte - UInt8(ascii: "0")
+        case UInt8(ascii: "a")...UInt8(ascii: "f"): byte - UInt8(ascii: "a") + 10
+        case UInt8(ascii: "A")...UInt8(ascii: "F"): byte - UInt8(ascii: "A") + 10
+        default: nil
+        }
+    }
+
+    /// Unwraps `url` if it's a known redirect link (see `unwrap`), then removes tracking query
+    /// parameters, preserving any non-tracking query parameters and the fragment. Returns nil if
+    /// the URL can't be parsed.
     ///
     /// Works on the raw string rather than rebuilding from parsed components, so everything
     /// other than the removed params (percent-encoding, param order, the fragment) is kept
     /// byte-for-byte.
-    public static func cleanUrl(_ url: String) -> String? {
+    public static func cleanUrl(_ original: String) -> String? {
+        let url = unwrap(original)
         guard let components = URLComponents(string: url) else { return nil }
 
         var beforeFragment = Substring(url)

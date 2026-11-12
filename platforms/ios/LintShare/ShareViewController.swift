@@ -71,14 +71,19 @@ final class ShareViewController: UIViewController {
         let sharedText = content.text
         let cleanedText: String
 
-        if let urlMatch = UrlCleaner.findFirstUrl(in: sharedText), ShortLinkResolver.isKnownShortLink(urlMatch.url) {
-            logger.debug("known short link detected, resolving: \(urlMatch.url)")
+        // Peel off redirect wrappers first (offline), so a short link hidden inside one, e.g. a
+        // youtu.be link in a Gmail google.com/url?q=... link, still gets resolved.
+        let urlMatch = UrlCleaner.findFirstUrl(in: sharedText)
+        let targetUrl = urlMatch.map { UrlCleaner.unwrap($0.url) }
+
+        if let urlMatch, let targetUrl, ShortLinkResolver.isKnownShortLink(targetUrl) {
+            logger.debug("known short link detected, resolving: \(targetUrl)")
             withAnimation(.snappy) { cardModel.phase = .resolving }
             // Short links carry no tracking params directly -- they only appear after the
             // redirect to the full URL, so resolve first. Every other link below completes with
             // no network access.
-            let resolvedUrl = await ShortLinkResolver.resolveOverNetwork(urlMatch.url)
-            if resolvedUrl == urlMatch.url {
+            let resolvedUrl = await ShortLinkResolver.resolveOverNetwork(targetUrl)
+            if resolvedUrl == targetUrl {
                 logger.warning("resolution failed or timed out, falling back to original short link")
             } else {
                 logger.debug("resolved to: \(resolvedUrl)")

@@ -1,5 +1,5 @@
 {
-  "_about": "Real shared links and what Lint must turn them into, checked by both the Android and iOS tests. Add a case for every source Lint supports or deliberately skips. Replace personal values (names, plates, per-share tokens) with placeholders before adding them. See shared/tests/README.md.",
+  "_about": "Real shared links (and well-documented share formats, marked verified: null until checked from a phone) and what Lint must turn them into, checked by both the Android and iOS tests. Add a case for every source Lint supports or deliberately skips. Replace personal values (names, plates, per-share tokens) with placeholders before adding them. See shared/tests/README.md.",
   "version": 1,
   "clean": [
     {
@@ -229,6 +229,206 @@
       "expected": "https://feverup.com/m/471615",
       "verified": "2026-10-30",
       "notes": "Shared via Secret Melbourne. suid value is a placeholder."
+    },
+    {
+      "source": "Gmail / Google Docs",
+      "category": "Search & ads",
+      "input": "https://www.google.com/url?q=https://example.com/article?utm_source%3Dnewsletter%26id%3D42&source=gmail&ust=1700000000000000&usg=AOvVaw0abcDEF",
+      "expected": "https://example.com/article?id=42",
+      "verified": null,
+      "notes": "Gmail-wrapped link: the inner link's own query is percent-encoded inside q. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://www.google.com.au/url?sa=t&rct=j&q=&esrc=s&source=web&url=https%3A%2F%2Fwww.abc.net.au%2Fnews%2Fstory&ved=2ahUKE&usg=AOvVaw1",
+      "expected": "https://www.abc.net.au/news/story",
+      "verified": null,
+      "notes": "Empty q, real link in url; Australian Google domain. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://www.google.com/url?q=not-a-link&sa=D",
+      "expected": "https://www.google.com/url?q=not-a-link&sa=D",
+      "verified": null,
+      "notes": "No http(s) link inside: left as it is. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://www.google.com/search?q=https%3A%2F%2Fexample.com&ei=abc",
+      "expected": "https://www.google.com/search?q=https%3A%2F%2Fexample.com",
+      "verified": null,
+      "notes": "A search for a URL isn't a redirect: only ei is stripped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Google AMP",
+      "category": "Search & ads",
+      "input": "https://www.google.com/amp/s/www.example.com/news/story.amp",
+      "expected": "https://www.example.com/news/story.amp",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Outlook Safe Links",
+      "category": "Search & ads",
+      "input": "https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fexample.com%2Fdocs%3Fpage%3D2%26utm_medium%3Demail&data=05%7C01%7Cuser%40example.com%7Cabc&sdata=xyz%3D&reserved=0",
+      "expected": "https://example.com/docs?page=2",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Outlook Safe Links",
+      "category": "Search & ads",
+      "input": "https://eur01.safelinks.protection.outlook.com/ap/w-59584e83/?url=https%3A%2F%2Fexample.com%2F&data=05%7C02&reserved=0",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Newer /ap/... path form. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook",
+      "category": "Social",
+      "input": "https://l.facebook.com/l.php?u=https%3A%2F%2Fexample.com%2Farticle%3Fid%3D7%26fbclid%3DIwAR0abc&h=AT0xyz&s=1",
+      "expected": "https://example.com/article?id=7",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook",
+      "category": "Social",
+      "input": "https://l.facebook.com.evil.com/l.php?u=https%3A%2F%2Fexample.com%2F",
+      "expected": "https://l.facebook.com.evil.com/l.php?u=https%3A%2F%2Fexample.com%2F",
+      "verified": null,
+      "notes": "Lookalike host: not unwrapped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook",
+      "category": "Social",
+      "input": "https://l.facebook.com/l.php?u=javascript%3Aalert(1)&h=AT0",
+      "expected": "https://l.facebook.com/l.php?u=javascript%3Aalert(1)&h=AT0",
+      "verified": null,
+      "notes": "Only http(s) targets are unwrapped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Facebook",
+      "category": "Social",
+      "input": "https://l.facebook.com/l.php?u=https%3A%2F%2Fexample.com%2F%ZZbad&h=AT0",
+      "expected": "https://l.facebook.com/l.php?u=https%3A%2F%2Fexample.com%2F%ZZbad&h=AT0",
+      "verified": null,
+      "notes": "Malformed percent-encoding: left as it is rather than guessed. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Instagram",
+      "category": "Social",
+      "input": "https://l.instagram.com/?u=https%3A%2F%2Fexample.com%2Fshop%3Futm_source%3Dig_bio&e=AT0abc",
+      "expected": "https://example.com/shop",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Threads",
+      "category": "Social",
+      "input": "https://l.threads.net/?u=https%3A%2F%2Fexample.com%2Fpost&e=AT0",
+      "expected": "https://example.com/post",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Messenger",
+      "category": "Social",
+      "input": "https://l.messenger.com/l.php?u=https%3A%2F%2Fexample.com%2F&h=AT0",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "YouTube",
+      "category": "Video & music",
+      "input": "https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqbXyz&q=https%3A%2F%2Fexample.com%2Fmerch%3Futm_campaign%3Dyt&v=dQw4w9WgXcQ",
+      "expected": "https://example.com/merch",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "LinkedIn",
+      "category": "Social",
+      "input": "https://www.linkedin.com/redir/redirect?url=https%3A%2F%2Fexample.com%2Fpost&urlhash=abc&trk=public_post-text",
+      "expected": "https://example.com/post",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "LinkedIn",
+      "category": "Social",
+      "input": "https://www.linkedin.com/safety/go?url=https%3A%2F%2Fexample.com%2Fjob&trk=flagship-messaging-web",
+      "expected": "https://example.com/job",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Reddit",
+      "category": "Social",
+      "input": "https://out.reddit.com/t3_abc123?url=https%3A%2F%2Fexample.com%2Fstory&token=AQAAabc&app_name=web2x",
+      "expected": "https://example.com/story",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "DuckDuckGo",
+      "category": "Search & ads",
+      "input": "https://duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.com%2F&rut=abc123",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Slack",
+      "category": "Work & productivity",
+      "input": "https://slack-redir.net/link?url=https%3A%2F%2Fexample.com%2Fdoc",
+      "expected": "https://example.com/doc",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Steam",
+      "category": "Social",
+      "input": "https://steamcommunity.com/linkfilter/?u=https%3A%2F%2Fexample.com%2F",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "VK",
+      "category": "Social",
+      "input": "https://vk.com/away.php?to=https%3A%2F%2Fexample.com%2F&cc_key=",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Tumblr",
+      "category": "Social",
+      "input": "https://t.umblr.com/redirect?z=https%3A%2F%2Fexample.com%2F&t=abc",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Nested wrappers",
+      "category": "All sites",
+      "input": "https://www.google.com/url?q=https://l.facebook.com/l.php?u%3Dhttps%253A%252F%252Fexample.com%252F%253Ffbclid%253Dx%26h%3DAT0&sa=D",
+      "expected": "https://example.com/",
+      "verified": null,
+      "notes": "A Facebook redirect inside a Gmail link: both are unwrapped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "Gmail / Google Docs",
+      "category": "Search & ads",
+      "input": "Read this: https://www.google.com/url?q=https://example.com/a?utm_source%3Dx&sa=D thanks",
+      "expected": "Read this: https://example.com/a thanks",
+      "verified": null,
+      "notes": "Wrapped link inside shared text. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     }
   ],
   "shortLinks": [
@@ -310,6 +510,25 @@
       "url": "https://d.didiglobal.com/xxxxxxx",
       "known": false,
       "notes": "Deliberately not resolved for now (#5)."
+    }
+  ],
+  "unwrap": [
+    {
+      "source": "Gmail / Google Docs",
+      "input": "https://www.google.com/url?q=https://youtu.be/dQw4w9WgXcQ?si%3Dabc&sa=D",
+      "expected": "https://youtu.be/dQw4w9WgXcQ?si=abc",
+      "notes": "Unwrapped before the short-link check, so the youtu.be link inside still gets resolved."
+    },
+    {
+      "source": "Facebook",
+      "input": "https://l.facebook.com/l.php?u=https%3A%2F%2Ft.co%2Fabc123&h=AT0",
+      "expected": "https://t.co/abc123"
+    },
+    {
+      "source": "Generic",
+      "input": "https://example.com/?u=https%3A%2F%2Fother.com",
+      "expected": "https://example.com/?u=https%3A%2F%2Fother.com",
+      "notes": "Not a known wrapper: unchanged."
     }
   ]
 }

@@ -21,8 +21,16 @@ struct SharedLinkCasesTests {
         var testDescription: String { "\(source): \(url)" }
     }
 
+    struct UnwrapCase: Decodable, Sendable, CustomTestStringConvertible {
+        let source: String
+        let input: String
+        let expected: String
+        var testDescription: String { "\(source): \(input.prefix(80))" }
+    }
+
     struct Cases: Decodable, Sendable {
         let clean: [CleanCase]
+        let unwrap: [UnwrapCase]
         let shortLinks: [ShortLinkCase]
     }
 
@@ -51,6 +59,11 @@ struct SharedLinkCasesTests {
     @Test(arguments: cases.clean)
     func cleansSharedCase(_ testCase: CleanCase) {
         #expect(UrlCleaner.cleanFirstUrl(in: testCase.input) == testCase.expected)
+    }
+
+    @Test(arguments: cases.unwrap)
+    func unwrapsSharedCase(_ testCase: UnwrapCase) {
+        #expect(UrlCleaner.unwrap(testCase.input) == testCase.expected)
     }
 
     @Test(arguments: cases.shortLinks)
