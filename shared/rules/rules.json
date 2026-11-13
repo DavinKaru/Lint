@@ -140,9 +140,6 @@
     },
     {
       "params": [
-        "ascsubtag",
-        "camp",
-        "creative",
         "dchild",
         "qid",
         "refRID",
@@ -151,7 +148,7 @@
         "srs"
       ],
       "source": "Amazon",
-      "notes": "camp, creative, qid, smid and srs are generic names, under review in #15."
+      "notes": "qid, smid and srs are generic names, under review in #15."
     },
     {
       "params": [
@@ -235,7 +232,7 @@
         "sg"
       ],
       "source": "Eventbrite",
-      "notes": "aff records how a link was shared (e.g. ebdsshandroid, ebdsshsms); sg is a long per-share token. Eventbrite uses a domain per country, hence the wildcard."
+      "notes": "aff records how a link was shared (e.g. ebdsshandroid, ebdsshsms) and sg is a long per-share token, both added when you share. Eventbrite uses a domain per country, hence the wildcard."
     },
     {
       "sites": [
@@ -309,15 +306,12 @@
         "pf_rd_i",
         "pf_rd_m",
         "content-id",
-        "linkCode",
-        "linkId",
-        "creativeASIN",
         "social_share",
         "_encoding",
         "ref_"
       ],
       "source": "Amazon (full links, every country domain)",
-      "notes": "Search and recommendation context on product links (keywords and sprefix carry what you searched for). Variant selectors th and psc are kept, and so is the tag affiliate ID (see the affiliate-ID decision issue). keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query."
+      "notes": "Search and recommendation context on product links (sprefix carries what you searched for). Variant selectors th and psc are kept. Affiliate link params (tag, linkCode, linkId, ascsubtag, creativeASIN, camp, creative) are kept, see affiliateParams. keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query."
     },
     {
       "sites": [
@@ -347,11 +341,10 @@
         "itunes.apple.com"
       ],
       "params": [
-        "uo",
-        "ct"
+        "uo"
       ],
       "source": "Apple Music, Podcasts and App Store",
-      "notes": "uo and ct are campaign/origin tracking. i= (the track or episode), mt= and app= are kept; the at= affiliate token is kept too."
+      "notes": "uo is origin tracking. i= (the track or episode), mt= and app= are kept, and so are the at= affiliate token and ct= campaign token (see affiliateParams)."
     },
     {
       "sites": [
@@ -362,7 +355,7 @@
         "showWelcomeOnShare"
       ],
       "source": "Substack",
-      "notes": "r is the sharer's referral ID. triedRedirect is left alone because custom-domain redirects use it."
+      "notes": "r is the referral ID of whoever shared the link, added when you share, so it identifies you and is removed (unlike affiliate IDs, see affiliateParams). triedRedirect is left alone because custom-domain redirects use it."
     },
     {
       "sites": [
@@ -542,20 +535,13 @@
         "_trksid",
         "_from",
         "hash",
-        "mkcid",
-        "mkevt",
-        "mkrid",
-        "campid",
-        "toolid",
-        "customid",
         "ssspo",
         "sssrc",
         "ssuid",
-        "widget_ver",
-        "amdata"
+        "widget_ver"
       ],
       "source": "eBay",
-      "notes": "Search, share-sheet (sss*) and partner-network (mk*, campid) tracking. var= picks the variation and epid= the product, so both are kept."
+      "notes": "Search and share-sheet (sss*) tracking. var= picks the variation and epid= the product, so both are kept, and so are the eBay Partner Network params (see affiliateParams). eBay's own app shares carry mkcid, mkrid and mkevt too; they're kept as well, since they can't be told apart from a partner's."
     },
     {
       "sites": [
@@ -569,11 +555,6 @@
         "pvid",
         "algo_pvid",
         "algo_exp_id",
-        "aff_platform",
-        "aff_trace_key",
-        "aff_fcid",
-        "aff_fsk",
-        "sk",
         "terminal_id",
         "afSmartRedirect",
         "gatewayAdapt",
@@ -590,7 +571,7 @@
         "_randl_shipto"
       ],
       "source": "AliExpress",
-      "notes": "Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price."
+      "notes": "Page, algorithm and share tracking. pdp_ext_f and pdp_npi are kept: they can carry the chosen SKU and price. The aff_* and sk affiliate params are kept (see affiliateParams)."
     },
     {
       "sites": [
@@ -644,16 +625,10 @@
         "refer_page_sn",
         "_x_sessn_id",
         "share_uin",
-        "_x_vst_scene",
-        "_x_ads_channel",
-        "_x_ads_sub_channel",
-        "_x_ads_account",
-        "_x_ads_set",
-        "_x_ads_id",
-        "_x_ads_creative_id"
+        "_x_vst_scene"
       ],
       "source": "Temu",
-      "notes": "Session, sharer (share_uin) and ad tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept."
+      "notes": "Session and sharer (share_uin) tracking. goods_id, sku_id and _x_ns_sku_id pick the product and are kept, and so are the _x_ads_* params, which credit Temu affiliates (see affiliateParams)."
     },
     {
       "sites": [
@@ -669,13 +644,10 @@
         "athguid",
         "athwpid",
         "athena",
-        "athancid",
-        "sourceid",
-        "veh",
-        "wmlspartner"
+        "athancid"
       ],
       "source": "Walmart",
-      "notes": "ath* are recommendation-carousel tracking. classType and selected are kept."
+      "notes": "ath* are recommendation-carousel tracking. classType and selected are kept, and so are the affiliate params (see affiliateParams)."
     },
     {
       "sites": [
@@ -746,7 +718,7 @@
         "clickId"
       ],
       "source": "Klook",
-      "notes": "Page tracking. aid (affiliate) is kept for now, see #28."
+      "notes": "Page tracking. aid (affiliate) is kept, see affiliateParams."
     },
     {
       "sites": [
@@ -1258,6 +1230,120 @@
         "/ap/signin/**"
       ],
       "source": "Amazon sign-in"
+    }
+  ],
+  "affiliateParams": [
+    {
+      "sites": [
+        "amazon.*"
+      ],
+      "params": [
+        "tag",
+        "linkCode",
+        "linkId",
+        "ascsubtag",
+        "creativeASIN",
+        "camp",
+        "creative"
+      ],
+      "source": "Amazon Associates",
+      "notes": "tag credits the associate; the rest are parts of the affiliate link Amazon generates or the associate's own sub-ID."
+    },
+    {
+      "sites": [
+        "apple.com"
+      ],
+      "params": [
+        "at",
+        "ct"
+      ],
+      "source": "Apple Services Performance Partners",
+      "notes": "at credits the affiliate and ct is the affiliate's own campaign token (https://performance-partners.apple.com/linking), like Amazon's ascsubtag. App Store Connect campaign links use ct too."
+    },
+    {
+      "sites": [
+        "ebay.*"
+      ],
+      "params": [
+        "campid",
+        "customid",
+        "toolid",
+        "mkcid",
+        "mkrid",
+        "mkevt",
+        "amdata"
+      ],
+      "source": "eBay Partner Network",
+      "notes": "campid identifies the partner and customid is their sub-ID; EPN needs mkcid, mkrid and mkevt with it to credit the click, and amdata carries a priority listing's payload (https://developer.ebay.com/api-docs/buy/static/ref-epn-link.html)."
+    },
+    {
+      "sites": [
+        "aliexpress.*"
+      ],
+      "params": [
+        "aff_platform",
+        "aff_trace_key",
+        "aff_fcid",
+        "aff_fsk",
+        "sk"
+      ],
+      "source": "AliExpress Portals",
+      "notes": "sk and aff_fsk identify the affiliate link. aff_fcid and aff_trace_key look like per-click IDs (see PRIVACY.md), kept because the affiliate network uses them to credit the click."
+    },
+    {
+      "sites": [
+        "walmart.com"
+      ],
+      "params": [
+        "wmlspartner",
+        "sourceid",
+        "veh"
+      ],
+      "source": "Walmart affiliates (Impact)"
+    },
+    {
+      "sites": [
+        "temu.com"
+      ],
+      "params": [
+        "_x_ads_channel",
+        "_x_ads_sub_channel",
+        "_x_ads_account",
+        "_x_ads_set",
+        "_x_ads_id",
+        "_x_ads_creative_id"
+      ],
+      "source": "Temu affiliates",
+      "notes": "Temu affiliate links carry the affiliate's channel and account in _x_ads_* (e.g. _x_ads_channel=kol_affiliate). Temu's own ad links use the same names; they're kept too."
+    },
+    {
+      "sites": [
+        "klook.com"
+      ],
+      "params": [
+        "aid"
+      ],
+      "source": "Klook affiliates"
+    },
+    {
+      "sites": [
+        "getyourguide.com"
+      ],
+      "params": [
+        "partner_id"
+      ],
+      "source": "GetYourGuide partners"
+    },
+    {
+      "sites": [
+        "booking.com"
+      ],
+      "params": [
+        "aid",
+        "label"
+      ],
+      "source": "Booking.com affiliates",
+      "notes": "aid is the affiliate ID and label the partner's own sub-ID for it."
     }
   ]
 }

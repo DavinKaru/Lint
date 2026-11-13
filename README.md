@@ -16,6 +16,16 @@ Lint has no visible UI beyond the OS share sheet:
 
 The one exception: for known short links, Lint briefly shows a small loading screen while it resolves the short link's real destination on-device — everything else stays instant with no UI of Lint's own (on iOS, the system shows Lint's sheet behind the re-opened share sheet). See [`PRIVACY.md`](PRIVACY.md) for exactly which domains, what that involves, and why it's safe.
 
+**Affiliate IDs are kept.** When a link credits whoever recommended it (Amazon's `tag`, Apple's
+`at`, eBay Partner Network's `campid`, AliExpress's `aff_*`, ...), Lint leaves those parameters
+alone: they're how creators and small sites get paid, and removing them doesn't make the link
+work any better. The search and share tracking around them is still removed, and so are
+referral codes an app adds when *you* share (Substack's `r`), since those identify you. Some
+affiliate params are per-click IDs; [`PRIVACY.md`](PRIVACY.md) says which. The
+ones Lint guarantees to keep are listed as `affiliateParams` in
+[`shared/rules/rules.json`](shared/rules/rules.json); others are kept simply because no rule
+strips them.
+
 Which links Lint handles, which are being looked into, and which it deliberately leaves alone (and why) are tracked on the [Link support board](https://github.com/users/DavinKaru/projects/1). If a link isn't cleaned, [report it](https://github.com/DavinKaru/Lint/issues/new?template=link-not-cleaned.yml).
 
 There are no accounts and no settings screens. Almost everything happens fully offline, and on-device.
