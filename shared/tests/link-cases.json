@@ -1488,6 +1488,86 @@
       "expected": "https://track.example-carrier.com/track?trackingId=AB123456789AU",
       "verified": null,
       "notes": "Some carriers' tracking pages and APIs take the parcel number as trackingId, so it's only stripped on LinkedIn (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Airbnb",
+      "category": "Events & travel",
+      "input": "https://www.airbnb.com.au/rooms/12345678?adults=2&children=1&check_in=2027-01-10&check_out=2027-01-14&photo_id=1234567&viralityEntryPoint=1&unique_share_id=00000000-0000-4000-8000-000000000000&slcid=0123456789abcdef0123456789abcdef&s=76&utm_source=ABC123",
+      "expected": "https://www.airbnb.com.au/rooms/12345678?adults=2&children=1&check_in=2027-01-10&check_out=2027-01-14&photo_id=1234567&viralityEntryPoint=1&unique_share_id=00000000-0000-4000-8000-000000000000&slcid=0123456789abcdef0123456789abcdef&s=76",
+      "verified": null,
+      "notes": "Guests, dates and photo_id pick what the link shows and must stay. unique_share_id, viralityEntryPoint, slcid and s look like share tracking but are left in until a real share is checked. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+    },
+    {
+      "source": "Booking.com",
+      "category": "Events & travel",
+      "input": "https://www.booking.com/hotel/au/example.html?aid=1234567&label=gen000nr-1AAAAAAAAAAAAAAAA&sid=0123456789abcdef0123456789abcdef&checkin=2027-01-10&checkout=2027-01-12&group_adults=2&group_children=1&age=7&no_rooms=1&utm_medium=ABC123",
+      "expected": "https://www.booking.com/hotel/au/example.html?aid=1234567&label=gen000nr-1AAAAAAAAAAAAAAAA&sid=0123456789abcdef0123456789abcdef&checkin=2027-01-10&checkout=2027-01-12&group_adults=2&group_children=1&age=7&no_rooms=1",
+      "verified": null,
+      "notes": "Dates, guests, ages and rooms must stay; aid (the affiliate ID) and label (the partner's sub-ID for it) are kept (#28). On ordinary shares from Booking's own site, aid and label may be Booking's own defaults rather than a partner's; check against a real share. sid is a session ID but is left in: no Booking.com strip rules yet, only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+    },
+    {
+      "source": "Expedia",
+      "category": "Events & travel",
+      "input": "https://www.expedia.com.au/Sydney-Hotels-Example.h12345678.Hotel-Information?chkin=2027-01-10&chkout=2027-01-12&rm1=a2&regionId=1234&rfrr=ABC123&utm_campaign=ABC123",
+      "expected": "https://www.expedia.com.au/Sydney-Hotels-Example.h12345678.Hotel-Information?chkin=2027-01-10&chkout=2027-01-12&rm1=a2&regionId=1234&rfrr=ABC123",
+      "verified": null,
+      "notes": "Dates, rooms (rm1=a2 is two adults) and regionId must stay. rfrr is referrer tracking but is left in until a real share is checked. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+    },
+    {
+      "source": "Google Flights",
+      "category": "Events & travel",
+      "input": "https://www.google.com/travel/flights/search?tfs=CBwQAhoeEgoyMDI3LTAxLTEwagcIARIDU1lEcgcIARIDTUVM&tfu=EgYIABAAGAA&hl=en&gl=AU&curr=AUD&utm_source=ABC123",
+      "expected": "https://www.google.com/travel/flights/search?tfs=CBwQAhoeEgoyMDI3LTAxLTEwagcIARIDU1lEcgcIARIDTUVM&tfu=EgYIABAAGAA&hl=en&gl=AU&curr=AUD",
+      "verified": null,
+      "notes": "tfs is the whole search (route, dates, passengers, cabin) and must stay, along with tfu, hl, gl and curr. No Google Flights rules yet: only the global rules and the general google.* ones (cd, ei, g_st, g_ep) apply until a real share is checked. Format from public sources, not taken from a real share."
+    },
+    {
+      "source": "Skyscanner",
+      "category": "Events & travel",
+      "input": "https://www.skyscanner.com.au/transport/flights/syd/mel/270110/270114/?adultsv2=1&childrenv2=&cabinclass=economy&rtn=1&preferdirects=false&ref=home",
+      "expected": "https://www.skyscanner.com.au/transport/flights/syd/mel/270110/270114/?adultsv2=1&childrenv2=&cabinclass=economy&rtn=1&preferdirects=false&ref=home",
+      "verified": null,
+      "notes": "The route and dates are in the path; passengers, cabin and filters must stay. ref=home is tracking but is left in: ref is only stripped on sites known to use it that way (#15). No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+    },
+    {
+      "source": "Uber trip share",
+      "category": "Maps & ride-share",
+      "input": "https://trip.uber.com/AbCdEf123456?utm_source=ABC123",
+      "expected": "https://trip.uber.com/AbCdEf123456",
+      "verified": null,
+      "notes": "The path token is the trip; the link is useless without it. Format from Uber's API (rider_tracking_url). No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+    },
+    {
+      "source": "Lyft trip share",
+      "category": "Maps & ride-share",
+      "input": "https://www.lyft.com/sr/AbCdEf123456",
+      "expected": "https://www.lyft.com/sr/AbCdEf123456",
+      "verified": null,
+      "notes": "The path token is the ride; left unchanged. The lyft.com/sr/ format was only seen in a 2017 user post, so the current format is unconfirmed. No site rules yet: only Lint's global rules apply until a real share is checked."
+    },
+    {
+      "source": "Ola trip share",
+      "category": "Maps & ride-share",
+      "input": "https://www.olacabs.com/track/abc12345",
+      "expected": "https://www.olacabs.com/track/abc12345",
+      "verified": null,
+      "notes": "The path is the ride (Ola's API share_ride_url); left unchanged. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+    },
+    {
+      "source": "SMH / The Age (AU)",
+      "category": "News & newsletters",
+      "input": "https://www.smh.com.au/national/example-article-20270110-p5abcd.html?ref=rss&utm_medium=rss&utm_source=rss_feed",
+      "expected": "https://www.smh.com.au/national/example-article-20270110-p5abcd.html?ref=rss",
+      "verified": null,
+      "notes": "utm_* is stripped; ref=rss is left in until gift links are checked (ref is only stripped on known sites, #15). This case doesn't exercise gift links, the reason SMH is a break risk: those haven't been seen yet. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
+    },
+    {
+      "source": "Shopify stores",
+      "category": "Shopping",
+      "input": "https://store.example/products/example-shirt?variant=12345678901234&pr_prod_strat=copurchase&pr_rec_pid=12&pr_ref_pid=34&pr_seq=uniform&_pos=1&_sid=abc123&_ss=r&utm_source=ABC123",
+      "expected": "https://store.example/products/example-shirt?variant=12345678901234&pr_prod_strat=copurchase&pr_rec_pid=12&pr_ref_pid=34&pr_seq=uniform&_pos=1&_sid=abc123&_ss=r",
+      "verified": null,
+      "notes": "variant picks the product option and must stay. Stores use their own domains, so Shopify's recommendation (pr_*) and search (_pos, _sid, _ss) tracking would need global rules; left in until reviewed. No site rules yet: only Lint's global rules apply until a real share is checked. Format from public sources, not taken from a real share."
     }
   ],
   "shortLinks": [
