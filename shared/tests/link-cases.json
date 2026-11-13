@@ -266,6 +266,14 @@
       "notes": "A search for a URL isn't a redirect: only ei is stripped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://example.com/listing?cd=2&ei=abc123",
+      "expected": "https://example.com/listing?cd=2&ei=abc123",
+      "verified": null,
+      "notes": "cd and ei are only stripped on Google (#15). Written for the test set, not taken from a real share."
+    },
+    {
       "source": "Google AMP",
       "category": "Search & ads",
       "input": "https://www.google.com/amp/s/www.example.com/news/story.amp",
@@ -826,6 +834,14 @@
       "notes": "Passed through unchanged; GitHub's own params are under review in #15. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
     },
     {
+      "source": "GitHub",
+      "category": "Work & productivity",
+      "input": "https://api.github.com/repos/example/repo/contents/README.md?ref=feature-branch",
+      "expected": "https://api.github.com/repos/example/repo/contents/README.md?ref=feature-branch",
+      "verified": null,
+      "notes": "ref is the branch, tag or commit (GitHub's REST docs), so it is never stripped here (#15). Written for the test set, not taken from a real share."
+    },
+    {
       "source": "eBay",
       "category": "Shopping",
       "input": "https://www.ebay.com.au/itm/123456789012?var=987654321&_trkparms=amclksrc%3DITM&_trksid=p4429486.c101224&ssspo=AbCd&sssrc=2047675&ssuid=xyz&widget_ver=artemis",
@@ -1362,12 +1378,116 @@
       "notes": "An Associates link: tag, linkCode and linkId are the creator's affiliate link and stay (#28); crid and ref_ are tracking. Written for the test set, not taken from a real share."
     },
     {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/gp/product/B0ABCDEF12/?smid=A1EXAMPLESELLER&psc=1&qid=1730000000",
+      "expected": "https://www.amazon.com/gp/product/B0ABCDEF12/?smid=A1EXAMPLESELLER&psc=1",
+      "verified": null,
+      "notes": "smid picks the seller's offer (and its price), so it stays on Amazon (#15); qid is search tracking. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/s?srs=17276797011&rh=n%3A1234&qid=1730000000",
+      "expected": "https://www.amazon.com/s?srs=17276797011&rh=n%3A1234",
+      "verified": null,
+      "notes": "On a search page srs can pick the store being browsed, so it's only stripped on product pages (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/dp/B0ABCDEF12?srs=17276797011&psc=1",
+      "expected": "https://www.amazon.com/dp/B0ABCDEF12?psc=1",
+      "verified": null,
+      "notes": "On a product page srs is the store page it was opened from. Written for the test set, not taken from a real share."
+    },
+    {
       "source": "Google Maps short links",
       "category": "Maps & ride-share",
       "input": "https://consent.google.com/ml?continue=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FSydney%2BOpera%2BHouse%2F%40-33.85%2C151.21%2C17z%3Fentry%3Dttu%26g_st%3Dic&gl=AU&hl=en",
       "expected": "https://www.google.com/maps/place/Sydney+Opera+House/@-33.85,151.21,17z?entry=ttu",
       "verified": null,
       "notes": "Unwrapped from the consent page, then g_st stripped. Format from public documentation and observed behaviour, not yet checked against a real share from the phone."
+    },
+    {
+      "source": "GitLab",
+      "category": "Work & productivity",
+      "input": "https://gitlab.com/api/v4/projects/12345/repository/files/README.md/raw?ref=main",
+      "expected": "https://gitlab.com/api/v4/projects/12345/repository/files/README.md/raw?ref=main",
+      "verified": null,
+      "notes": "ref is the branch (GitLab's API docs) and must stay (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "New York Times",
+      "category": "News & newsletters",
+      "input": "https://www.nytimes.com/2026/01/01/world/example-article.html?smid=nytcore-ios-share",
+      "expected": "https://www.nytimes.com/2026/01/01/world/example-article.html",
+      "verified": null,
+      "notes": "smid marks how the article was shared. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Goodreads",
+      "category": "Shopping",
+      "input": "https://www.goodreads.com/book/show/12345678-example-book?from_search=true&from_srp=true&qid=AbCdEf1234&rank=1&ref=nav_sb_ss_1_5",
+      "expected": "https://www.goodreads.com/book/show/12345678-example-book?rank=1",
+      "verified": null,
+      "notes": "A book opened from search: qid identifies the search, and it, from_search, from_srp and ref are stripped (#15). rank is left in. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Kickstarter",
+      "category": "Shopping",
+      "input": "https://www.kickstarter.com/projects/example/example-project?ref=abc123&utm_source=x",
+      "expected": "https://www.kickstarter.com/projects/example/example-project?ref=abc123",
+      "verified": null,
+      "notes": "ref is the creator's referral tag, which creators and paid referral services are credited by, so it's kept like an affiliate ID (#28). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Seek (AU)",
+      "category": "Work & productivity",
+      "input": "https://nz.seek.com/job/12345678?ref=search-standalone",
+      "expected": "https://nz.seek.com/job/12345678",
+      "verified": null,
+      "notes": "Seek New Zealand is served from nz.seek.com; ref is stripped there too. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Reddit",
+      "category": "Social",
+      "input": "https://www.reddit.com/r/example/comments/abc123/example_post/?ref=share&context=3",
+      "expected": "https://www.reddit.com/r/example/comments/abc123/example_post/?context=3",
+      "verified": null,
+      "notes": "ref is only stripped on sites that use it for tracking, like Reddit (#15); context= picks how much of the thread shows. Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "LinkedIn",
+      "category": "Work & productivity",
+      "input": "https://www.linkedin.com/jobs/view/1234567890/?refId=AbCdEf%3D%3D&trackingId=GhIjKl%3D%3D&trk=public_jobs",
+      "expected": "https://www.linkedin.com/jobs/view/1234567890/",
+      "verified": null,
+      "notes": "refId, trackingId and trk are only stripped on LinkedIn (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Google Search",
+      "category": "Search & ads",
+      "input": "https://www.google.com/search?q=example&ei=AbCdEf&cd=1",
+      "expected": "https://www.google.com/search?q=example",
+      "verified": null,
+      "notes": "cd and ei are only stripped on google.* (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Amazon",
+      "category": "Shopping",
+      "input": "https://www.amazon.com/-/es/gp/product/B0ABCDEF12?srs=1234567890&th=1",
+      "expected": "https://www.amazon.com/-/es/gp/product/B0ABCDEF12?th=1",
+      "verified": null,
+      "notes": "srs is stripped on product pages, including /-/<lang>/gp/product/ (#15). Written for the test set, not taken from a real share."
+    },
+    {
+      "source": "Parcel tracking",
+      "category": "Shopping",
+      "input": "https://track.example-carrier.com/track?trackingId=AB123456789AU",
+      "expected": "https://track.example-carrier.com/track?trackingId=AB123456789AU",
+      "verified": null,
+      "notes": "Some carriers' tracking pages and APIs take the parcel number as trackingId, so it's only stripped on LinkedIn (#15). Written for the test set, not taken from a real share."
     }
   ],
   "shortLinks": [

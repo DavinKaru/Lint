@@ -72,11 +72,10 @@
     },
     {
       "params": [
-        "ref",
         "ref_src"
       ],
       "source": "Generic referral",
-      "notes": "Generic names, under review in #15."
+      "notes": "ref_src is distinctive enough to strip everywhere. ref itself is only stripped on sites that use it for tracking: GitHub and GitLab links use ?ref= for the branch (#15)."
     },
     {
       "params": [
@@ -87,8 +86,6 @@
     {
       "params": [
         "aqs",
-        "cd",
-        "ei",
         "iflsig",
         "pcampaignid",
         "rlz",
@@ -99,8 +96,7 @@
         "_ga",
         "_gl"
       ],
-      "source": "Google (Ads, Analytics, Search, Shopping)",
-      "notes": "cd and ei are generic names, under review in #15."
+      "source": "Google (Ads, Analytics, Search, Shopping)"
     },
     {
       "params": [
@@ -123,32 +119,17 @@
         "correlation_id",
         "rdt",
         "ref_campaign",
-        "ref_source",
-        "share_id"
+        "ref_source"
       ],
-      "source": "Reddit",
-      "notes": "share_id is a generic name, under review in #15."
-    },
-    {
-      "params": [
-        "refId",
-        "trackingId",
-        "trk"
-      ],
-      "source": "LinkedIn",
-      "notes": "Generic names, under review in #15."
+      "source": "Reddit"
     },
     {
       "params": [
         "dchild",
-        "qid",
         "refRID",
-        "smid",
-        "spIA",
-        "srs"
+        "spIA"
       ],
-      "source": "Amazon",
-      "notes": "qid, smid and srs are generic names, under review in #15."
+      "source": "Amazon"
     },
     {
       "params": [
@@ -218,7 +199,8 @@
         "eid",
         "referral_code",
         "referral_story_type",
-        "tracking"
+        "tracking",
+        "ref"
       ],
       "source": "Meta / Facebook (including Marketplace)",
       "notes": "eid is a Facebook tracking param, but Google Calendar uses ?eid= to identify an event (#2), so it's only stripped on Facebook. referral_code, referral_story_type and tracking are added to shared Marketplace listings."
@@ -280,10 +262,12 @@
       ],
       "params": [
         "g_st",
-        "g_ep"
+        "g_ep",
+        "cd",
+        "ei"
       ],
-      "source": "Google Maps",
-      "notes": "Added to links resolved from maps.app.goo.gl: g_st is the share type and g_ep encodes the share context. entry= is left alone."
+      "source": "Google (Maps, Search)",
+      "notes": "Maps links resolved from maps.app.goo.gl carry g_st (the share type) and g_ep (the share context); entry= is left alone. cd and ei are search-result tracking, only stripped on Google because the names are generic (#15)."
     },
     {
       "sites": [
@@ -308,7 +292,9 @@
         "content-id",
         "social_share",
         "_encoding",
-        "ref_"
+        "ref_",
+        "qid",
+        "ref"
       ],
       "source": "Amazon (full links, every country domain)",
       "notes": "Search and recommendation context on product links (sprefix carries what you searched for). Variant selectors th and psc are kept. Affiliate link params (tag, linkCode, linkId, ascsubtag, creativeASIN, camp, creative) are kept, see affiliateParams. keywords is only stripped on product pages (below): older search links (amazon.com/s?keywords=...) use it as the query."
@@ -328,10 +314,11 @@
         "/-/*/gp/aw/d/*/**"
       ],
       "params": [
-        "keywords"
+        "keywords",
+        "srs"
       ],
       "source": "Amazon product pages",
-      "notes": "keywords on a product link is what you searched for to find it. Only stripped on product pages: on search links (/s?keywords=...) it is the query. /-/<lang>/ paths are the same pages in another language."
+      "notes": "keywords on a product link is what you searched for to find it, and srs the store page it was opened from. Only stripped on product pages: on search links (/s?keywords=...) keywords is the query, and srs can pick the store being browsed (#15). /-/<lang>/ paths are the same pages in another language."
     },
     {
       "sites": [
@@ -391,7 +378,10 @@
         "lipi",
         "midToken",
         "midSig",
-        "trkEmail"
+        "trkEmail",
+        "refId",
+        "trackingId",
+        "trk"
       ],
       "source": "LinkedIn",
       "notes": "rcm identifies the member who shared a post; lipi, midToken, midSig and trkEmail are page and email tracking. otpToken (email sign-in) is deliberately not listed."
@@ -593,7 +583,8 @@
         "pf_from",
         "logging_key",
         "content_source",
-        "share_time"
+        "share_time",
+        "ref"
       ],
       "source": "Etsy",
       "notes": "Search and share tracking on listing links. variation0/variation1 pick the options and are kept."
@@ -740,6 +731,61 @@
       ],
       "source": "Deezer",
       "notes": "App deep-link plumbing added to shared track links."
+    },
+    {
+      "sites": [
+        "reddit.com"
+      ],
+      "params": [
+        "share_id",
+        "ref"
+      ],
+      "source": "Reddit",
+      "notes": "share_id and ref on post links; share_id is only stripped here because the name is generic (#15)."
+    },
+    {
+      "sites": [
+        "nytimes.com"
+      ],
+      "params": [
+        "smid"
+      ],
+      "source": "New York Times",
+      "notes": "smid marks how an article was shared (smid=nytcore-ios-share). Not stripped on Amazon, where smid picks the seller's offer (#15)."
+    },
+    {
+      "sites": [
+        "goodreads.com"
+      ],
+      "params": [
+        "ref",
+        "qid",
+        "from_search",
+        "from_srp"
+      ],
+      "source": "Goodreads",
+      "notes": "ref marks which part of the page a book link came from; qid, from_search and from_srp mark a link opened from search results (qid identifies the search)."
+    },
+    {
+      "sites": [
+        "seek.com.au",
+        "nz.seek.com"
+      ],
+      "params": [
+        "ref"
+      ],
+      "source": "Seek (AU, NZ)",
+      "notes": "ref marks where a job link was opened from (ref=search-standalone)."
+    },
+    {
+      "sites": [
+        "snapchat.com"
+      ],
+      "params": [
+        "share_id"
+      ],
+      "source": "Snapchat",
+      "notes": "share_id identifies the share on profile links."
     }
   ],
   "shortLinkHosts": [
@@ -846,6 +892,24 @@
     }
   ],
   "neverStrip": [
+    {
+      "params": [
+        "ref"
+      ],
+      "notes": "GitHub's and GitLab's APIs use ?ref= for the branch (#15). Only stripped on sites known to use it for tracking (siteParams)."
+    },
+    {
+      "params": [
+        "smid"
+      ],
+      "notes": "On Amazon, smid picks the seller's offer and price (#15). Only stripped on nytimes.com."
+    },
+    {
+      "params": [
+        "trackingId"
+      ],
+      "notes": "Some carriers use trackingId for the parcel number (#15). Only stripped on LinkedIn."
+    },
     {
       "params": [
         "cid"
@@ -1233,6 +1297,16 @@
     }
   ],
   "affiliateParams": [
+    {
+      "sites": [
+        "kickstarter.com"
+      ],
+      "params": [
+        "ref"
+      ],
+      "source": "Kickstarter referral tags",
+      "notes": "Creators tag their share links with ref= and see pledges per tag; paid referral services like Kickbooster credit backers through the same tag (https://help.kickstarter.com/hc/en-us/articles/115005138933). Kickstarter's own ref=discovery tags can't be told apart, so all are kept."
+    },
     {
       "sites": [
         "amazon.*"

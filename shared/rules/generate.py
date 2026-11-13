@@ -198,7 +198,9 @@ def sites_overlap(a: str, b: str) -> bool:
         endings = {"com", "uk", "com.au", "co.uk"}
         if not other.endswith(".*"):
             labels = other.split(".")
-            endings |= {labels[-1], ".".join(labels[-2:])}
+            # Only endings a wildcard can have: kickstarter.com's "kickstarter.com" isn't one.
+            endings |= {e for e in (labels[-1], ".".join(labels[-2:]))
+                        if re.fullmatch(r"com|[a-z]{2}|(com|co)\.[a-z]{2}", e)}
         return [f"{key[:-2]}.{ending}" for ending in endings]
     return any(matches(h, b) for h in hosts(a, b)) or any(matches(h, a) for h in hosts(b, a))
 
